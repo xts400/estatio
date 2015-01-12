@@ -26,6 +26,10 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.batik.transcoder.Transcoder;
+import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.fop.svg.PDFTranscoder;
 import org.apache.isis.applib.annotation.ActionSemantics;
 import org.apache.isis.applib.annotation.ActionSemantics.Of;
@@ -41,7 +45,6 @@ import org.estatio.dom.document.InteractiveMapDocuments;
 import org.isisaddons.wicket.svg.cpt.applib.InteractiveMap;
 import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapAttribute;
 import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapElement;
-import org.isisaddons.wicket.svg.cpt.export.SVGExport;
 
 @DomainService
 public class InteractiveMapForFixedAssetService {
@@ -57,6 +60,7 @@ public class InteractiveMapForFixedAssetService {
         try {
             String svgString = new String(document.getFile().getBytes(), "UTF-8");
             InteractiveMap interactiveMap = new InteractiveMap(svgString);
+            interactiveMap.setTitle(document.getName());
             for (Unit unit : units.findByProperty(property)) {
                 final Color color = representation.getColorService().getColor(unit);
                 colorMap = ColorMapHelper.addToMap(colorMap, color);
@@ -116,11 +120,13 @@ public class InteractiveMapForFixedAssetService {
         StringReader input = new StringReader(svgContent);
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        SVGExport svgExporter = new SVGExport();
-        svgExporter.setTranscoder(new PDFTranscoder());
-        svgExporter.setInput(input);
-        svgExporter.setOutput(output);
-        svgExporter.transcode();
+        Transcoder transcoder = new PDFTranscoder();
+        try {
+            transcoder.transcode(new TranscoderInput(input), new TranscoderOutput(output));
+        } catch (TranscoderException tx) {
+            throw new RuntimeException("An error occurred while transcoding SVG document '"
+                                       + interactiveMap.getTitle() + "' to PDF", tx);
+        }
 
         return new Blob(property.getName() + ".pdf", "application/pdf", output.toByteArray());
     }
