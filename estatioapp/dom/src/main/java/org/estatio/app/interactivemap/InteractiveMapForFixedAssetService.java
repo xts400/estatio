@@ -16,6 +16,8 @@
  */
 package org.estatio.app.interactivemap;
 
+import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.HashMap;
@@ -24,11 +26,13 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.fop.svg.PDFTranscoder;
 import org.apache.isis.applib.annotation.ActionSemantics;
 import org.apache.isis.applib.annotation.ActionSemantics.Of;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NotInServiceMenu;
 import org.apache.isis.applib.services.linking.DeepLinkService;
+import org.apache.isis.applib.value.Blob;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.asset.Units;
@@ -37,6 +41,7 @@ import org.estatio.dom.document.InteractiveMapDocuments;
 import org.isisaddons.wicket.svg.cpt.applib.InteractiveMap;
 import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapAttribute;
 import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapElement;
+import org.isisaddons.wicket.svg.cpt.export.SVGExport;
 
 @DomainService
 public class InteractiveMapForFixedAssetService {
@@ -97,12 +102,39 @@ public class InteractiveMapForFixedAssetService {
         return documents.allDocuments();
     }
 
-    public boolean hideShowMap(Property property, InteractiveMapForFixedAssetRepresentation representation) {
-        InteractiveMapDocument document = documents.findByFixedAsset(property);
-        return document == null;
+    public boolean hideShowMap(final Property property, final InteractiveMapForFixedAssetRepresentation representation) {
+        return shouldShowSvgActions(property);
     }
 
     // //////////////////////////////////////
+
+    @ActionSemantics(Of.SAFE)
+    @NotInServiceMenu
+    public Blob exportMap(final Property property, final InteractiveMapForFixedAssetRepresentation representation) {
+        InteractiveMap interactiveMap = showMap(property, representation);
+        String svgContent = interactiveMap.parse();
+        StringReader input = new StringReader(svgContent);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        SVGExport svgExporter = new SVGExport();
+        svgExporter.setTranscoder(new PDFTranscoder());
+        svgExporter.setInput(input);
+        svgExporter.setOutput(output);
+        svgExporter.transcode();
+
+        return new Blob(property.getName() + ".pdf", "application/pdf", output.toByteArray());
+    }
+
+    public boolean hideExportMap(final Property property, final InteractiveMapForFixedAssetRepresentation representation) {
+        return shouldShowSvgActions(property);
+    }
+
+    // //////////////////////////////////////
+
+    private boolean shouldShowSvgActions(final Property property) {
+        InteractiveMapDocument document = documents.findByFixedAsset(property);
+        return document == null;
+    }
 
     @Inject
     private InteractiveMapDocuments documents;

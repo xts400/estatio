@@ -23,10 +23,8 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.Named;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.value.Blob;
-
 import org.estatio.dom.EstatioDomainService;
 import org.estatio.dom.asset.FixedAsset;
-import org.estatio.dom.asset.Property;
 
 @DomainService(menuOrder = "10")
 @Named("Documents")

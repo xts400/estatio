@@ -155,6 +155,19 @@ language governing permissions and limitations under the License.
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-transcoder</artifactId>
+            <version>${apache-batik.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.xmlgraphics</groupId>
+            <artifactId>batik-codec</artifactId>
+            <version>${apache-batik.version}</version>
+        </dependency>
+        <!-- SVG -->
+
         <!-- EXCEL -->
         <dependency>
             <groupId>org.isisaddons.module.excel</groupId>

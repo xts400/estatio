@@ -105,6 +105,8 @@ language governing permissions and limitations under the License.
         <!-- must be consistent with the versions defined by the JDO Objectstore -->
         <datanucleus-maven-plugin.version>3.3.2</datanucleus-maven-plugin.version>
 
+        <apache-batik.version>1.7</apache-batik.version>
+
         <!-- override in each module (used by locate global resources) -->
         <siteBaseDir>.</siteBaseDir>
 
