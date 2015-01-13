@@ -1,5 +1,5 @@
 /*
- *  Copyright 2013~2014 Dan Haywood
+ *  Copyright 2015 Eurocommercial Properties NV
  *
  *  Licensed under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
@@ -31,27 +31,39 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.fop.svg.PDFTranscoder;
+
 import org.apache.isis.applib.annotation.ActionSemantics;
 import org.apache.isis.applib.annotation.ActionSemantics.Of;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NotInServiceMenu;
 import org.apache.isis.applib.services.linking.DeepLinkService;
 import org.apache.isis.applib.value.Blob;
+
+import org.isisaddons.wicket.svg.cpt.applib.InteractiveMap;
+import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapAttribute;
+import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapElement;
+
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.asset.Units;
 import org.estatio.dom.document.InteractiveMapDocument;
 import org.estatio.dom.document.InteractiveMapDocuments;
-import org.isisaddons.wicket.svg.cpt.applib.InteractiveMap;
-import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapAttribute;
-import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapElement;
 
 @DomainService
 public class InteractiveMapForFixedAssetService {
 
     @ActionSemantics(Of.SAFE)
     @NotInServiceMenu
+    public InteractiveMapForFixedAssetManager maps(Property property) {
+        return new InteractiveMapForFixedAssetManager(property, InteractiveMapForFixedAssetRepresentation.DEFAULT);
+    }
+
+    @ActionSemantics(Of.SAFE)
+    @NotInServiceMenu
     public InteractiveMap showMap(Property property, InteractiveMapForFixedAssetRepresentation representation) {
+        if (property == null || representation == null) {
+            return null;
+        }
 
         Map<Color, Integer> colorMap = new HashMap<>();
 
@@ -67,7 +79,8 @@ public class InteractiveMapForFixedAssetService {
 
                 // shape
                 InteractiveMapElement element = new InteractiveMapElement(unit.getReference());
-                //element.addAttribute(new InteractiveMapAttribute("fill", color.getColor()));
+                // element.addAttribute(new InteractiveMapAttribute("fill",
+                // color.getColor()));
                 URI link = deepLinkService.deepLinkFor(unit);
                 element.addAttribute(new InteractiveMapAttribute("xlink:href", link.toString()));
                 interactiveMap.addElement(element);
@@ -85,13 +98,18 @@ public class InteractiveMapForFixedAssetService {
 
             int legendId = 1;
             for (Color color : ColorMapHelper.sortByValue(colorMap)) {
-//                // label
-//                interactiveMap.addElement(new InteractiveMapElement(String.format("legend%dText", legendId), color.getLabel()));
-//                // color
-//                final InteractiveMapElement element = new InteractiveMapElement(String.format("legend%dShape", legendId));
-//                element.addAttribute(new InteractiveMapAttribute("fill", color.getColor()));
-//                interactiveMap.addElement(element);
-//                legendId++;
+                // // label
+                // interactiveMap.addElement(new
+                // InteractiveMapElement(String.format("legend%dText",
+                // legendId), color.getLabel()));
+                // // color
+                // final InteractiveMapElement element = new
+                // InteractiveMapElement(String.format("legend%dShape",
+                // legendId));
+                // element.addAttribute(new InteractiveMapAttribute("fill",
+                // color.getColor()));
+                // interactiveMap.addElement(element);
+                // legendId++;
             }
 
             return interactiveMap;
@@ -125,7 +143,7 @@ public class InteractiveMapForFixedAssetService {
             transcoder.transcode(new TranscoderInput(input), new TranscoderOutput(output));
         } catch (TranscoderException tx) {
             throw new RuntimeException("An error occurred while transcoding SVG document '"
-                                       + interactiveMap.getTitle() + "' to PDF", tx);
+                    + interactiveMap.getTitle() + "' to PDF", tx);
         }
 
         return new Blob(property.getName() + ".pdf", "application/pdf", output.toByteArray());
