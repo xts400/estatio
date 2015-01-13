@@ -16,30 +16,43 @@
  */
 package org.estatio.app.interactivemap;
 
-import com.google.common.base.Objects;
-
 public class Color {
-    
+
     final private String color;
-    
+
     final private String label;
-    
-    public Color(String color, String label) {
+
+    public Color(final String color, final String label) {
         this.color = color;
+        this.label = label;
+    }
+
+    public Color(final int r, final int g, final int b, String label) {
+        this.color = String.format("#%02x%02x%02x", r, g, b);
         this.label = label;
     }
 
     public String getColor() {
         return color;
     }
-    
+
     public String getLabel() {
         return label;
     }
 
     @Override
-    public boolean equals(Object other) {
-        return Objects.equal(this, other);
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final Color other = (Color) obj;
+        return this.getColor().equals(other.getColor());
     }
 
     @Override

@@ -18,7 +18,7 @@ package org.estatio.app.interactivemap;
 
 import org.estatio.dom.asset.FixedAsset;
 
-public interface ColorService {
+public interface InteractiveMapForFixedAssetColorService {
         
     Color getColor(FixedAsset item);
 

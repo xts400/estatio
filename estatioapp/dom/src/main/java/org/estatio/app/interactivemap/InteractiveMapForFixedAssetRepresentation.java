@@ -16,13 +16,36 @@
  */
 package org.estatio.app.interactivemap;
 
-public enum InteractiveMapForFixedAssetRepresentation {
-    DEFAULT {
-        @Override
-        public ColorService getColorService() {
-            return new StatusColorService();
-        }
-    };
+import org.estatio.dom.utils.StringUtils;
 
-    public abstract ColorService getColorService();
+public enum InteractiveMapForFixedAssetRepresentation {
+    DEFAULT(InteractiveMapForFixedAssetColorServiceDefault.class),
+    VACANT(InteractiveMapForFixedAssetColorServiceVacant.class),
+    EXPIRY(InteractiveMapForFixedAssetColorServiceExpiry.class);
+
+    private Class<? extends InteractiveMapForFixedAssetColorService> cls;
+
+    private InteractiveMapForFixedAssetRepresentation(Class<? extends InteractiveMapForFixedAssetColorService> cls) {
+        this.cls = cls;
+    }
+
+    public Class<? extends InteractiveMapForFixedAssetColorService> getCls() {
+        return cls;
+    }
+
+    public InteractiveMapForFixedAssetColorService getColorService()
+    {
+        try {
+            return cls.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String title() {
+        return StringUtils.enumTitle(this.name());
+    }
 }

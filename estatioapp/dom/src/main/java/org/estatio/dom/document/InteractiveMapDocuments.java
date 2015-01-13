@@ -20,17 +20,19 @@ import java.util.List;
 
 import org.apache.isis.applib.DomainObjectContainer;
 import org.apache.isis.applib.annotation.DomainService;
-import org.apache.isis.applib.annotation.Named;
+import org.apache.isis.applib.annotation.DomainServiceLayout;
+import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.value.Blob;
+
 import org.estatio.dom.EstatioDomainService;
 import org.estatio.dom.asset.FixedAsset;
 
-@DomainService(menuOrder = "10")
-@Named("Administration")
+@DomainService()
+@DomainServiceLayout(named = "Other", menuBar = DomainServiceLayout.MenuBar.PRIMARY, menuOrder = "80.10")
 public class InteractiveMapDocuments extends EstatioDomainService<InteractiveMapDocument> {
 
-    public InteractiveMapDocuments() 
+    public InteractiveMapDocuments()
     {
         super(InteractiveMapDocuments.class, InteractiveMapDocument.class);
     }
@@ -52,7 +54,10 @@ public class InteractiveMapDocuments extends EstatioDomainService<InteractiveMap
         return firstMatch("findByFixedAsset", "fixedAsset", fixedAsset);
     }
 
-    public InteractiveMapDocument newDocument(final @Named("Name") String name, final @Named("File") Blob file, FixedAsset fixedAsset) {
+    public InteractiveMapDocument newDocument(
+            final @ParameterLayout(named = "Name") String name,
+            final @ParameterLayout(named = "File") Blob file,
+            final FixedAsset fixedAsset) {
         InteractiveMapDocument document = container.newTransientInstance(InteractiveMapDocument.class);
         document.setName(name);
         document.setFile(file);
@@ -65,6 +70,5 @@ public class InteractiveMapDocuments extends EstatioDomainService<InteractiveMap
 
     @javax.inject.Inject
     private DomainObjectContainer container;
-
 
 }

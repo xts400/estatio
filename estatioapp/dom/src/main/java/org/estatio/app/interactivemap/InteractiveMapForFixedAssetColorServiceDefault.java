@@ -18,7 +18,7 @@ package org.estatio.app.interactivemap;
 
 import org.estatio.dom.asset.FixedAsset;
 
-public class StatusColorService implements ColorService {
+public class InteractiveMapForFixedAssetColorServiceDefault implements InteractiveMapForFixedAssetColorService {
 
     @Override
     public Color getColor(FixedAsset item) {

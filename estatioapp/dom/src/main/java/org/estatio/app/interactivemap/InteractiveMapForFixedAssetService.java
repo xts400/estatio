@@ -21,7 +21,6 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -32,10 +31,12 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.fop.svg.PDFTranscoder;
 
+import org.apache.isis.applib.AbstractService;
 import org.apache.isis.applib.annotation.ActionSemantics;
 import org.apache.isis.applib.annotation.ActionSemantics.Of;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NotInServiceMenu;
+import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.Prototype;
 import org.apache.isis.applib.services.linking.DeepLinkService;
 import org.apache.isis.applib.value.Blob;
@@ -51,9 +52,10 @@ import org.estatio.dom.document.InteractiveMapDocument;
 import org.estatio.dom.document.InteractiveMapDocuments;
 
 @DomainService
-public class InteractiveMapForFixedAssetService {
+public class InteractiveMapForFixedAssetService extends AbstractService {
 
-    @Prototype //TODO: Work in progress, therefore only accessible in prototype mode
+    @Prototype
+    // TODO: Work in progress, therefore only accessible in prototype mode
     @ActionSemantics(Of.SAFE)
     @NotInServiceMenu
     public InteractiveMapForFixedAssetManager maps(Property property) {
@@ -62,7 +64,9 @@ public class InteractiveMapForFixedAssetService {
 
     @ActionSemantics(Of.SAFE)
     @NotInServiceMenu
-    public InteractiveMap showMap(Property property, InteractiveMapForFixedAssetRepresentation representation) {
+    public InteractiveMap showMap(
+            final Property property,
+            final @ParameterLayout(named = "representation") InteractiveMapForFixedAssetRepresentation representation) {
         if (property == null || representation == null) {
             return null;
         }
@@ -71,18 +75,22 @@ public class InteractiveMapForFixedAssetService {
 
         InteractiveMapDocument document = documents.findByFixedAsset(property);
 
+        InteractiveMapForFixedAssetColorService colorService = representation.getColorService();
+        getContainer().injectServicesInto(colorService);
+
         try {
             String svgString = new String(document.getFile().getBytes(), "UTF-8");
             InteractiveMap interactiveMap = new InteractiveMap(svgString);
             interactiveMap.setTitle(document.getName());
             for (Unit unit : units.findByProperty(property)) {
-                final Color color = representation.getColorService().getColor(unit);
+                final Color color = colorService.getColor(unit);
                 colorMap = ColorMapHelper.addToMap(colorMap, color);
 
                 // shape
                 InteractiveMapElement element = new InteractiveMapElement(unit.getReference());
-                // element.addAttribute(new InteractiveMapAttribute("fill",
-                // color.getColor()));
+                if (color != null) {
+                    element.addAttribute(new InteractiveMapAttribute("fill", color.getColor()));
+                }
                 URI link = deepLinkService.deepLinkFor(unit);
                 element.addAttribute(new InteractiveMapAttribute("xlink:href", link.toString()));
                 interactiveMap.addElement(element);
