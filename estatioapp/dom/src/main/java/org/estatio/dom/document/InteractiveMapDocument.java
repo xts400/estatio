@@ -23,6 +23,7 @@ import javax.jdo.annotations.VersionStrategy;
 
 import org.apache.isis.applib.annotation.Bookmarkable;
 import org.apache.isis.applib.annotation.Hidden;
+import org.apache.isis.applib.annotation.Immutable;
 import org.apache.isis.applib.annotation.Named;
 import org.apache.isis.applib.annotation.Optional;
 import org.apache.isis.applib.annotation.Title;
@@ -44,6 +45,7 @@ import org.estatio.dom.asset.FixedAsset;
                 + "FROM org.estatio.dom.document.InteractiveMapDocument "
                 + "WHERE fixedAsset == :fixedAsset")
 @Bookmarkable
+@Immutable
 @Named("Document")
 public class InteractiveMapDocument implements Comparable<InteractiveMapDocument> {
 
@@ -63,7 +65,7 @@ public class InteractiveMapDocument implements Comparable<InteractiveMapDocument
 
     private FixedAsset fixedAsset;
 
-    @Column(allowsNull = "false")
+    @Column(allowsNull = "false", name = "fixedAssetId")
     public FixedAsset getFixedAsset() {
         return fixedAsset;
     }
@@ -92,6 +94,13 @@ public class InteractiveMapDocument implements Comparable<InteractiveMapDocument
 
     public Blob download() {
         return getFile();
+    }
+
+    // //////////////////////////////////////
+
+    public InteractiveMapDocument upload(Blob blob) {
+        setFile(blob);
+        return this;
     }
 
     // //////////////////////////////////////

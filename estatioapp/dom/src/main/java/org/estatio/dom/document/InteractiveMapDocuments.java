@@ -27,7 +27,7 @@ import org.estatio.dom.EstatioDomainService;
 import org.estatio.dom.asset.FixedAsset;
 
 @DomainService(menuOrder = "10")
-@Named("Documents")
+@Named("Administration")
 public class InteractiveMapDocuments extends EstatioDomainService<InteractiveMapDocument> {
 
     public InteractiveMapDocuments() 

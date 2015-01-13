@@ -36,6 +36,7 @@ import org.apache.isis.applib.annotation.ActionSemantics;
 import org.apache.isis.applib.annotation.ActionSemantics.Of;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NotInServiceMenu;
+import org.apache.isis.applib.annotation.Prototype;
 import org.apache.isis.applib.services.linking.DeepLinkService;
 import org.apache.isis.applib.value.Blob;
 
@@ -52,6 +53,7 @@ import org.estatio.dom.document.InteractiveMapDocuments;
 @DomainService
 public class InteractiveMapForFixedAssetService {
 
+    @Prototype //TODO: Work in progress, therefore only accessible in prototype mode
     @ActionSemantics(Of.SAFE)
     @NotInServiceMenu
     public InteractiveMapForFixedAssetManager maps(Property property) {
@@ -120,10 +122,6 @@ public class InteractiveMapForFixedAssetService {
         return null;
     }
 
-    public List<InteractiveMapDocument> choices0ShowMap() {
-        return documents.allDocuments();
-    }
-
     public boolean hideShowMap(final Property property, final InteractiveMapForFixedAssetRepresentation representation) {
         return shouldShowSvgActions(property);
     }
@@ -132,7 +130,7 @@ public class InteractiveMapForFixedAssetService {
 
     @ActionSemantics(Of.SAFE)
     @NotInServiceMenu
-    public Blob exportMap(final Property property, final InteractiveMapForFixedAssetRepresentation representation) {
+    public Blob downloadMap(final Property property, final InteractiveMapForFixedAssetRepresentation representation) {
         InteractiveMap interactiveMap = showMap(property, representation);
         String svgContent = interactiveMap.parse();
         StringReader input = new StringReader(svgContent);
@@ -149,7 +147,7 @@ public class InteractiveMapForFixedAssetService {
         return new Blob(property.getName() + ".pdf", "application/pdf", output.toByteArray());
     }
 
-    public boolean hideExportMap(final Property property, final InteractiveMapForFixedAssetRepresentation representation) {
+    public boolean hideDownloadMap(final Property property, final InteractiveMapForFixedAssetRepresentation representation) {
         return shouldShowSvgActions(property);
     }
 

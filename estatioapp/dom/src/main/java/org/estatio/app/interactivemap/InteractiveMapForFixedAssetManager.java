@@ -34,6 +34,8 @@ import org.estatio.dom.asset.Property;
 @ViewModel
 public class InteractiveMapForFixedAssetManager extends EstatioViewModel {
 
+    public InteractiveMapForFixedAssetManager() {}
+    
     public InteractiveMapForFixedAssetManager(final Property property, final InteractiveMapForFixedAssetRepresentation representation) {
         this.property = property;
         this.representationStr = representation.name();
