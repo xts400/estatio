@@ -41,6 +41,7 @@ import org.apache.isis.applib.annotation.Prototype;
 import org.apache.isis.applib.services.linking.DeepLinkService;
 import org.apache.isis.applib.value.Blob;
 
+import org.isisaddons.wicket.svg.cpt.applib.Color;
 import org.isisaddons.wicket.svg.cpt.applib.InteractiveMap;
 import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapAttribute;
 import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapElement;
@@ -84,12 +85,13 @@ public class InteractiveMapForFixedAssetService extends AbstractService {
             interactiveMap.setTitle(document.getName());
             for (Unit unit : units.findByProperty(property)) {
                 final Color color = colorService.getColor(unit);
-                colorMap = ColorMapHelper.addToMap(colorMap, color);
 
                 // shape
                 InteractiveMapElement element = new InteractiveMapElement(unit.getReference());
                 if (color != null) {
+                    colorMap = ColorMapHelper.addToMap(colorMap, color);
                     element.addAttribute(new InteractiveMapAttribute("fill", color.getColor()));
+                    element.addAttribute(new InteractiveMapAttribute("class", color.getLabel()));
                 }
                 URI link = deepLinkService.deepLinkFor(unit);
                 element.addAttribute(new InteractiveMapAttribute("xlink:href", link.toString()));
@@ -106,20 +108,8 @@ public class InteractiveMapForFixedAssetService extends AbstractService {
 
             }
 
-            int legendId = 1;
             for (Color color : ColorMapHelper.sortByValue(colorMap)) {
-                // // label
-                // interactiveMap.addElement(new
-                // InteractiveMapElement(String.format("legend%dText",
-                // legendId), color.getLabel()));
-                // // color
-                // final InteractiveMapElement element = new
-                // InteractiveMapElement(String.format("legend%dShape",
-                // legendId));
-                // element.addAttribute(new InteractiveMapAttribute("fill",
-                // color.getColor()));
-                // interactiveMap.addElement(element);
-                // legendId++;
+                interactiveMap.addLegendItem(color);
             }
 
             return interactiveMap;

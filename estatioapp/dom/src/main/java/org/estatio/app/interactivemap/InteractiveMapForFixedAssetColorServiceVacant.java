@@ -26,6 +26,7 @@ import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseStatus;
 import org.estatio.dom.lease.Occupancies;
 import org.estatio.dom.lease.Occupancy;
+import org.isisaddons.wicket.svg.cpt.applib.Color;
 
 public class InteractiveMapForFixedAssetColorServiceVacant implements InteractiveMapForFixedAssetColorService {
 

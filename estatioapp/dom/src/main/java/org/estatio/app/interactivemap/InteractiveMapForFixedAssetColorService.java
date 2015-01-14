@@ -17,6 +17,7 @@
 package org.estatio.app.interactivemap;
 
 import org.estatio.dom.asset.FixedAsset;
+import org.isisaddons.wicket.svg.cpt.applib.Color;
 
 public interface InteractiveMapForFixedAssetColorService {
         

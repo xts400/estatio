@@ -18,6 +18,7 @@ package org.estatio.app.interactivemap;
 
 import javax.inject.Inject;
 
+import org.isisaddons.wicket.svg.cpt.applib.Color;
 import org.joda.time.Months;
 
 import org.apache.isis.applib.services.clock.ClockService;

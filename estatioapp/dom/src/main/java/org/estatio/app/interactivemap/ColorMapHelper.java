@@ -24,6 +24,7 @@ import java.util.Map;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import org.isisaddons.wicket.svg.cpt.applib.Color;
 
 public class ColorMapHelper {
 
