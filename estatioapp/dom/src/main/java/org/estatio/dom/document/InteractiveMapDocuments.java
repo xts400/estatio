@@ -19,14 +19,23 @@ package org.estatio.dom.document;
 import java.util.List;
 
 import org.apache.isis.applib.DomainObjectContainer;
+import org.apache.isis.applib.annotation.ActionLayout;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.DomainServiceLayout;
+import org.apache.isis.applib.annotation.MemberOrder;
+import org.apache.isis.applib.annotation.NotInServiceMenu;
 import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.value.Blob;
 
+import org.estatio.app.interactivemap.InteractiveMapForFixedAssetRepresentation;
+import org.estatio.app.interactivemap.InteractiveMapForFixedAssetService;
 import org.estatio.dom.EstatioDomainService;
 import org.estatio.dom.asset.FixedAsset;
+import org.estatio.dom.asset.Property;
+import org.isisaddons.wicket.svg.cpt.applib.InteractiveMap;
+
+import javax.inject.Inject;
 
 @DomainService()
 @DomainServiceLayout(named = "Other", menuBar = DomainServiceLayout.MenuBar.PRIMARY, menuOrder = "80.10")
@@ -45,6 +54,7 @@ public class InteractiveMapDocuments extends EstatioDomainService<InteractiveMap
         return "Document";
     }
 
+    @MemberOrder(sequence = "2")
     public List<InteractiveMapDocument> allDocuments() {
         return container.allInstances(InteractiveMapDocument.class);
     }
@@ -54,6 +64,7 @@ public class InteractiveMapDocuments extends EstatioDomainService<InteractiveMap
         return firstMatch("findByFixedAsset", "fixedAsset", fixedAsset);
     }
 
+    @MemberOrder(sequence = "1")
     public InteractiveMapDocument newDocument(
             final @ParameterLayout(named = "Name") String name,
             final @ParameterLayout(named = "File") Blob file,
@@ -66,9 +77,26 @@ public class InteractiveMapDocuments extends EstatioDomainService<InteractiveMap
         return document;
     }
 
+    @NotInServiceMenu
+    @ActionLayout(named = "Open")
+    public InteractiveMap openDocument(
+            final InteractiveMapDocument document,
+            final @ParameterLayout(named = "Representation")InteractiveMapForFixedAssetRepresentation representation
+    ) {
+        FixedAsset fixedAsset = document.getFixedAsset();
+        if (!(fixedAsset instanceof Property)) {
+            return null;
+        }
+
+        InteractiveMap interactiveMap = interactiveMapService.showMap((Property) fixedAsset, representation);
+        return interactiveMap;
+    }
+
     // //////////////////////////////////////
+
+    @Inject
+    private InteractiveMapForFixedAssetService interactiveMapService;
 
     @javax.inject.Inject
     private DomainObjectContainer container;
-
 }
