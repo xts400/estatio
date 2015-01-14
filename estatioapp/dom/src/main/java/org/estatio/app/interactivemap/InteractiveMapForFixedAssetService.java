@@ -21,16 +21,17 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
+import com.google.common.base.Strings;
 import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.fop.svg.PDFTranscoder;
-
 import org.apache.isis.applib.AbstractService;
 import org.apache.isis.applib.annotation.ActionSemantics;
 import org.apache.isis.applib.annotation.ActionSemantics.Of;
@@ -40,17 +41,19 @@ import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.Prototype;
 import org.apache.isis.applib.services.linking.DeepLinkService;
 import org.apache.isis.applib.value.Blob;
-
-import org.isisaddons.wicket.svg.cpt.applib.Color;
-import org.isisaddons.wicket.svg.cpt.applib.InteractiveMap;
-import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapAttribute;
-import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapElement;
-
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.asset.Units;
 import org.estatio.dom.document.InteractiveMapDocument;
 import org.estatio.dom.document.InteractiveMapDocuments;
+import org.estatio.dom.lease.Lease;
+import org.estatio.dom.lease.Occupancies;
+import org.estatio.dom.lease.Occupancy;
+import org.isisaddons.wicket.svg.cpt.applib.Color;
+import org.isisaddons.wicket.svg.cpt.applib.InteractiveMap;
+import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapAttribute;
+import org.isisaddons.wicket.svg.cpt.applib.InteractiveMapElement;
+import org.joda.time.LocalDate;
 
 @DomainService
 public class InteractiveMapForFixedAssetService extends AbstractService {
@@ -84,6 +87,7 @@ public class InteractiveMapForFixedAssetService extends AbstractService {
             InteractiveMap interactiveMap = new InteractiveMap(svgString);
             interactiveMap.setTitle(document.getName());
             for (Unit unit : units.findByProperty(property)) {
+
                 final Color color = colorService.getColor(unit);
 
                 // shape
@@ -93,6 +97,11 @@ public class InteractiveMapForFixedAssetService extends AbstractService {
                     element.addAttribute(new InteractiveMapAttribute("fill", color.getColor()));
                     element.addAttribute(new InteractiveMapAttribute("class", color.getLabel()));
                 }
+                String leaseName = getLeaseName(unit);
+                if (!Strings.isNullOrEmpty(leaseName)) {
+                    interactiveMap.getElementTitle2Id().put(leaseName, unit.getReference());
+                }
+
                 URI link = deepLinkService.deepLinkFor(unit);
                 element.addAttribute(new InteractiveMapAttribute("xlink:href", link.toString()));
                 interactiveMap.addElement(element);
@@ -116,6 +125,20 @@ public class InteractiveMapForFixedAssetService extends AbstractService {
         } catch (UnsupportedEncodingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String getLeaseName(Unit unit) {
+        LocalDate today = LocalDate.now();
+        List<Occupancy> occupancyList = occupancies.occupancies(unit);
+        for (Occupancy occupancy : occupancyList) {
+            LocalDate startDate = occupancy.getStartDate();
+            LocalDate endDate = occupancy.getEndDate();
+            if ((startDate == null || today.isAfter(startDate)) && (endDate == null || today.isBefore(endDate))) {
+                Lease lease = occupancy.getLease();
+                return lease.getName();
+            }
         }
         return null;
     }
@@ -161,6 +184,9 @@ public class InteractiveMapForFixedAssetService extends AbstractService {
 
     @Inject
     private Units units;
+
+    @Inject
+    private Occupancies occupancies;
 
     @Inject
     private DeepLinkService deepLinkService;
