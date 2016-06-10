@@ -52,9 +52,6 @@ import lombok.Setter;
         strategy = VersionStrategy.VERSION_NUMBER,
         column = "version"
 )
-@Unique(
-        name = "Organisation"
-)
 public class OrganisationPreviousName implements Comparable<OrganisationPreviousName> {
 
     public String title() {
