@@ -34,7 +34,6 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
 import org.estatio.dom.FinderInteraction;
 import org.estatio.dom.FinderInteraction.FinderMethod;
-import org.estatio.dom.apptenancy.EstatioApplicationTenancyRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -93,8 +92,6 @@ public class ProgramRepositoryTest {
 
         @Mock
         private DomainObjectContainer mockContainer;
-        @Mock
-        private EstatioApplicationTenancyRepository mockEstatioApplicationTenancyRepository;
 
         ProgramRepository programRepository;
 
@@ -102,7 +99,6 @@ public class ProgramRepositoryTest {
         public void setup() {
             programRepository = new ProgramRepository();
             programRepository.setContainer(mockContainer);
-            programRepository.estatioApplicationTenancyRepository = mockEstatioApplicationTenancyRepository;
         }
 
 

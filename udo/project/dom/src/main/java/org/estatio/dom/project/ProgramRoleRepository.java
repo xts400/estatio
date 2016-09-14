@@ -35,6 +35,7 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.SemanticsOf;
+import org.apache.isis.applib.services.eventbus.AbstractDomainEvent;
 import org.apache.isis.applib.services.scratchpad.Scratchpad;
 
 import org.estatio.dom.UdoDomainRepositoryAndFactory;
@@ -140,7 +141,7 @@ public class ProgramRoleRepository extends UdoDomainRepositoryAndFactory<Program
         Party replacementParty = ev.getReplacement();
 
         switch (ev.getEventPhase()) {
-        case VALIDATE:
+        case AbstractDomainEvent.Phase.VALIDATE:
             List<ProgramRole> programRoles = findByParty(sourceParty);
 
             if (programRoles.size() > 0 && replacementParty == null) {
@@ -149,7 +150,7 @@ public class ProgramRoleRepository extends UdoDomainRepositoryAndFactory<Program
                 scratchpad.put(onPartyRemoveScratchpadKey = UUID.randomUUID(), programRoles);
             }
             break;
-        case EXECUTING:
+        case AbstractDomainEvent.Phase.EXECUTING:
             programRoles = (List<ProgramRole>) scratchpad.get(onPartyRemoveScratchpadKey);
             for (ProgramRole programRole : programRoles) {
                 programRole.setParty(replacementParty);

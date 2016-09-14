@@ -20,17 +20,13 @@ package org.estatio.dom.project;
 
 import java.util.List;
 
-import javax.inject.Inject;
-
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.Dflt;
 import org.estatio.dom.UdoDomainRepositoryAndFactory;
-import org.estatio.dom.apptenancy.EstatioApplicationTenancyRepository;
 import org.estatio.dom.utils.StringUtils;
 
 @DomainService(repositoryFor = Program.class, nature = NatureOfService.DOMAIN)
@@ -61,16 +57,6 @@ public class ProgramRepository extends UdoDomainRepositoryAndFactory<Program> {
     }
 
     @Programmatic
-    public List<ApplicationTenancy> choices3NewProgram() {
-        return estatioApplicationTenancyRepository.globalOrCountryTenanciesForCurrentUser();
-    }
-
-    @Programmatic
-    public ApplicationTenancy default3NewProgram() {
-        return Dflt.of(choices3NewProgram());
-    }
-
-    @Programmatic
     public List<Program> allPrograms() {
         return allInstances();
     }
@@ -80,7 +66,5 @@ public class ProgramRepository extends UdoDomainRepositoryAndFactory<Program> {
         return allMatches("matchByReferenceOrName", "matcher", StringUtils.wildcardToCaseInsensitiveRegex(searchStr));
     }
 
-    @Inject
-    EstatioApplicationTenancyRepository estatioApplicationTenancyRepository;
 
 }

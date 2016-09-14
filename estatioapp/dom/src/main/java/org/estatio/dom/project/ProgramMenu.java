@@ -33,6 +33,9 @@ import org.apache.isis.applib.annotation.SemanticsOf;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.estatio.dom.Dflt;
+import org.estatio.dom.apptenancy.EstatioApplicationTenancyRepository;
+
 @DomainService(nature = NatureOfService.VIEW)
 @DomainServiceLayout(menuOrder = "35", menuBar = DomainServiceLayout.MenuBar.PRIMARY, named = "Projects")
 public class ProgramMenu {
@@ -48,11 +51,11 @@ public class ProgramMenu {
     }
 
     public List<ApplicationTenancy> choices3NewProgram() {
-        return programRepository.choices3NewProgram();
+        return estatioApplicationTenancyRepository.globalOrCountryTenanciesForCurrentUser();
     }
 
     public ApplicationTenancy default3NewProgram() {
-        return programRepository.default3NewProgram();
+        return Dflt.of(choices3NewProgram());
     }
 
     @Action(semantics = SemanticsOf.SAFE)
@@ -67,4 +70,8 @@ public class ProgramMenu {
 
     @Inject
     ProgramRepository programRepository;
+
+    @Inject
+    EstatioApplicationTenancyRepository estatioApplicationTenancyRepository;
+
 }
