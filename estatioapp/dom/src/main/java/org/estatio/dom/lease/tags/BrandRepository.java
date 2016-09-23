@@ -20,6 +20,7 @@
 package org.estatio.dom.lease.tags;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -66,6 +67,15 @@ public class BrandRepository extends UdoDomainRepositoryAndFactory<Brand> {
 
     public Brand findUnique(final String name, final ApplicationTenancy applicationTenancy) {
         return uniqueMatch("findByNameAndAtPath", "name", name, "atPath", applicationTenancy.getPath());
+    }
+
+    public List<Brand> listDuplicateNames() {
+        List<Brand> allBrands = allBrands();
+        return allBrands.stream()
+                .filter(brand1 -> allBrands.stream()
+                        .filter(brand2 -> brand1.getName().equals(brand2.getName()))
+                        .count() > 1)
+                .collect(Collectors.toList());
     }
 
     @Programmatic

@@ -123,6 +123,31 @@ public class BrandRepositoryIntegTest extends EstatioIntegrationTest {
 
     }
 
+    public static class ListDuplicateNames extends BrandRepositoryIntegTest {
+
+        @Test
+        public void happyCase() throws Exception {
+            // given
+            final List<Brand> noDuplicates = brandRepository.listDuplicateNames();
+            assertThat(noDuplicates).isEmpty();
+
+            final Brand happyValley = brandRepository.findByName(BrandsFixture.HAPPY_VALLEY);
+            assertThat(happyValley.getName()).isEqualTo(BrandsFixture.HAPPY_VALLEY);
+            assertThat(happyValley.getApplicationTenancyPath()).isEqualTo("/");
+
+            // same brand name, different application tenancy
+            // when
+            final Brand newBrand = wrap(brandRepository).newBrand(BrandsFixture.HAPPY_VALLEY, null, null, null, applicationTenancyRepository.findByPath("/FRA"));
+            assertThat(newBrand).isNotNull();
+
+            // then
+            final List<Brand> duplicates = brandRepository.listDuplicateNames();
+            assertThat(duplicates).isNotEmpty();
+            assertThat(duplicates).extracting(Brand::getName).containsOnly(BrandsFixture.HAPPY_VALLEY);
+            assertThat(duplicates).extracting(Brand::getApplicationTenancyPath).containsExactly("/", "/FRA");
+        }
+    }
+
     @Rule
     public ExpectedException exception = ExpectedException.none();
 

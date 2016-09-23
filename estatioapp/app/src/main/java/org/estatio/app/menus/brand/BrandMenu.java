@@ -97,6 +97,12 @@ public class BrandMenu extends UdoDomainRepositoryAndFactory<Brand> {
         return brandRepository.allBrands();
     }
 
+    @Action(semantics = SemanticsOf.SAFE)
+    @MemberOrder(sequence = "3")
+    public List<Brand> listBrandsWithDuplicateNames() {
+        return brandRepository.listDuplicateNames();
+    }
+
     @Inject
     IsisJdoSupport isisJdoSupport;
 
