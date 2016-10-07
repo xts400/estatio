@@ -42,14 +42,14 @@ import org.apache.isis.applib.annotation.Where;
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
 import org.estatio.app.security.EstatioRole;
-import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.JdoColumnLength;
+import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.WithIntervalMutable;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.geography.Country;
-import org.estatio.dom.lease.tags.ActivityRepository;
 import org.estatio.dom.lease.tags.Activity;
+import org.estatio.dom.lease.tags.ActivityRepository;
 import org.estatio.dom.lease.tags.Brand;
 import org.estatio.dom.lease.tags.BrandCoverage;
 import org.estatio.dom.lease.tags.BrandRepository;
@@ -72,7 +72,7 @@ import lombok.Setter;
         column = "version")
 @javax.jdo.annotations.Unique(
         name = "Occupancy_lease_unit_startDate_UNQ",
-        members = {"lease", "unit", "startDate"})
+        members = { "lease", "unit", "startDate" })
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
                 name = "findByUnit", language = "JDOQL",
@@ -118,9 +118,9 @@ public class Occupancy
 
     public String title() {
         return TitleBuilder.start()
+                .withName(getLease())
+                .withName(" ")
                 .withName(getStartDate())
-                .withTupleElement(getLease())
-                .withTupleElement(getUnit())
                 .toString();
     }
 

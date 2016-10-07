@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2012-2014 Eurocommercial Properties NV
+ *  Copyright 2012-2015 Eurocommercial Properties NV
  *
  *
  *  Licensed under the Apache License, Version 2.0 (the
@@ -16,39 +16,40 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.estatio.dom.invoice.viewmodel.dnc;
 
-import java.util.List;
+package org.estatio.dom.lease.contributed;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
-import org.apache.isis.applib.annotation.Collection;
-import org.apache.isis.applib.annotation.CollectionLayout;
 import org.apache.isis.applib.annotation.Contributed;
 import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
-import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
+import org.estatio.dom.asset.Unit;
+import org.estatio.dom.lease.Occupancy;
+import org.estatio.dom.lease.OccupancyRepository;
 
 @Mixin
-public class InvoiceSummaryForPropertyDueDateStatus_documentsAndCommunications {
+public class Unit_occupiedBy {
 
-    private final InvoiceSummaryForPropertyDueDateStatus invoiceSummary;
+    private final Unit unit;
 
-    public InvoiceSummaryForPropertyDueDateStatus_documentsAndCommunications(
-            final InvoiceSummaryForPropertyDueDateStatus invoiceSummary) {
-        this.invoiceSummary = invoiceSummary;
+    public Unit_occupiedBy(Unit unit) {
+        this.unit = unit;
     }
+
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(contributed = Contributed.AS_ASSOCIATION)
-    @Collection()
-    @CollectionLayout(defaultView = "table")
-    public List<InvoiceDocAndComm> $$() {
-        return invoiceDocAndCommFactory.documentsAndCommunicationsFor(invoiceSummary.getInvoices());
+    public Occupancy $$() {
+        Optional<Occupancy> ifOccupied = occupancyRepository.findByUnit(unit).stream().filter(Occupancy::isCurrent).findFirst();
+        return ifOccupied.isPresent() ? ifOccupied.get() : null;
     }
 
     @Inject
-    InvoiceDocAndComm.Factory invoiceDocAndCommFactory;
+    private OccupancyRepository occupancyRepository;
+
 }

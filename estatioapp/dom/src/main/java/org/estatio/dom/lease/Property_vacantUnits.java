@@ -1,6 +1,6 @@
 /*
  *
- *  Copyright 2012-2014 Eurocommercial Properties NV
+ *  Copyright 2012-2015 Eurocommercial Properties NV
  *
  *
  *  Licensed under the Apache License, Version 2.0 (the
@@ -16,39 +16,37 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.estatio.dom.invoice.viewmodel.dnc;
+
+package org.estatio.dom.lease;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
-import org.apache.isis.applib.annotation.Collection;
-import org.apache.isis.applib.annotation.CollectionLayout;
 import org.apache.isis.applib.annotation.Contributed;
-import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
-import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForPropertyDueDateStatus;
+import org.estatio.dom.asset.Property;
+import org.estatio.dom.asset.Unit;
+import org.estatio.dom.asset.UnitRepository;
 
-@Mixin
-public class InvoiceSummaryForPropertyDueDateStatus_documentsAndCommunications {
+public class Property_vacantUnits {
 
-    private final InvoiceSummaryForPropertyDueDateStatus invoiceSummary;
+    final private Property property;
 
-    public InvoiceSummaryForPropertyDueDateStatus_documentsAndCommunications(
-            final InvoiceSummaryForPropertyDueDateStatus invoiceSummary) {
-        this.invoiceSummary = invoiceSummary;
+    public Property_vacantUnits(Property property) {
+        this.property = property;
     }
+
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(contributed = Contributed.AS_ASSOCIATION)
-    @Collection()
-    @CollectionLayout(defaultView = "table")
-    public List<InvoiceDocAndComm> $$() {
-        return invoiceDocAndCommFactory.documentsAndCommunicationsFor(invoiceSummary.getInvoices());
+    public List<Unit> $$() {
+        return unitRepository.findByProperty(property).stream().filter(unit -> !unit.isCurrent()).collect(Collectors.toList());
     }
 
     @Inject
-    InvoiceDocAndComm.Factory invoiceDocAndCommFactory;
+    private UnitRepository unitRepository;
 }
