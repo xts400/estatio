@@ -17,7 +17,7 @@
  *  under the License.
  */
 
-package org.estatio.dom.lease;
+package org.estatio.dom.lease.contributed;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,12 +27,16 @@ import javax.inject.Inject;
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
 import org.apache.isis.applib.annotation.Contributed;
+import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.asset.UnitRepository;
+import org.estatio.dom.lease.Occupancy;
+import org.estatio.dom.lease.OccupancyRepository;
 
+@Mixin
 public class Property_vacantUnits {
 
     final private Property property;
@@ -44,9 +48,19 @@ public class Property_vacantUnits {
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(contributed = Contributed.AS_ASSOCIATION)
     public List<Unit> $$() {
-        return unitRepository.findByProperty(property).stream().filter(unit -> !unit.isCurrent()).collect(Collectors.toList());
+        List<Unit> occupiedUnits = occupancyRepository.occupanciesByProperty(property)
+                .stream()
+                .map(Occupancy::getUnit)
+                .collect(Collectors.toList());
+        return unitRepository.findByProperty(property)
+                .stream()
+                .filter(unit -> !occupiedUnits.contains(unit))
+                .collect(Collectors.toList());
     }
 
     @Inject
     private UnitRepository unitRepository;
+
+    @Inject
+    private OccupancyRepository occupancyRepository;
 }

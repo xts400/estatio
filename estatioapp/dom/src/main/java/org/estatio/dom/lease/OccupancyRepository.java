@@ -127,8 +127,16 @@ public class OccupancyRepository extends UdoDomainRepositoryAndFactory<Occupancy
 
     public List<Occupancy> occupanciesByPropertyAndInterval(final Property property, final LocalDateInterval localDateInterval) {
         List<Occupancy> foundOccupancies = new ArrayList<>();
-        for (Unit unit : unitRepository.findByProperty(property)){
+        for (Unit unit : unitRepository.findByProperty(property)) {
             foundOccupancies.addAll(occupanciesByUnitAndInterval(unit, localDateInterval));
+        }
+        return foundOccupancies;
+    }
+
+    public List<Occupancy> occupanciesByProperty(final Property property) {
+        List<Occupancy> foundOccupancies = new ArrayList<>();
+        for (Unit unit : unitRepository.findByProperty(property)) {
+            foundOccupancies.addAll(findByUnit(unit));
         }
         return foundOccupancies;
     }
@@ -219,6 +227,5 @@ public class OccupancyRepository extends UdoDomainRepositoryAndFactory<Occupancy
 
     @Inject
     private UnitRepository unitRepository;
-
 
 }
