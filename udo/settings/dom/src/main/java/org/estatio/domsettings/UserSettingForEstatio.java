@@ -22,14 +22,19 @@ package org.estatio.domsettings;
 
 import javax.jdo.annotations.IdentityType;
 
+import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.DomainObjectLayout;
 import org.apache.isis.applib.annotation.MemberOrder;
 
 import org.isisaddons.module.settings.dom.SettingType;
 import org.isisaddons.module.settings.dom.UserSetting;
 
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.types.DescriptionType;
+import org.incode.module.base.dom.types.NameType;
+
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.estatio.domsettings.types.SettingKeyType;
+import org.estatio.domsettings.types.SettingTypeType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +42,9 @@ import lombok.Setter;
 @javax.jdo.annotations.PersistenceCapable(
         identityType = IdentityType.APPLICATION, 
         objectIdClass=UserSettingPrimaryKey.class,
-        table="UserSetting")
+        table="UserSetting"
+        ,schema = "dbo"     // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.Queries({ 
     @javax.jdo.annotations.Query(
             name = "findByUserAndKey", language = "JDOQL", 
@@ -58,7 +65,10 @@ import lombok.Setter;
                     + "ORDER BY user, key") 
 })
 // can't see how to specify this order in the primary key; however HSQLDB objects :-(
-//@javax.jdo.annotations.Unique(name="USER_KEY_IDX", members={"user","key"}) 
+//@javax.jdo.annotations.Unique(name="USER_KEY_IDX", members={"user","key"})
+@DomainObject(
+        objectType = "org.estatio.domsettings.UserSettingForEstatio"
+)
 @DomainObjectLayout(named = "User Setting")
 public class UserSettingForEstatio extends SettingAbstractForEstatio implements UserSetting {
 
@@ -70,7 +80,7 @@ public class UserSettingForEstatio extends SettingAbstractForEstatio implements 
                 .toString();
     }
 
-    @javax.jdo.annotations.Column(length=JdoColumnLength.NAME)
+    @javax.jdo.annotations.Column(length= NameType.Meta.MAX_LEN)
     @javax.jdo.annotations.PrimaryKey
     @MemberOrder(sequence = "5")
     @Getter @Setter
@@ -78,14 +88,14 @@ public class UserSettingForEstatio extends SettingAbstractForEstatio implements 
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull="false", length=JdoColumnLength.Setting.KEY)
+    @javax.jdo.annotations.Column(allowsNull="false", length= SettingKeyType.Meta.MAX_LEN)
     @javax.jdo.annotations.PrimaryKey
     @Getter @Setter
     private String key;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(length=JdoColumnLength.DESCRIPTION)
+    @javax.jdo.annotations.Column(length= DescriptionType.Meta.MAX_LEN)
     @javax.jdo.annotations.Persistent
     @Override
     public String getDescription() {
@@ -112,7 +122,7 @@ public class UserSettingForEstatio extends SettingAbstractForEstatio implements 
     
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull="false", length=JdoColumnLength.Setting.TYPE)
+    @javax.jdo.annotations.Column(allowsNull="false", length= SettingTypeType.Meta.MAX_LEN)
     @javax.jdo.annotations.Persistent
     @Override
     public SettingType getType() {

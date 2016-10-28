@@ -46,11 +46,14 @@ import org.estatio.dom.financial.bankaccount.BankAccountRepository;
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo" // Isis' ObjectSpecId inferred from @Discriminator
+)
 // identityType=IdentityType.DATASTORE inherited from superclass
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.NEW_TABLE)
 // no @DatastoreIdentity nor @Version, since inherited from supertype
+@javax.jdo.annotations.Discriminator("org.estatio.dom.bankmandate.BankMandate")
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
                 name = "findBankMandatesFor", language = "JDOQL",

@@ -18,7 +18,7 @@
  */
 package org.estatio.dom.lease;
 
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum LeaseItemStatus {
 
@@ -39,6 +39,14 @@ public enum LeaseItemStatus {
 
     public static LeaseItemStatus valueOfElse(final String status, final LeaseItemStatus statusElse) {
         return status != null ? valueOf(status) : statusElse;
+    }
+
+    public static class Meta {
+
+        public final static int MAX_LEN = 20;
+
+        private Meta() {}
+
     }
 
 }

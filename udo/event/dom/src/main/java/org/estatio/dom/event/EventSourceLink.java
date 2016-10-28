@@ -33,12 +33,15 @@ import org.apache.isis.applib.annotation.Title;
 
 import org.isisaddons.module.poly.dom.PolymorphicAssociationLink;
 
-import org.estatio.dom.JdoColumnLength;
+import org.estatio.dom.event.types.CalendarNameType;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType=IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType=IdentityType.DATASTORE
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(strategy = IdGeneratorStrategy.IDENTITY, column = "id")
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.NEW_TABLE)
@@ -69,7 +72,7 @@ import lombok.Setter;
 })
 @javax.jdo.annotations.Unique(name="EventSourceLink_event_source_UNQ", members = {"event","sourceObjectType","sourceIdentifier"})
 @DomainObject(
-        objectType = "event.EventSourceLink"
+        objectType = "event.EventSourceLink"    // TODO: migrate to IncodeEvent in future
 )
 public abstract class EventSourceLink extends PolymorphicAssociationLink<Event, EventSource, EventSourceLink> {
 
@@ -161,7 +164,7 @@ public abstract class EventSourceLink extends PolymorphicAssociationLink<Event, 
      *     it is safe to copy.
      * </p>
      */
-    @javax.jdo.annotations.Column(allowsNull = "false", length= JdoColumnLength.Event.CALENDAR_NAME)
+    @javax.jdo.annotations.Column(allowsNull = "false", length= CalendarNameType.Meta.MAX_LEN)
     @Property(editing = Editing.DISABLED)
     @Title(prepend=": ", sequence="2")
     @Getter @Setter

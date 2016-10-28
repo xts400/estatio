@@ -30,7 +30,7 @@ import org.apache.isis.applib.DomainObjectContainer;
 import org.apache.isis.applib.query.Query;
 import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 
-import org.estatio.dom.FinderInteraction;
+import org.incode.module.base.dom.testing.FinderInteraction;
 import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
 import org.estatio.dom.budgeting.keyitem.KeyItemForTesting;
@@ -204,7 +204,6 @@ public class BudgetCalculationRepositoryTest {
             BudgetItemAllocation budgetItemAllocation = new BudgetItemAllocation();
             KeyItem keyItem = new KeyItem();
             BigDecimal value = new BigDecimal("100");
-            BigDecimal sourceValue = new BigDecimal("1000");
             final BudgetCalculation budgetCalculation = new BudgetCalculation();
 
             // expect
@@ -217,13 +216,12 @@ public class BudgetCalculationRepositoryTest {
             });
 
             //when
-            BudgetCalculation newBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(budgetItemAllocation, keyItem, value, sourceValue, null);
+            BudgetCalculation newBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(budgetItemAllocation, keyItem, value, null);
 
             //then
             assertThat(newBudgetCalculation.getBudgetItemAllocation()).isEqualTo(budgetItemAllocation);
             assertThat(newBudgetCalculation.getKeyItem()).isEqualTo(keyItem);
             assertThat(newBudgetCalculation.getValue()).isEqualTo(value);
-            assertThat(newBudgetCalculation.getSourceValue()).isEqualTo(sourceValue);
         }
     }
 
@@ -256,7 +254,6 @@ public class BudgetCalculationRepositoryTest {
                     newCalculation.setBudgetItemAllocation(budgetItemAllocation);
                     newCalculation.setKeyItem(keyItem);
                     newCalculation.setValue(value);
-                    newCalculation.setSourceValue(sourceValue);
                     newCalculation.setCalculationType(calculationType);
                     return newCalculation;
                 }
@@ -273,22 +270,15 @@ public class BudgetCalculationRepositoryTest {
                             .findUnique(budgetItemAllocation, keyItem, null, null)
                             .getValue())
                     .isEqualTo(value);
-            assertThat(
-                    budgetCalculationRepository
-                            .findUnique(budgetItemAllocation, keyItem, null, null)
-                            .getSourceValue())
-                    .isEqualTo(sourceValue);
             BigDecimal updatedValue = new BigDecimal("100");
-            BigDecimal updatedSourceValue = new BigDecimal("1000");
 
             //when
-            BudgetCalculation updatedBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(budgetItemAllocation, keyItem, updatedValue, updatedSourceValue, null);
+            BudgetCalculation updatedBudgetCalculation = budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(budgetItemAllocation, keyItem, updatedValue, null);
 
             //then
             assertThat(updatedBudgetCalculation.getBudgetItemAllocation()).isEqualTo(budgetItemAllocation);
             assertThat(updatedBudgetCalculation.getKeyItem()).isEqualTo(keyItem);
             assertThat(updatedBudgetCalculation.getValue()).isEqualTo(updatedValue);
-            assertThat(updatedBudgetCalculation.getSourceValue()).isEqualTo(updatedSourceValue);
         }
 
     }

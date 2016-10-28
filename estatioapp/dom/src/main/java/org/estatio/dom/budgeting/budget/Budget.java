@@ -56,9 +56,11 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.app.security.EstatioRole;
+import org.incode.module.base.dom.with.WithIntervalMutable;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.WithIntervalMutable;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.UnitRepository;
@@ -78,15 +80,14 @@ import org.estatio.dom.budgeting.keytable.KeyValueMethod;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.lease.Occupancy;
 import org.estatio.dom.lease.OccupancyRepository;
-import org.estatio.dom.utils.TitleBuilder;
-import org.estatio.dom.valuetypes.LocalDateInterval;
+import org.estatio.dom.roles.EstatioRole;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType = IdentityType.DATASTORE
-        //      ,schema = "budget"
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
 )
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
@@ -108,7 +109,9 @@ import lombok.Setter;
                         "WHERE property == :property && startDate == :startDate")
 })
 @Unique(name = "Budget_property_startDate_UNQ", members = { "property", "startDate" })
-@DomainObject()
+@DomainObject(
+        objectType = "org.estatio.dom.budgeting.budget.Budget"
+)
 @DomainObjectLayout(bookmarking = BookmarkPolicy.AS_ROOT)
 public class Budget extends UdoDomainObject2<Budget>
         implements WithIntervalMutable<Budget>, WithApplicationTenancyProperty, BudgetItemCreator {
@@ -317,17 +320,15 @@ public class Budget extends UdoDomainObject2<Budget>
     public KeyTable createKeyTable(
             final String name,
             final FoundationValueType foundationValueType,
-            final KeyValueMethod keyValueMethod,
-            final Integer numberOfDigits) {
-        return keyTableRepository.newKeyTable(this, name, foundationValueType, keyValueMethod, numberOfDigits);
+            final KeyValueMethod keyValueMethod) {
+        return keyTableRepository.newKeyTable(this, name, foundationValueType, keyValueMethod, 6);
     }
 
     public String validateCreateKeyTable(
             final String name,
             final FoundationValueType foundationValueType,
-            final KeyValueMethod keyValueMethod,
-            final Integer numberOfDigits) {
-        return keyTableRepository.validateNewKeyTable(this, name, foundationValueType, keyValueMethod, numberOfDigits);
+            final KeyValueMethod keyValueMethod) {
+        return keyTableRepository.validateNewKeyTable(this, name, foundationValueType, keyValueMethod, 6);
     }
 
     @Programmatic

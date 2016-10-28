@@ -15,6 +15,7 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 import org.estatio.dom.UdoDomainService;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForInvoiceRun;
+import org.estatio.dom.invoice.viewmodel.InvoiceSummaryForInvoiceRunRepository;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseRepository;
 import org.estatio.dom.lease.invoicing.InvoiceCalculationParameters;
@@ -36,7 +37,7 @@ public class InvoiceServiceMenuAndContributions extends UdoDomainService<Invoice
 
     /**
      * Returns the
-     * {@link InvoiceSummariesForInvoiceRunMenu
+     * {@link InvoiceSummaryForInvoiceRunRepository
      * invoice summaries} that are newly calculated for all
      * of the {@link Lease}s matched by the provided <tt>property</tt> and the
      * other
@@ -52,13 +53,13 @@ public class InvoiceServiceMenuAndContributions extends UdoDomainService<Invoice
             final LocalDate startDueDate,
             final LocalDate nextDueDate) {
         final String runId = invoiceCalculationService.calculateAndInvoice(
-                new InvoiceCalculationParameters(
-                        property,
-                        selection.selectedTypes(),
-                        runType,
-                        invoiceDueDate,
-                        startDueDate,
-                        nextDueDate));
+                InvoiceCalculationParameters.builder()
+                        .property(property)
+                        .leaseItemTypes(selection.selectedTypes())
+                        .invoiceRunType(runType)
+                        .invoiceDueDate(invoiceDueDate)
+                        .startDueDate(startDueDate)
+                        .nextDueDate(nextDueDate).build());
         return invoiceSummaries.findByRunId(runId);
     }
 
@@ -110,13 +111,13 @@ public class InvoiceServiceMenuAndContributions extends UdoDomainService<Invoice
             if (lease.getApplicationTenancy().getPath().matches(applicationTenancy.getPath()+".*")){
                 for (LocalDate dueDate : lease.dueDatesInRange(startDueDate, nextDueDate)) {
                     InvoiceCalculationParameters parameters =
-                            new InvoiceCalculationParameters(
-                                    lease,
-                                    selection.selectedTypes(),
-                                    InvoiceRunType.NORMAL_RUN,
-                                    dueDate,
-                                    startDueDate,
-                                    dueDate.plusDays(1));
+                            InvoiceCalculationParameters.builder()
+                                    .lease(lease)
+                                    .leaseItemTypes(selection.selectedTypes())
+                                    .invoiceRunType(InvoiceRunType.NORMAL_RUN)
+                                    .invoiceDueDate(dueDate)
+                                    .startDueDate(startDueDate)
+                                    .nextDueDate(dueDate.plusDays(1)).build();
                     runId = invoiceCalculationService.calculateAndInvoice(parameters);
                     if (runId != null) {
                         final InvoiceSummaryForInvoiceRun summaryForInvoiceRun = invoiceSummaries.findByRunId(runId);
@@ -143,13 +144,14 @@ public class InvoiceServiceMenuAndContributions extends UdoDomainService<Invoice
             final LocalDate startDueDate,
             final LocalDate nextDueDate) {
         String runId = invoiceCalculationService.calculateAndInvoice(
-                new InvoiceCalculationParameters(
-                        lease,
-                        calculationSelection.selectedTypes(),
-                        runType,
-                        invoiceDueDate,
-                        startDueDate,
-                        nextDueDate));
+                InvoiceCalculationParameters.builder()
+                .lease(lease)
+                .leaseItemTypes(calculationSelection.selectedTypes())
+                .invoiceRunType(runType)
+                .invoiceDueDate(invoiceDueDate)
+                .startDueDate(startDueDate)
+                .nextDueDate(nextDueDate)
+                .build());
         if (runId != null) {
             return invoiceSummaries.findByRunId(runId);
         }
@@ -211,7 +213,7 @@ public class InvoiceServiceMenuAndContributions extends UdoDomainService<Invoice
     private InvoiceCalculationService invoiceCalculationService;
 
     @javax.inject.Inject
-    private InvoiceSummariesForInvoiceRunMenu invoiceSummaries;
+    private InvoiceSummaryForInvoiceRunRepository invoiceSummaries;
 
 
 

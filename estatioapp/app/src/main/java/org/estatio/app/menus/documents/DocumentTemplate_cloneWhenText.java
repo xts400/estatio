@@ -37,13 +37,14 @@ import org.apache.isis.applib.services.i18n.TranslatableString;
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancyRepository;
 
-import org.incode.module.documents.dom.DocumentsModule;
-import org.incode.module.documents.dom.impl.applicability.Applicability;
-import org.incode.module.documents.dom.impl.docs.DocumentSort;
-import org.incode.module.documents.dom.impl.docs.DocumentTemplate;
-import org.incode.module.documents.dom.impl.docs.DocumentTemplateRepository;
-import org.incode.module.documents.dom.impl.rendering.RenderingStrategy;
-import org.incode.module.documents.dom.impl.types.DocumentType;
+import org.incode.module.document.dom.DocumentModule;
+import org.incode.module.document.dom.impl.applicability.Applicability;
+import org.incode.module.document.dom.impl.docs.DocumentSort;
+import org.incode.module.document.dom.impl.docs.DocumentTemplate;
+import org.incode.module.document.dom.impl.docs.DocumentTemplateRepository;
+import org.incode.module.document.dom.impl.rendering.RenderingStrategy;
+import org.incode.module.document.dom.impl.types.DocumentType;
+import org.incode.module.document.dom.types.NameType;
 
 import org.estatio.dom.apptenancy.EstatioApplicationTenancyRepository;
 
@@ -62,21 +63,21 @@ public class DocumentTemplate_cloneWhenText {
             contributed = Contributed.AS_ACTION
     )
     public DocumentTemplate $$(
-            @Parameter(maxLength = DocumentsModule.JdoColumnLength.NAME)
+            @Parameter(maxLength = NameType.Meta.MAX_LEN)
             @ParameterLayout(named = "Name")
             final String name,
             final ApplicationTenancy applicationTenancy,
             @Parameter(optionality = Optionality.OPTIONAL)
             @ParameterLayout(named = "Date")
             final LocalDate date,
-            @ParameterLayout(named = "Text", multiLine = DocumentsModule.Constants.TEXT_MULTILINE)
+            @ParameterLayout(named = "Text", multiLine = DocumentModule.Constants.TEXT_MULTILINE)
             final String templateText,
+            @ParameterLayout(named = "Content rendering strategy")
             final RenderingStrategy contentRenderingStrategy,
-            @Parameter(maxLength = DocumentsModule.JdoColumnLength.SUBJECT_TEXT)
-            @ParameterLayout(named = "Subject text")
-            final String subjectText,
-            @ParameterLayout(named = "Subject rendering strategy")
-            final RenderingStrategy subjectRenderingStrategy,
+            @Parameter(maxLength = DocumentTemplate.NameTextType.Meta.MAX_LEN)
+            final String nameText,
+            @ParameterLayout(named = "Name rendering strategy")
+            final RenderingStrategy nameRenderingStrategy,
             @ParameterLayout(named = "Preview only?")
             final boolean previewOnly) {
 
@@ -85,7 +86,7 @@ public class DocumentTemplate_cloneWhenText {
         final String fileSuffix = documentTemplate.getFileSuffix();
         final DocumentTemplate template = documentTemplateRepository.createText(
                 type, date, applicationTenancy.getPath(), fileSuffix, previewOnly, name, mimeType, templateText, contentRenderingStrategy,
-                subjectText, subjectRenderingStrategy);
+                nameText, nameRenderingStrategy);
         for (Applicability applicability : documentTemplate.getAppliesTo()) {
             template.applicable(applicability.getDomainClassName(), applicability.getBinderClassName());
         }
@@ -123,11 +124,11 @@ public class DocumentTemplate_cloneWhenText {
     }
 
     public String default5$$() {
-        return documentTemplate.getSubjectText();
+        return documentTemplate.getNameText();
     }
 
     public RenderingStrategy default6$$() {
-        return documentTemplate.getSubjectRenderingStrategy();
+        return documentTemplate.getNameRenderingStrategy();
     }
 
     public boolean default7$$() {

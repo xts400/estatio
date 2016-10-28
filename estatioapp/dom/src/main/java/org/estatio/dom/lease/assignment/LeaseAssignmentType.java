@@ -18,7 +18,7 @@
  */
 package org.estatio.dom.lease.assignment;
 
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum LeaseAssignmentType {
     
@@ -29,6 +29,13 @@ public enum LeaseAssignmentType {
     public String title() {
         return StringUtils.enumTitle(this.toString());
     }
-    
+
+
+    public static class Meta {
+        private Meta(){}
+
+        public final static int MAX_LEN = 30;
+    }
+
 
 }

@@ -37,19 +37,20 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.budgeting.Distributable;
 import org.estatio.dom.budgeting.keytable.KeyTable;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType = IdentityType.DATASTORE
-        //       ,schema = "budget"
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
 )
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
@@ -57,7 +58,6 @@ import lombok.Setter;
 @javax.jdo.annotations.Version(
         strategy = VersionStrategy.VERSION_NUMBER,
         column = "version")
-@DomainObject(editing = Editing.DISABLED)
 @javax.jdo.annotations.Queries({
         @Query(
                 name = "findByKeyTableAndUnit", language = "JDOQL",
@@ -65,6 +65,10 @@ import lombok.Setter;
                         "FROM org.estatio.dom.budgeting.keyitem.KeyItem " +
                         "WHERE keyTable == :keyTable && unit == :unit")
 })
+@DomainObject(
+        editing = Editing.DISABLED,
+        objectType = "org.estatio.dom.budgeting.keyitem.KeyItem"
+)
 public class KeyItem extends UdoDomainObject2<KeyItem>
         implements WithApplicationTenancyProperty, Distributable {
 

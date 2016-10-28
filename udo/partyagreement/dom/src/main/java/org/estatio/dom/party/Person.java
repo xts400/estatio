@@ -32,19 +32,21 @@ import org.apache.isis.applib.util.TitleBuffer;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.RegexValidation;
+import org.incode.module.base.dom.types.ProperNameType;
+
 import org.estatio.dom.apptenancy.WithApplicationTenancyCountry;
 import org.estatio.dom.apptenancy.WithApplicationTenancyPathPersisted;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo" // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
+@javax.jdo.annotations.Discriminator("org.estatio.dom.party.Person")
 @DomainObject(editing = Editing.DISABLED)
-public class Person
-        extends Party
+public class Person extends Party
         implements WithApplicationTenancyCountry, WithApplicationTenancyPathPersisted {
 
 
@@ -68,7 +70,7 @@ public class Person
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(length = JdoColumnLength.Person.INITIALS)
+    @javax.jdo.annotations.Column(length = InitialsType.Meta.MAX_LEN)
     @MemberOrder(sequence = "2")
     @Getter @Setter
     private String initials;
@@ -82,19 +84,19 @@ public class Person
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.PROPER_NAME)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = ProperNameType.Meta.MAX_LEN)
     @Getter @Setter
     private String firstName;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.PROPER_NAME)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = ProperNameType.Meta.MAX_LEN)
     @Getter @Setter
     private String lastName;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = PersonGenderType.Type.MAX_LEN)
     @MemberOrder(sequence = "1")
     @Getter @Setter
     private PersonGenderType gender;
@@ -117,7 +119,7 @@ public class Person
 
     public Person change(
             final PersonGenderType gender,
-            final @Parameter(optionality = Optionality.OPTIONAL, regexPattern = RegexValidation.Person.INITIALS, regexPatternReplacement = RegexValidation.Person.INITIALS_DESCRIPTION) String initials,
+            final @Parameter(optionality = Optionality.OPTIONAL, regexPattern = InitialsType.Meta.REGEX, regexPatternReplacement = InitialsType.Meta.REGEX_DESCRIPTION) String initials,
             final String firstName,
             final String lastName) {
         setGender(gender);
@@ -144,4 +146,38 @@ public class Person
         return getLastName();
     }
 
+
+    // //////////////////////////////////////
+
+    public static class InitialsType {
+
+        private InitialsType() {}
+
+        public static class Meta {
+
+            public static final int MAX_LEN = 3;
+
+            public static final String REGEX = "[A-Z]+";
+            public static final String REGEX_DESCRIPTION = "Only letters are allowed";
+
+            private Meta() {}
+
+        }
+
+    }
+
+    public static class ReferenceType {
+
+        private ReferenceType() {}
+
+        public static class Meta {
+
+            public static final String REGEX = "[A-Z,0-9,_,-,/]+";
+            public static final String REGEX_DESCRIPTION = "Only letters, numbers and 3 symbols being: \"_\" , \"-\" and \"/\" are allowed";
+
+            private Meta() {}
+
+        }
+
+    }
 }

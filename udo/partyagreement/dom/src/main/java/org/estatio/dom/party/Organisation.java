@@ -39,17 +39,19 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.RegexValidation;
+import org.incode.module.base.dom.types.ReferenceType;
+
 import org.estatio.dom.apptenancy.WithApplicationTenancyCountry;
 import org.estatio.dom.apptenancy.WithApplicationTenancyPathPersisted;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable
-@javax.jdo.annotations.Inheritance(
-        strategy = InheritanceStrategy.NEW_TABLE)
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo" // Isis' ObjectSpecId inferred from @Discriminator
+)
+@javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
+@javax.jdo.annotations.Discriminator("org.estatio.dom.party.Organisation")
 @DomainObject(editing = Editing.DISABLED)
 public class Organisation
         extends Party
@@ -74,7 +76,7 @@ public class Organisation
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(length = JdoColumnLength.Organisation.FISCAL_CODE)
+    @javax.jdo.annotations.Column(length = FiscalCodeType.Meta.MAX_LEN)
     @Property(optionality = Optionality.OPTIONAL)
     @MemberOrder(sequence = "1")
     @Getter @Setter
@@ -82,7 +84,7 @@ public class Organisation
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(length = JdoColumnLength.Organisation.VAT_CODE)
+    @javax.jdo.annotations.Column(length = VatCodeType.Meta.MAX_LEN)
     @Property(optionality = Optionality.OPTIONAL)
     @MemberOrder(sequence = "1")
     @Getter @Setter
@@ -91,7 +93,7 @@ public class Organisation
     // //////////////////////////////////////
 
 
-    @javax.jdo.annotations.Column(length = JdoColumnLength.Organisation.COC_CODE)
+    @javax.jdo.annotations.Column(length = CocCodeType.Meta.MAX_LEN)
     @Property(optionality = Optionality.OPTIONAL)
     @Getter @Setter
     private String chamberOfCommerceCode;
@@ -106,9 +108,9 @@ public class Organisation
     // //////////////////////////////////////
 
     public Organisation change(
-            final @Parameter(optionality = Optionality.OPTIONAL, regexPattern = RegexValidation.REFERENCE, regexPatternReplacement = RegexValidation.REFERENCE_DESCRIPTION) String vatCode,
-            final @Parameter(optionality = Optionality.OPTIONAL, regexPattern = RegexValidation.REFERENCE, regexPatternReplacement = RegexValidation.REFERENCE_DESCRIPTION) String fiscalCode,
-            final @Parameter(optionality = Optionality.OPTIONAL, regexPattern = RegexValidation.REFERENCE, regexPatternReplacement = RegexValidation.REFERENCE_DESCRIPTION) String chamberOfCommerceCode) {
+            final @Parameter(optionality = Optionality.OPTIONAL, regexPattern = ReferenceType.Meta.REGEX, regexPatternReplacement = ReferenceType.Meta.REGEX_DESCRIPTION) String vatCode,
+            final @Parameter(optionality = Optionality.OPTIONAL, regexPattern = ReferenceType.Meta.REGEX, regexPatternReplacement = ReferenceType.Meta.REGEX_DESCRIPTION) String fiscalCode,
+            final @Parameter(optionality = Optionality.OPTIONAL, regexPattern = ReferenceType.Meta.REGEX, regexPatternReplacement = ReferenceType.Meta.REGEX_DESCRIPTION) String chamberOfCommerceCode) {
         setVatCode(vatCode);
         setFiscalCode(fiscalCode);
         setChamberOfCommerceCode(chamberOfCommerceCode);
@@ -158,4 +160,55 @@ public class Organisation
 
     @Inject
     OrganisationPreviousNameRepository organisationPreviousNameRepository;
+
+    public static class CocCodeType {
+
+        private CocCodeType() {}
+
+        public static class Meta {
+
+            /**
+             * TODO: review
+             */
+            public static final int MAX_LEN = 30;
+
+            private Meta() {}
+
+        }
+
+    }
+
+    public static class FiscalCodeType {
+
+        private FiscalCodeType() {}
+
+        public static class Meta {
+
+            /**
+             * TODO: review
+             */
+            public static final int MAX_LEN = 30;
+
+            private Meta() {}
+
+        }
+
+    }
+
+    public static class VatCodeType {
+
+        private VatCodeType() {}
+
+        public static class Meta {
+
+            /**
+             * TODO: review
+             */
+            public static final int MAX_LEN = 30;
+
+            private Meta() {}
+
+        }
+
+    }
 }

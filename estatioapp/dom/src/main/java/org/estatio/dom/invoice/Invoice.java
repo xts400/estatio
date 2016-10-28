@@ -53,8 +53,8 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.EstatioUserRole;
-import org.estatio.dom.JdoColumnLength;
+import org.incode.module.communications.dom.impl.commchannel.CommunicationChannel;
+
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyAny;
 import org.estatio.dom.apptenancy.WithApplicationTenancyPathPersisted;
@@ -63,7 +63,6 @@ import org.estatio.dom.asset.financial.FixedAssetFinancialAccount;
 import org.estatio.dom.asset.financial.FixedAssetFinancialAccountRepository;
 import org.estatio.dom.bankmandate.BankMandate;
 import org.estatio.dom.charge.Charge;
-import org.estatio.dom.communicationchannel.CommunicationChannel;
 import org.estatio.dom.currency.Currency;
 import org.estatio.dom.financial.FinancialAccount;
 import org.estatio.dom.financial.bankaccount.BankAccount;
@@ -71,12 +70,15 @@ import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.invoicing.InvoiceItemForLease;
 import org.estatio.dom.numerator.Numerator;
 import org.estatio.dom.party.Party;
+import org.estatio.dom.roles.EstatioRole;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable(
-        identityType = IdentityType.DATASTORE)
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"   // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -113,6 +115,14 @@ import lombok.Setter;
                         "dueDate == :dueDate " +
                         "ORDER BY invoiceNumber"),
         @javax.jdo.annotations.Query(
+                name = "findByApplicationTenancyPathAndSellerAndInvoiceDate", language = "JDOQL",
+                value = "SELECT FROM org.estatio.dom.invoice.Invoice " +
+                        "WHERE " +
+                        "seller == :seller && " +
+                        "applicationTenancyPath == :applicationTenancyPath && " +
+                        "invoiceDate == :invoiceDate " +
+                        "ORDER BY invoiceNumber"),
+        @javax.jdo.annotations.Query(
                 name = "findByFixedAssetAndDueDateAndStatus", language = "JDOQL",
                 value = "SELECT FROM org.estatio.dom.invoice.Invoice " +
                         "WHERE " +
@@ -126,6 +136,13 @@ import lombok.Setter;
                         "WHERE " +
                         "fixedAsset == :fixedAsset && " +
                         "dueDate == :dueDate " +
+                        "ORDER BY invoiceNumber"),
+        @javax.jdo.annotations.Query(
+                name = "findByFixedAssetAndInvoiceDate", language = "JDOQL",
+                value = "SELECT FROM org.estatio.dom.invoice.Invoice " +
+                        "WHERE " +
+                        "fixedAsset == :fixedAsset && " +
+                        "invoiceDate == :invoiceDate " +
                         "ORDER BY invoiceNumber"),
         @javax.jdo.annotations.Query(
                 name = "findByStatus", language = "JDOQL",
@@ -182,7 +199,10 @@ import lombok.Setter;
         @Index(name = "Invoice_invoiceNumber_IDX",
                 members = { "invoiceNumber" })
 })
-@DomainObject(editing = Editing.DISABLED)
+@DomainObject(
+        editing = Editing.DISABLED,
+        objectType = "org.estatio.dom.invoice.Invoice"
+)
 @DomainObjectLayout(bookmarking = BookmarkPolicy.AS_ROOT)
 public class Invoice
         extends UdoDomainObject2<Invoice>
@@ -253,14 +273,14 @@ public class Invoice
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.Invoice.NUMBER)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = InvoiceNumberType.Meta.MAX_LEN)
     @Property(hidden = Where.ALL_TABLES)
     @Getter @Setter
     private String collectionNumber;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.Invoice.NUMBER)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = InvoiceNumberType.Meta.MAX_LEN)
     @Property(hidden = Where.ALL_TABLES)
     @Getter @Setter
     private String invoiceNumber;
@@ -320,7 +340,7 @@ public class Invoice
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.STATUS_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = InvoiceStatus.Meta.MAX_LEN)
     @Getter @Setter
     private InvoiceStatus status;
 
@@ -334,7 +354,7 @@ public class Invoice
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.PAYMENT_METHOD_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = PaymentMethod.Meta.MAX_LEN)
     @Getter @Setter
     private PaymentMethod paymentMethod;
 
@@ -697,7 +717,7 @@ public class Invoice
     }
 
     public boolean hideSaveAsHistoric(){
-        return !EstatioUserRole.ADMIN_ROLE.isApplicableTo(getUser());
+        return !EstatioRole.ADMINISTRATOR.hasRoleWithSuffix(getUser());
     }
 
     @javax.inject.Inject
@@ -711,4 +731,24 @@ public class Invoice
 
     @javax.inject.Inject
     InvoiceItemRepository invoiceItemRepository;
+
+
+
+
+    public static class InvoiceNumberType {
+
+        private InvoiceNumberType() {}
+
+        public static class Meta {
+
+            /**
+             * TODO: review
+             */
+            public static final int MAX_LEN = 16;
+
+            private Meta() {}
+
+        }
+
+    }
 }

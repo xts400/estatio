@@ -17,9 +17,9 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancyRepository;
 import org.isisaddons.module.security.dom.user.ApplicationUser;
 
-import org.estatio.dom.apptenancy.EstatioApplicationTenancyRepositoryForCountry;
-import org.estatio.dom.geography.Country;
-import org.estatio.dom.valuetypes.ApplicationTenancyLevel;
+import org.estatio.dom.country.EstatioApplicationTenancyRepositoryForCountry;
+import org.incode.module.country.dom.impl.Country;
+import org.estatio.dom.apptenancy.ApplicationTenancyLevel;
 
 @DomainService(
         nature = NatureOfService.DOMAIN

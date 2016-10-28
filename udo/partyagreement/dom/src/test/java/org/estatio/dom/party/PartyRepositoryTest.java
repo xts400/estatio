@@ -27,8 +27,8 @@ import org.apache.isis.applib.query.Query;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.FinderInteraction;
-import org.estatio.dom.FinderInteraction.FinderMethod;
+import org.incode.module.base.dom.testing.FinderInteraction;
+import org.incode.module.base.dom.testing.FinderInteraction.FinderMethod;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;

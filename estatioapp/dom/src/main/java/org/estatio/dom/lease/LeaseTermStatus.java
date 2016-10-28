@@ -18,7 +18,7 @@
  */
 package org.estatio.dom.lease;
 
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum LeaseTermStatus {
 
@@ -49,6 +49,14 @@ public enum LeaseTermStatus {
 
     public boolean isUpdatable() {
         return updatable;
+    }
+
+    public static class Meta {
+
+        public final static int MAX_LEN = 20;
+
+        private Meta() {}
+
     }
 
 }

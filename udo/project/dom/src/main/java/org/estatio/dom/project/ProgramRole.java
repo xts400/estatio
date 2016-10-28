@@ -33,6 +33,7 @@ import org.joda.time.LocalDate;
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.BookmarkPolicy;
 import org.apache.isis.applib.annotation.CollectionLayout;
+import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.DomainObjectLayout;
 import org.apache.isis.applib.annotation.Editing;
 import org.apache.isis.applib.annotation.Optionality;
@@ -46,13 +47,13 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.JdoColumnLength;
+import org.incode.module.base.dom.with.WithIntervalContiguous;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.UdoDomainObject;
-import org.estatio.dom.WithIntervalContiguous;
 import org.estatio.dom.apptenancy.WithApplicationTenancyGlobalAndCountry;
 import org.estatio.dom.party.Party;
-import org.estatio.dom.utils.TitleBuilder;
-import org.estatio.dom.valuetypes.LocalDateInterval;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -62,7 +63,10 @@ import lombok.Setter;
  * {@link #getType() type} of role with respect to a {@link #getProgram() program
  * }, for a particular {@link #getInterval() interval of time}.
  */
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"  // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -110,7 +114,9 @@ import lombok.Setter;
                         + "FROM org.estatio.dom.project.ProgramRole "
                         + "WHERE party == :party ")
 })
-
+@DomainObject(
+        objectType = "org.estatio.dom.project.ProgramRole"
+)
 @DomainObjectLayout(bookmarking=BookmarkPolicy.AS_CHILD)
 public class ProgramRole
         extends UdoDomainObject<ProgramRole>
@@ -147,7 +153,7 @@ public class ProgramRole
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = ProgramRoleType.Type.MAX_LEN)
     @Property(editing=Editing.DISABLED)
     @Getter @Setter
     private ProgramRoleType type;

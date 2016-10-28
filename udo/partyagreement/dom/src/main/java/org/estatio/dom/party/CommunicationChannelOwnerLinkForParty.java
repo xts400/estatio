@@ -28,17 +28,19 @@ import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.services.bookmark.BookmarkService;
-import org.estatio.dom.communicationchannel.CommunicationChannelOwner;
-import org.estatio.dom.communicationchannel.CommunicationChannelOwnerLink;
+import org.incode.module.communications.dom.impl.commchannel.CommunicationChannelOwner;
+import org.incode.module.communications.dom.impl.commchannel.CommunicationChannelOwnerLink;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable()
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.NEW_TABLE)
 @DomainObject(
-        objectType = "party.CommunicationChannelOwnerLinkForParty"
+        objectType = "party.CommunicationChannelOwnerLinkForParty"  // TODO: reconcile with schema
 )
 public class CommunicationChannelOwnerLinkForParty extends CommunicationChannelOwnerLink {
 

@@ -29,15 +29,17 @@ import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.Property;
 
-import org.estatio.dom.utils.MathUtils;
+import org.incode.module.base.dom.utils.MathUtils;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo"     // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.SUPERCLASS_TABLE)
-public class LeaseTermForFixed
-        extends LeaseTerm {
+@javax.jdo.annotations.Discriminator("org.estatio.dom.lease.LeaseTermForFixed")
+public class LeaseTermForFixed extends LeaseTerm {
 
     @javax.jdo.annotations.Column(scale = 2, allowsNull = "true")
     @Property(optionality = Optionality.OPTIONAL, editing = Editing.DISABLED)

@@ -49,13 +49,14 @@ import org.apache.isis.applib.annotation.SemanticsOf;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.Chained;
+import org.incode.module.base.dom.Chained;
+import org.incode.module.base.dom.with.WithStartDate;
+import org.incode.module.base.dom.utils.MathUtils;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.WithStartDate;
 import org.estatio.dom.apptenancy.WithApplicationTenancyCountry;
 import org.estatio.dom.index.api.IndexValueCreator;
-import org.estatio.dom.utils.MathUtils;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -67,7 +68,10 @@ import lombok.Setter;
  *
  * @see Index
  */
-@PersistenceCapable(identityType = IdentityType.DATASTORE)
+@PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -90,7 +94,10 @@ import lombok.Setter;
                         "&& startDate <= :date " +
                         "ORDER BY startDate DESC ")
 })
-@DomainObject(editing = Editing.DISABLED)
+@DomainObject(
+        editing = Editing.DISABLED,
+        objectType = "org.estatio.dom.index.IndexBase"
+)
 public class IndexBase
         extends UdoDomainObject2<IndexBase>
         implements WithStartDate, Chained<IndexBase>, WithApplicationTenancyCountry, IndexValueCreator {

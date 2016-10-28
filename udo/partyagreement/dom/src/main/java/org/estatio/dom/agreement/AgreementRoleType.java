@@ -31,17 +31,21 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.types.TitleType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.WithTitleComparable;
+import org.incode.module.base.dom.with.WithTitleComparable;
 import org.estatio.dom.apptenancy.ApplicationTenancyConstants;
 import org.estatio.dom.apptenancy.WithApplicationTenancyGlobal;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -63,7 +67,11 @@ import lombok.Setter;
                         + "FROM org.estatio.dom.agreement.AgreementRoleType "
                         + "WHERE appliesTo == :agreementType && title == :title")
 })
-@DomainObject(editing = Editing.DISABLED, bounded = true)
+@DomainObject(
+        editing = Editing.DISABLED,
+        bounded = true,
+        objectType = "org.estatio.dom.agreement.AgreementRoleType"
+)
 public class AgreementRoleType
         extends UdoDomainObject2<AgreementRoleType>
         implements WithTitleComparable<AgreementRoleType>, WithApplicationTenancyGlobal {
@@ -86,7 +94,7 @@ public class AgreementRoleType
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.TITLE)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = TitleType.Meta.MAX_LEN)
     @Getter @Setter
     private String title;
 

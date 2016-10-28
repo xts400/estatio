@@ -39,18 +39,22 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.Chained;
+import org.incode.module.base.dom.Chained;
+import org.incode.module.base.dom.with.WithIntervalMutable;
+import org.incode.module.base.dom.types.NameType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.WithIntervalMutable;
 import org.estatio.dom.apptenancy.WithApplicationTenancyCountry;
-import org.estatio.dom.utils.TitleBuilder;
-import org.estatio.dom.valuetypes.LocalDateInterval;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"  // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -66,7 +70,10 @@ import lombok.Setter;
                         + "  && startDate <= :date"
                         + "  && (endDate == null || endDate >= :date)")
 })
-@DomainObject(editing = Editing.DISABLED)
+@DomainObject(
+        editing = Editing.DISABLED,
+        objectType = "org.estatio.dom.tax.TaxRate"
+)
 public class TaxRate
         extends UdoDomainObject2<TaxRate>
         implements Chained<TaxRate>, WithIntervalMutable<TaxRate>, WithApplicationTenancyCountry {
@@ -108,7 +115,7 @@ public class TaxRate
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.NAME)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = NameType.Meta.MAX_LEN)
     @Property(optionality = Optionality.OPTIONAL)
     @Getter @Setter
     private String externalReference;

@@ -29,12 +29,13 @@ import org.joda.time.LocalDate;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Programmatic;
 
-@javax.jdo.annotations.PersistenceCapable
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo"   // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.SUPERCLASS_TABLE)
-@DomainObject(
-        objectType = "lease.RollingBreakOption"
-)
+@javax.jdo.annotations.Discriminator("org.estatio.dom.lease.breaks.RollingBreakOption")
+@DomainObject()
 public class RollingBreakOption
         extends BreakOption {
 

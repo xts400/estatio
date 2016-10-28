@@ -15,17 +15,19 @@ import org.apache.isis.applib.annotation.SemanticsOf;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.lease.Occupancy;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType = IdentityType.DATASTORE
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
 )
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
@@ -46,7 +48,9 @@ import lombok.Setter;
                         "WHERE occupancy == :occupancy && charge == :charge")
 })
 @Unique(name = "ServiceChargeItem_occupancy_charge_UNQ", members = { "occupancy", "charge" })
-@DomainObject()
+@DomainObject(
+        objectType = "org.estatio.dom.budgetassignment.ServiceChargeItem"
+)
 public class ServiceChargeItem extends UdoDomainObject2<ServiceChargeItem> implements WithApplicationTenancyProperty {
 
     public ServiceChargeItem()  {

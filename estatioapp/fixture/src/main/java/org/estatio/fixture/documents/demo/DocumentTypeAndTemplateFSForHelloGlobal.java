@@ -23,14 +23,14 @@ import org.joda.time.LocalDate;
 
 import org.apache.isis.applib.services.clock.ClockService;
 
-import org.incode.module.documents.dom.impl.docs.DocumentTemplate;
-import org.incode.module.documents.dom.impl.rendering.RenderingStrategy;
-import org.incode.module.documents.dom.impl.rendering.RenderingStrategyRepository;
-import org.incode.module.documents.dom.impl.types.DocumentType;
-import org.incode.module.documents.dom.impl.types.DocumentTypeRepository;
-import org.incode.module.documents.fixture.DocumentTemplateFSAbstract;
+import org.incode.module.document.dom.impl.docs.DocumentTemplate;
+import org.incode.module.document.dom.impl.rendering.RenderingStrategy;
+import org.incode.module.document.dom.impl.rendering.RenderingStrategyRepository;
+import org.incode.module.document.dom.impl.types.DocumentType;
+import org.incode.module.document.dom.impl.types.DocumentTypeRepository;
+import org.incode.module.document.fixture.DocumentTemplateFSAbstract;
 
-import org.estatio.dom.WithNameGetter;
+import org.incode.module.base.dom.with.WithNameGetter;
 import org.estatio.dom.documents.binders.BinderForWithNameGetterAttachToInput;
 import org.estatio.fixture.documents.RenderingStrategies;
 import org.estatio.fixture.security.tenancy.ApplicationTenancyForGlobal;
@@ -63,7 +63,8 @@ public class DocumentTypeAndTemplateFSForHelloGlobal extends DocumentTemplateFSA
 
         final DocumentTemplate documentTemplate = upsertDocumentTextTemplate(
                 documentType, date, AT_PATH, FILE_SUFFIX, false, TEMPLATE_NAME, TEMPLATE_MIME_TYPE,
-                SUBJECT_TEXT, freemarkerRenderingStrategy, CONTENT_TEXT, freemarkerRenderingStrategy,
+                CONTENT_TEXT, freemarkerRenderingStrategy,
+                SUBJECT_TEXT, freemarkerRenderingStrategy,
                 executionContext);
 
         documentTemplate.applicable(WithNameGetter.class, BinderForWithNameGetterAttachToInput.class);

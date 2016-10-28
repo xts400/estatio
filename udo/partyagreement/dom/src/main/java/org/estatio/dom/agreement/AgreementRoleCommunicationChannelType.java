@@ -34,16 +34,20 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.types.TitleType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
 import org.estatio.dom.apptenancy.ApplicationTenancyConstants;
 import org.estatio.dom.apptenancy.WithApplicationTenancyGlobal;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType=IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType=IdentityType.DATASTORE
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy=IdGeneratorStrategy.NATIVE, 
         column="id")
@@ -64,9 +68,12 @@ import lombok.Setter;
                         + "FROM org.estatio.dom.agreement.AgreementRoleCommunicationChannelType "
                         + "WHERE appliesTo == :agreementType && title == :title")
 })
-
-@DomainObject(bounded = true, editing = Editing.DISABLED)
-public class AgreementRoleCommunicationChannelType 
+@DomainObject(
+        bounded = true,
+        editing = Editing.DISABLED,
+        objectType = "org.estatio.dom.agreement.AgreementRoleCommunicationChannelType"
+)
+public class AgreementRoleCommunicationChannelType
         extends UdoDomainObject2<AgreementRoleCommunicationChannelType>
         implements WithApplicationTenancyGlobal {
 
@@ -88,7 +95,7 @@ public class AgreementRoleCommunicationChannelType
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull="false", length=JdoColumnLength.TITLE)
+    @javax.jdo.annotations.Column(allowsNull="false", length= TitleType.Meta.MAX_LEN)
     @Getter @Setter
     private String title;
 

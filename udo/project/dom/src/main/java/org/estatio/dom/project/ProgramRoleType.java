@@ -23,8 +23,8 @@ import com.google.common.base.Predicate;
 
 import org.apache.isis.applib.annotation.Programmatic;
 
-import org.estatio.dom.TitledEnum;
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.TitledEnum;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum ProgramRoleType implements TitledEnum {
 
@@ -53,6 +53,15 @@ public enum ProgramRoleType implements TitledEnum {
                 return pr != null && Objects.equal(pr.getType(), this) ? true : false;
             }
         };
+    }
+
+
+    // //////////////////////////////////////
+
+    public static class Type {
+        private Type(){}
+
+        public final static int MAX_LEN = 30;
     }
 
 }

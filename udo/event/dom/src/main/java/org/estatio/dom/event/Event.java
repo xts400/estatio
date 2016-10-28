@@ -40,10 +40,12 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 import org.isisaddons.wicket.fullcalendar2.cpt.applib.CalendarEvent;
 import org.isisaddons.wicket.fullcalendar2.cpt.applib.CalendarEventable;
 
+import org.incode.module.base.dom.types.NotesType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.utils.TitleBuilder;
+import org.estatio.dom.event.types.CalendarNameType;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -52,7 +54,10 @@ import lombok.Setter;
  * An event that has or is scheduled to occur at some point in time, pertaining
  * to an {@link EventSource}.
  */
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -67,7 +72,10 @@ import lombok.Setter;
                     "WHERE date >= :rangeStartDate " +
                     "   && date <= :rangeEndDate")
 })
-@DomainObject(editing = Editing.DISABLED)
+@DomainObject(
+        editing = Editing.DISABLED,
+        objectType = "org.estatio.dom.event.Event"
+)
 public class Event
         extends UdoDomainObject2<Event>
         implements CalendarEventable, WithApplicationTenancyProperty {
@@ -155,14 +163,14 @@ public class Event
      * break</i>, <i>Fixed break exercise</i> and <i>Fixed break exercise
      * reminder</i>.
      */
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.Event.CALENDAR_NAME)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = CalendarNameType.Meta.MAX_LEN)
     @Property(editing = Editing.DISABLED)
     @Getter @Setter
     private String calendarName;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.NOTES)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = NotesType.Meta.MAX_LEN)
     @PropertyLayout(multiLine = NUMBER_OF_LINES)
     @Getter @Setter
     private String notes;

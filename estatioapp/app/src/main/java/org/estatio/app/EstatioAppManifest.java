@@ -15,15 +15,16 @@ import org.isisaddons.module.pdfbox.dom.PdfBoxModule;
 import org.isisaddons.module.security.SecurityModule;
 
 import org.incode.module.communications.dom.CommunicationsModule;
+import org.incode.module.country.dom.CountryModule;
 import org.incode.module.docrendering.stringinterpolator.dom.StringInterpolatorDocRenderingModule;
-import org.incode.module.documents.dom.DocumentsModule;
+import org.incode.module.document.dom.DocumentModule;
 
 import org.estatio.dom.EstatioDomainModule;
 import org.estatio.domlink.EstatioDomainLinkModule;
 import org.estatio.domsettings.EstatioDomainSettingsModule;
 import org.estatio.fixture.EstatioFixtureModule;
 import org.estatio.fixturescripts.EstatioFixtureScriptsModule;
-import org.estatio.services.calendar.CalendarService;
+import org.incode.module.base.services.calendar.CalendarService;
 
 public class EstatioAppManifest implements AppManifest {
 
@@ -44,8 +45,10 @@ public class EstatioAppManifest implements AppManifest {
                         EstatioDomainLinkModule.class,
                         EstatioDomainSettingsModule.class,
 
+                        CountryModule.class,
                         CommunicationsModule.class,
-                        DocumentsModule.class,
+                        DocumentModule.class,
+
                         PdfBoxModule.class,
                         StringInterpolatorDocRenderingModule.class,
 
@@ -137,6 +140,8 @@ public class EstatioAppManifest implements AppManifest {
         final Map<String, String> props = Maps.newHashMap();
         withStandardProps(props);
 
+        withEstatioSchemaOverrides(props);
+
         // uncomment to use log4jdbc instead
         // withLog4jdbc(props);
 
@@ -162,6 +167,19 @@ public class EstatioAppManifest implements AppManifest {
         props.put("isis.services.eventbus.allowLateRegistration", "true");
         props.put("isis.services.injector.injectPrefix", "true");
 
+        return props;
+    }
+
+    /**
+     * We need to use overrides where we have a dependency on a module whose entities is defined to reside
+     * its own schema (eg incode modules), but where we have a PK/FK relationship to its entities.
+     *
+     * In this case, because DN (seems to) require both are in the same schema, we force the module's entity to be
+     * mapped to a table in Estatio's own schema, ie 'dbo'.
+     */
+    private static Map<String, String> withEstatioSchemaOverrides(Map<String, String> props) {
+        // to pick up Xxx-dbo.orm overrides
+        props.put("isis.persistor.datanucleus.impl.datanucleus.Mapping", "dbo");
         return props;
     }
 

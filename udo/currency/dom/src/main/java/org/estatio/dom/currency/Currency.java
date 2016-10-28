@@ -29,15 +29,16 @@ import org.apache.isis.applib.annotation.PropertyLayout;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.types.NameType;
+import org.incode.module.base.dom.types.ReferenceType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.RegexValidation;
-import org.estatio.dom.WithNameUnique;
-import org.estatio.dom.WithReferenceComparable;
-import org.estatio.dom.WithReferenceUnique;
+import org.incode.module.base.dom.with.WithNameUnique;
+import org.incode.module.base.dom.with.WithReferenceComparable;
+import org.incode.module.base.dom.with.WithReferenceUnique;
 import org.estatio.dom.apptenancy.ApplicationTenancyConstants;
 import org.estatio.dom.apptenancy.WithApplicationTenancyGlobal;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -48,7 +49,10 @@ import lombok.Setter;
  * <p>
  * Used for taxes, indices, invoices, charges.
  */
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"  // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -74,7 +78,13 @@ import lombok.Setter;
                         + "WHERE reference.matches(:searchArg) "
                         + "|| description.matches(:searchArg)")
 })
-@DomainObject(editing = Editing.DISABLED, autoCompleteRepository = CurrencyRepository.class, autoCompleteAction = "autoComplete", bounded = true)
+@DomainObject(
+        editing = Editing.DISABLED,
+        autoCompleteRepository = CurrencyRepository.class,
+        autoCompleteAction = "autoComplete",
+        bounded = true,
+        objectType = "org.estatio.dom.currency.Currency"
+)
 public class Currency
         extends UdoDomainObject2<Currency>
         implements WithReferenceComparable<Currency>, WithReferenceUnique, WithNameUnique, WithApplicationTenancyGlobal {
@@ -101,15 +111,18 @@ public class Currency
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.REFERENCE)
-    @Property(regexPattern = RegexValidation.Currency.REFERENCE)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = ReferenceType.Meta.MAX_LEN)
+    @Property(regexPattern = ReferenceType.Meta.REGEX)
     @Getter @Setter
     private String reference;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.NAME)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = NameType.Meta.MAX_LEN)
     @Getter @Setter
     private String name;
+
+
+
 
 }

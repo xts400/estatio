@@ -18,15 +18,12 @@
  */
 package org.incode.module.communications.dom.spi;
 
-import org.estatio.dom.communicationchannel.EmailAddress;
+import org.incode.module.communications.dom.impl.commchannel.EmailAddress;
 
 import lombok.Getter;
 import lombok.Setter;
 
 public class CommHeaderForEmail extends CommHeaderAbstract<EmailAddress> {
-
-    @Getter @Setter
-    private String subject;
 
     @Getter
     private String cc ;

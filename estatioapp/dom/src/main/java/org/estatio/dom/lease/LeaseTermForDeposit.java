@@ -31,13 +31,16 @@ import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.Programmatic;
 
-import org.estatio.dom.JdoColumnScale;
+import org.incode.module.base.dom.types.MoneyType;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo" // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.SUPERCLASS_TABLE)
+@javax.jdo.annotations.Discriminator("org.estatio.dom.lease.LeaseTermForDeposit")
 public class LeaseTermForDeposit extends LeaseTerm {
 
     @Column(allowsNull = "false")
@@ -53,15 +56,15 @@ public class LeaseTermForDeposit extends LeaseTerm {
     private boolean includeVat;
 
     @Getter @Setter
-    @Column(allowsNull = "true", scale = JdoColumnScale.MONEY)
+    @Column(allowsNull = "true", scale = MoneyType.Meta.SCALE)
     private BigDecimal calculatedDepositValue;
 
     @Getter @Setter
-    @Column(allowsNull = "true", scale = JdoColumnScale.MONEY)
+    @Column(allowsNull = "true", scale = MoneyType.Meta.SCALE)
     private BigDecimal depositBase;
 
     @Getter @Setter
-    @Column(allowsNull = "true", scale = JdoColumnScale.MONEY)
+    @Column(allowsNull = "true", scale = MoneyType.Meta.SCALE)
     private BigDecimal manualDepositValue;
 
     public LeaseTermForDeposit terminate(final LocalDate endDate) {

@@ -18,7 +18,7 @@
  */
 package org.estatio.dom.party;
 
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum PersonGenderType {
 
@@ -28,6 +28,15 @@ public enum PersonGenderType {
 
     public String title() {
         return StringUtils.enumTitle(name());
+    }
+
+
+    // //////////////////////////////////////
+
+    public static class Type {
+        private Type(){}
+
+        public final static int MAX_LEN = 30;
     }
 
 }

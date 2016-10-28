@@ -26,7 +26,6 @@ import org.joda.time.LocalDate;
 
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
-import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancyRepository;
 import org.isisaddons.wicket.gmap3.cpt.applib.Location;
 
@@ -35,13 +34,13 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.asset.PropertyType;
 import org.estatio.dom.asset.UnitType;
-import org.estatio.dom.geography.Country;
-import org.estatio.dom.geography.CountryRepository;
-import org.estatio.dom.geography.StateRepository;
+import org.incode.module.country.dom.impl.Country;
+import org.incode.module.country.dom.impl.CountryRepository;
+import org.incode.module.country.dom.impl.StateRepository;
 import org.estatio.dom.party.Party;
 import org.estatio.dom.party.PartyRepository;
 
-import static org.estatio.integtests.VT.ld;
+import static org.incode.module.base.integtests.VT.ld;
 
 /**
  * Sets up the {@link org.estatio.dom.asset.Property} and also a number of

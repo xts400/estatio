@@ -11,8 +11,6 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
 import org.estatio.dom.budgetassignment.BudgetCalculationLinkRepository;
-import org.estatio.dom.budgeting.Distributable;
-import org.estatio.dom.budgeting.DistributionService;
 import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
@@ -26,13 +24,12 @@ public class BudgetCalculationService {
         removeTemporaryCalculations(budget);
 
         List<BudgetCalculation> budgetCalculations = new ArrayList<>();
-        for (BudgetCalculationResult result : getCalculatedResults(budget)){
+        for (BudgetCalculationViewmodel result : getCalculations(budget)){
             budgetCalculations.add(
                     budgetCalculationRepository.updateOrCreateTemporaryBudgetCalculation(
                     result.getBudgetItemAllocation(),
                     result.getKeyItem(),
                     result.getValue(),
-                    result.getSourceValue(),
                     result.getCalculationType())
             );
         }
@@ -45,19 +42,19 @@ public class BudgetCalculationService {
         }
     }
 
-    public List<BudgetCalculationResult> getCalculatedResults(final Budget budget){
-        List<BudgetCalculationResult> budgetCalculationResults = new ArrayList<>();
+    public List<BudgetCalculationViewmodel> getCalculations(final Budget budget){
+        List<BudgetCalculationViewmodel> budgetCalculationViewmodels = new ArrayList<>();
         for (BudgetItem budgetItem : budget.getItems()) {
 
-            budgetCalculationResults.addAll(calculate(budgetItem));
+            budgetCalculationViewmodels.addAll(calculate(budgetItem));
 
         }
-        return budgetCalculationResults;
+        return budgetCalculationViewmodels;
     }
 
-    private List<BudgetCalculationResult> calculate(final BudgetItem budgetItem) {
+    private List<BudgetCalculationViewmodel> calculate(final BudgetItem budgetItem) {
 
-        List<BudgetCalculationResult> result = new ArrayList<>();
+        List<BudgetCalculationViewmodel> result = new ArrayList<>();
         for (BudgetItemAllocation itemAllocation : budgetItem.getBudgetItemAllocations()) {
 
             result.addAll(calculate(itemAllocation));
@@ -67,9 +64,9 @@ public class BudgetCalculationService {
         return result;
     }
 
-    private List<BudgetCalculationResult> calculate(final BudgetItemAllocation itemAllocation) {
+    private List<BudgetCalculationViewmodel> calculate(final BudgetItemAllocation itemAllocation) {
 
-        List<BudgetCalculationResult> results = new ArrayList<>();
+        List<BudgetCalculationViewmodel> results = new ArrayList<>();
 
         BigDecimal budgetedTotal = percentageOf(itemAllocation.getBudgetItem().getBudgetedValue(), itemAllocation.getPercentage());
         results.addAll(calculateForTotalAndType(itemAllocation, budgetedTotal, BudgetCalculationType.BUDGETED));
@@ -82,49 +79,38 @@ public class BudgetCalculationService {
         return results;
     }
 
-    private List<BudgetCalculationResult> calculateForTotalAndType(final BudgetItemAllocation itemAllocation, final BigDecimal total, final BudgetCalculationType calculationType) {
+    private List<BudgetCalculationViewmodel> calculateForTotalAndType(final BudgetItemAllocation itemAllocation, final BigDecimal total, final BudgetCalculationType calculationType) {
 
-        List<Distributable> results = new ArrayList<>();
+        List<BudgetCalculationViewmodel> results = new ArrayList<>();
 
-        BigDecimal keySum = itemAllocation.getKeyTable().getKeyValueMethod().keySum(itemAllocation.getKeyTable());
+        BigDecimal divider = itemAllocation.getKeyTable().getKeyValueMethod().divider(itemAllocation.getKeyTable());
 
         for (KeyItem keyItem : itemAllocation.getKeyTable().getItems()) {
 
-            BudgetCalculationResult calculationResult;
+            BudgetCalculationViewmodel calculationResult;
 
-            // case all values in keyTable are zero
-            if (keySum.compareTo(BigDecimal.ZERO) == 0) {
-                calculationResult = new BudgetCalculationResult(
-                        itemAllocation,
-                        keyItem,
-                        BigDecimal.ONE,
-                        BigDecimal.ZERO,
-                        calculationType);
-            } else {
-                calculationResult = new BudgetCalculationResult(
-                        itemAllocation,
-                        keyItem,
-                        BigDecimal.ONE,
-                        total.multiply(keyItem.getValue()).
-                                divide(keySum, MathContext.DECIMAL64),
-                        calculationType);
 
-            }
+            calculationResult = new BudgetCalculationViewmodel(
+                    itemAllocation,
+                    keyItem,
+                    total.multiply(keyItem.getValue()).
+                            divide(divider, MathContext.DECIMAL64).
+                            setScale(keyItem.getKeyTable().getPrecision(), BigDecimal.ROUND_HALF_UP),
+                    calculationType);
+
+
 
             results.add(calculationResult);
         }
 
-        DistributionService distributionService = new DistributionService();
-        distributionService.distribute(results, total, 6);
-
-        return (List<BudgetCalculationResult>) (Object) results;
+        return results;
 
     }
 
     private BigDecimal percentageOf(final BigDecimal value, final BigDecimal percentage) {
         return value
                 .multiply(percentage)
-                .divide(new BigDecimal(100), MathContext.DECIMAL64);
+                .divide(new BigDecimal("100"), MathContext.DECIMAL64);
     }
 
 

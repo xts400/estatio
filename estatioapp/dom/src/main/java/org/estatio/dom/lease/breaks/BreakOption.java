@@ -48,15 +48,16 @@ import org.apache.isis.applib.annotation.Where;
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 import org.isisaddons.wicket.fullcalendar2.cpt.applib.CalendarEventable;
 
+import org.incode.module.base.dom.types.DescriptionType;
+import org.incode.module.base.dom.utils.JodaPeriodUtils;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.event.Event;
-import org.estatio.dom.event.EventSource;
 import org.estatio.dom.event.EventRepository;
+import org.estatio.dom.event.EventSource;
 import org.estatio.dom.lease.Lease;
-import org.estatio.dom.utils.JodaPeriodUtils;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -64,16 +65,21 @@ import lombok.Setter;
 /**
  * Represents a condition upon which the {@link Lease} can be terminated.
  */
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"  // Isis' ObjectSpecId inferred from @Discriminator
+)
+@javax.jdo.annotations.Discriminator(
+        strategy = DiscriminatorStrategy.VALUE_MAP,
+        column = "discriminator",
+        value = "org.estatio.dom.lease.breaks.BreakOption"
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
 @javax.jdo.annotations.Version(
         strategy = VersionStrategy.VERSION_NUMBER,
         column = "version")
-@javax.jdo.annotations.Discriminator(
-        strategy = DiscriminatorStrategy.CLASS_NAME,
-        column = "discriminator")
 @javax.jdo.annotations.Unique(
         name = "BreakOption_lease_type_breakDate_exerciseType_exerciseDate_UNQ",
         members = { "lease", "type", "breakDate", "exerciseType", "exerciseDate" })
@@ -126,7 +132,7 @@ public abstract class BreakOption
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = BreakType.Meta.MAX_LEN)
     @Getter @Setter
     private BreakType type;
 
@@ -162,13 +168,13 @@ public abstract class BreakOption
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.BreakOption.EXERCISE_TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = BreakExerciseType.Meta.MAX_LEN)
     @Getter @Setter
     private BreakExerciseType exerciseType;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.DURATION)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = NotificationPeriodType.Meta.MAX_LEN)
     @Getter @Setter
     private String notificationPeriod;
 
@@ -193,7 +199,7 @@ public abstract class BreakOption
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.DESCRIPTION)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = DescriptionType.Meta.MAX_LEN)
     @Property(hidden = Where.PARENTED_TABLES, optionality = Optionality.OPTIONAL)
     @Getter @Setter
     private String description;
@@ -358,4 +364,22 @@ public abstract class BreakOption
 
     @Inject
     protected EventRepository eventRepository;
+
+
+    // //////////////////////////////////////
+
+
+    public static class NotificationPeriodType {
+
+        private NotificationPeriodType() {}
+
+        public static class Meta {
+
+            public static final int MAX_LEN = 20;
+
+            private Meta() {}
+
+        }
+
+    }
 }

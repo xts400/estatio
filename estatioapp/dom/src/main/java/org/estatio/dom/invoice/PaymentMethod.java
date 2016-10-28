@@ -18,7 +18,7 @@
  */
 package org.estatio.dom.invoice;
 
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum PaymentMethod {
 
@@ -34,6 +34,14 @@ public enum PaymentMethod {
     
     public boolean isDirectDebit() {
         return this == DIRECT_DEBIT;
+    }
+
+    public static class Meta {
+
+        public final static int MAX_LEN = 30;
+
+        private Meta() {}
+
     }
 
 }

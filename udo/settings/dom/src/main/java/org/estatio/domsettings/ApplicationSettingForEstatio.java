@@ -21,19 +21,25 @@ package org.estatio.domsettings;
 
 import javax.jdo.annotations.IdentityType;
 
+import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.DomainServiceLayout;
 
 import org.isisaddons.module.settings.dom.ApplicationSetting;
 import org.isisaddons.module.settings.dom.SettingType;
 
-import org.estatio.dom.JdoColumnLength;
+import org.incode.module.base.dom.types.DescriptionType;
+
+import org.estatio.domsettings.types.SettingKeyType;
+import org.estatio.domsettings.types.SettingTypeType;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType = IdentityType.APPLICATION,
-        table="ApplicationSetting")
+        table="ApplicationSetting"
+        ,schema = "dbo"     // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.Queries({ 
      @javax.jdo.annotations.Query(
              name = "findByKey", language = "JDOQL", 
@@ -46,17 +52,20 @@ import lombok.Setter;
                     + "FROM org.estatio.domsettings.ApplicationSettingForEstatio "
                     + "ORDER BY key")
 })
+@DomainObject(
+        objectType = "org.estatio.domsettings.ApplicationSettingForEstatio"
+)
 @DomainServiceLayout(named = "Application Setting")
 public class ApplicationSettingForEstatio extends SettingAbstractForEstatio implements ApplicationSetting {
 
-    @javax.jdo.annotations.Column(allowsNull="false", length=JdoColumnLength.Setting.KEY)
+    @javax.jdo.annotations.Column(allowsNull="false", length= SettingKeyType.Meta.MAX_LEN)
     @javax.jdo.annotations.PrimaryKey
     @Getter @Setter
     private String key;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(length=JdoColumnLength.DESCRIPTION)
+    @javax.jdo.annotations.Column(length= DescriptionType.Meta.MAX_LEN)
     @javax.jdo.annotations.Persistent
     @Override
     public String getDescription() {
@@ -82,7 +91,7 @@ public class ApplicationSettingForEstatio extends SettingAbstractForEstatio impl
     
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull="false", length=JdoColumnLength.Setting.TYPE)
+    @javax.jdo.annotations.Column(allowsNull="false", length= SettingTypeType.Meta.MAX_LEN)
     @javax.jdo.annotations.Persistent
     @Override
     public SettingType getType() {

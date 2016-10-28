@@ -17,6 +17,7 @@ import javax.jdo.annotations.VersionStrategy;
 import org.joda.time.LocalDate;
 
 import org.apache.isis.applib.annotation.Action;
+import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
@@ -27,17 +28,21 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.app.security.EstatioRole;
+import org.estatio.dom.roles.EstatioRole;
+import org.incode.module.base.dom.types.DescriptionType;
+import org.incode.module.base.dom.types.MoneyType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.JdoColumnScale;
 import org.estatio.dom.apptenancy.WithApplicationTenancyCountry;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@PersistenceCapable(identityType = IdentityType.DATASTORE)
+@PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @DatastoreIdentity(strategy = IdGeneratorStrategy.IDENTITY, column = "id")
 @Version(strategy = VersionStrategy.VERSION_NUMBER, column = "version")
 @Queries({
@@ -63,6 +68,9 @@ import lombok.Setter;
 @Index(
         name = "FinancialAccountTransaction_financialAccount_transactionDate_IDX",
         members = { "financialAccount", "transactionDate" })
+@DomainObject(
+        objectType = "org.estatio.dom.financial.FinancialAccountTransaction"
+)
 public class FinancialAccountTransaction
         extends UdoDomainObject2<FinancialAccountTransaction>
         implements WithApplicationTenancyCountry {
@@ -113,7 +121,7 @@ public class FinancialAccountTransaction
     // //////////////////////////////////////
 
 
-    @Column(allowsNull = "true", length = JdoColumnLength.DESCRIPTION)
+    @Column(allowsNull = "true", length = DescriptionType.Meta.MAX_LEN)
     @MemberOrder(sequence = "4")
     @Property(hidden = Where.ALL_TABLES)
     @Getter @Setter
@@ -121,7 +129,7 @@ public class FinancialAccountTransaction
 
     // //////////////////////////////////////
 
-    @Column(allowsNull = "false", scale = JdoColumnScale.MONEY)
+    @Column(allowsNull = "false", scale = MoneyType.Meta.SCALE)
     @MemberOrder(sequence = "5")
     @Getter @Setter
     BigDecimal amount;
@@ -146,8 +154,18 @@ public class FinancialAccountTransaction
         return !EstatioRole.ADMINISTRATOR.isApplicableFor(getUser());
     }
 
+    @Action(semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
+    public void remove(final String reason) {
+        remove(this);
+    }
+
+    public boolean hideRemove() {
+        return !EstatioRole.ADMINISTRATOR.isApplicableFor(getUser());
+    }
+
+
     public BigDecimal default0ChangeTransactionDetails(){
-        return getAmount().setScale(JdoColumnScale.MONEY);
+        return getAmount().setScale(MoneyType.Meta.SCALE);
     }
 
     public LocalDate default1ChangeTransactionDetails(){

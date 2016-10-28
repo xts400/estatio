@@ -24,6 +24,7 @@ import javax.jdo.annotations.VersionStrategy;
 
 import org.joda.time.LocalDate;
 
+import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Property;
 import org.apache.isis.applib.annotation.PropertyLayout;
@@ -32,7 +33,6 @@ import org.apache.isis.applib.annotation.Where;
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
 import org.estatio.dom.apptenancy.WithApplicationTenancyPathPersisted;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.lease.Lease;
@@ -41,13 +41,19 @@ import lombok.Getter;
 import lombok.Setter;
 
 //TODO: is this in scope?
-@javax.jdo.annotations.PersistenceCapable(identityType=IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType=IdentityType.DATASTORE
+        ,schema = "dbo"  // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy=IdGeneratorStrategy.NATIVE, 
         column="id")
 @javax.jdo.annotations.Version(
         strategy = VersionStrategy.VERSION_NUMBER, 
         column = "version")
+@DomainObject(
+        objectType = "org.estatio.dom.lease.assignment.LeaseAssignment"
+)
 public class LeaseAssignment
         extends UdoDomainObject2<LeaseAssignment>
         implements WithApplicationTenancyProperty, WithApplicationTenancyPathPersisted {
@@ -99,7 +105,7 @@ public class LeaseAssignment
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull="false", length=JdoColumnLength.TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull="false", length= LeaseAssignmentType.Meta.MAX_LEN)
     @Getter @Setter
     private LeaseAssignmentType type;
 

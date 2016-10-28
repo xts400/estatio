@@ -37,30 +37,34 @@ import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.Property;
 import org.apache.isis.applib.annotation.Where;
 
-import org.estatio.app.security.EstatioRole;
+import org.incode.module.base.dom.roles.EstatioRole;
+import org.incode.module.base.dom.types.ReferenceType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.with.WithNameComparable;
+import org.incode.module.base.dom.with.WithReferenceUnique;
+import org.incode.module.communications.dom.impl.commchannel.CommunicationChannelOwner;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.RegexValidation;
-import org.estatio.dom.WithNameComparable;
-import org.estatio.dom.WithReferenceUnique;
 import org.estatio.dom.agreement.AgreementRole;
 import org.estatio.dom.agreement.AgreementRoleHolder;
-import org.estatio.dom.communicationchannel.CommunicationChannelOwner;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @Discriminator
+)
+@javax.jdo.annotations.Discriminator(
+        strategy = DiscriminatorStrategy.VALUE_MAP,
+        column = "discriminator",
+        value = "org.estatio.dom.party.Party")
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
 @javax.jdo.annotations.Version(
         strategy = VersionStrategy.VERSION_NUMBER,
         column = "version")
-@javax.jdo.annotations.Discriminator(
-        strategy = DiscriminatorStrategy.CLASS_NAME,
-        column = "discriminator")
 @javax.jdo.annotations.Uniques({
         @javax.jdo.annotations.Unique(
                 name = "Party_reference_UNQ", members = "reference")
@@ -83,7 +87,11 @@ import lombok.Setter;
                 value = "SELECT "
                         + "FROM org.estatio.dom.party.Party "
                         + "WHERE reference == :reference") })
-@DomainObject(editing = Editing.DISABLED, autoCompleteAction = "autoComplete", autoCompleteRepository = PartyRepository.class)
+@DomainObject(
+        editing = Editing.DISABLED,
+        autoCompleteAction = "autoComplete",
+        autoCompleteRepository = PartyRepository.class
+)
 @DomainObjectLayout(bookmarking = BookmarkPolicy.AS_ROOT)
 public abstract class Party
         extends UdoDomainObject2<Party>
@@ -102,14 +110,14 @@ public abstract class Party
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.REFERENCE)
-    @Property(editing = Editing.DISABLED, regexPattern = RegexValidation.REFERENCE)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = ReferenceType.Meta.MAX_LEN)
+    @Property(editing = Editing.DISABLED, regexPattern = ReferenceType.Meta.REGEX)
     @Getter @Setter
     private String reference;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.Party.NAME)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = NameType.Meta.MAX_LEN)
     @Getter @Setter
     private String name;
 
@@ -163,4 +171,20 @@ public abstract class Party
         return party != this ? null : "Cannot replace a party with itself";
     }
 
+
+    // //////////////////////////////////////
+
+    public static class NameType {
+
+        private NameType() {}
+
+        public static class Meta {
+
+            public static final int MAX_LEN = 80;
+
+            private Meta() {}
+
+        }
+
+    }
 }

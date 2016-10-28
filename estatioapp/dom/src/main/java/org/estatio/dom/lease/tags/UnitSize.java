@@ -29,18 +29,22 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.types.NameType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.WithNameComparable;
-import org.estatio.dom.WithNameUnique;
+import org.incode.module.base.dom.with.WithNameComparable;
+import org.incode.module.base.dom.with.WithNameUnique;
 import org.estatio.dom.apptenancy.ApplicationTenancyConstants;
 import org.estatio.dom.apptenancy.WithApplicationTenancyGlobal;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE, 
         column = "id")
@@ -62,7 +66,11 @@ import lombok.Setter;
                 value = "SELECT name "
                         + "FROM org.estatio.dom.lease.tags.UnitSize")
 })
-@DomainObject(bounded = true, editing = Editing.DISABLED)
+@DomainObject(
+        bounded = true,
+        editing = Editing.DISABLED,
+        objectType = "org.estatio.dom.lease.tags.UnitSize"
+)
 public class UnitSize
         extends UdoDomainObject2<UnitSize>
         implements WithNameUnique, WithNameComparable<UnitSize>, WithApplicationTenancyGlobal {
@@ -83,7 +91,7 @@ public class UnitSize
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length=JdoColumnLength.NAME)
+    @javax.jdo.annotations.Column(allowsNull = "false", length= NameType.Meta.MAX_LEN)
     @Getter @Setter
     private String name;
 

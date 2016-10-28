@@ -19,6 +19,7 @@
 package org.estatio.dom.financial;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.jdo.annotations.DiscriminatorStrategy;
@@ -41,29 +42,35 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.types.NameType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.with.WithNameGetter;
+import org.incode.module.base.dom.with.WithReferenceGetter;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.RegexValidation;
-import org.estatio.dom.WithNameGetter;
-import org.estatio.dom.WithReferenceGetter;
 import org.estatio.dom.apptenancy.WithApplicationTenancyCountry;
 import org.estatio.dom.party.Party;
-import org.estatio.dom.utils.TitleBuilder;
+import org.estatio.dom.roles.EstatioRole;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
+@javax.jdo.annotations.Discriminator(
+        strategy = DiscriminatorStrategy.VALUE_MAP,
+        column = "discriminator",
+        value = "org.estatio.dom.financial.FinancialAccount"
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.IDENTITY,
         column = "id")
 @javax.jdo.annotations.Version(
         strategy = VersionStrategy.VERSION_NUMBER,
         column = "version")
-@javax.jdo.annotations.Discriminator(
-        strategy = DiscriminatorStrategy.CLASS_NAME,
-        column = "discriminator")
 @javax.jdo.annotations.Uniques({
         @javax.jdo.annotations.Unique(
 //                name = "FinancialAccount_reference_UNQ", members = "reference")
@@ -118,20 +125,20 @@ public class FinancialAccount
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.FinancialAccount.REFERENCE)
-    @Property(regexPattern = RegexValidation.REFERENCE)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = ReferenceType.Meta.MAX_LEN)
+    @Property(regexPattern = org.incode.module.base.dom.types.ReferenceType.Meta.REGEX)
     @Getter @Setter
     private String reference;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.NAME)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = NameType.Meta.MAX_LEN)
     @Getter @Setter
     private String name;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = FinancialAccountType.Meta.MAX_LEN)
     @Property(hidden = Where.EVERYWHERE)
     @Getter @Setter
     private FinancialAccountType type;
@@ -150,7 +157,7 @@ public class FinancialAccount
     // //////////////////////////////////////
 
     @Property(optionality = Optionality.OPTIONAL)
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.NAME)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = NameType.Meta.MAX_LEN)
     @Getter @Setter
     private String externalReference;
 
@@ -183,6 +190,44 @@ public class FinancialAccount
         return getName();
     }
 
+    @Programmatic
+    public List<FinancialAccountTransaction> getTransactions(){
+        return financialAccountTransactionRepository.transactions(this);
+    }
+
+    // //////////////////////////////////////
+
+    @Action(semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
+    public void remove(final String reason) {
+        for (FinancialAccountTransaction transaction : getTransactions()){
+            transaction.remove(reason);
+        }
+    }
+
+    public boolean hideRemove() {
+        return !EstatioRole.ADMINISTRATOR.isApplicableFor(getUser());
+    }
+
     @Inject
     private FinancialAccountTransactionRepository financialAccountTransactionRepository;
+
+
+    // //////////////////////////////////////
+
+    public static class ReferenceType {
+
+        private ReferenceType() {}
+
+        public static class Meta {
+
+            /**
+             * To store the IBAN code as reference we need to increase this
+             */
+            public final static int MAX_LEN = 34;
+
+            private Meta() {}
+
+        }
+
+    }
 }

@@ -18,8 +18,8 @@
  */
 package org.estatio.dom.lease.breaks;
 
-import org.estatio.dom.Titled;
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.Titled;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum BreakType implements Titled {
 
@@ -41,4 +41,14 @@ public enum BreakType implements Titled {
     public String title() {
         return StringUtils.enumTitle(this.toString());
     }
+
+
+    // //////////////////////////////////////
+
+    public static class Meta {
+        private Meta(){}
+
+        public final static int MAX_LEN = 30;
+    }
+
 }

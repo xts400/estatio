@@ -23,8 +23,8 @@ import com.google.common.base.Predicate;
 
 import org.apache.isis.applib.annotation.Programmatic;
 
-import org.estatio.dom.TitledEnum;
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.TitledEnum;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum FixedAssetRoleType implements TitledEnum {
 
@@ -46,6 +46,12 @@ public enum FixedAssetRoleType implements TitledEnum {
                 return far != null && Objects.equal(far.getType(), this) ? true : false;
             }
         };
+    }
+
+    public static class Meta {
+        private Meta(){}
+
+        public final static int MAX_LEN = 30;
     }
 
 }

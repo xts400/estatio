@@ -30,9 +30,9 @@ import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.NatureOfService;
 
-import org.incode.module.documents.dom.impl.paperclips.Paperclip;
-import org.incode.module.documents.dom.impl.paperclips.PaperclipRepository;
-import org.incode.module.documents.dom.mixins.T_documents;
+import org.incode.module.document.dom.impl.paperclips.Paperclip;
+import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
+import org.incode.module.document.dom.mixins.T_documents;
 
 import org.estatio.dom.asset.FixedAsset;
 
@@ -41,12 +41,11 @@ import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType= IdentityType.DATASTORE
-//        ,
-//        schema = "estatioAssets"  // DN doesn't seem to allow this to be in a different schema to FixedAsset...
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @DomainObject#objectType
 )
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
 @DomainObject(
-        objectType = "estatioAssets.PaperclipForFixedAsset"
+        objectType = "org.estatio.dom.asset.paperclips.PaperclipForFixedAsset"
 )
 @DomainObjectLayout(
         bookmarking = BookmarkPolicy.AS_ROOT

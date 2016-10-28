@@ -18,7 +18,7 @@
  */
 package org.estatio.dom.lease;
 
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum LeaseStatus {
 
@@ -29,6 +29,14 @@ public enum LeaseStatus {
 
     public String title() {
         return StringUtils.enumTitle(this.name());
+    }
+
+    public static class Meta {
+
+        public final static int MAX_LEN = 20;
+
+        private Meta() {}
+
     }
 
 }

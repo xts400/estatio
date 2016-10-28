@@ -57,10 +57,12 @@ import org.apache.isis.applib.services.eventbus.ActionDomainEvent;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.with.WithIntervalMutable;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.WithIntervalMutable;
-import org.estatio.dom.WithSequence;
+import org.incode.module.base.dom.with.WithSequence;
 import org.estatio.dom.apptenancy.EstatioApplicationTenancyRepository;
 import org.estatio.dom.apptenancy.WithApplicationTenancyPathPersisted;
 import org.estatio.dom.apptenancy.WithApplicationTenancyPropertyLocal;
@@ -70,8 +72,6 @@ import org.estatio.dom.invoice.InvoicingInterval;
 import org.estatio.dom.invoice.PaymentMethod;
 import org.estatio.dom.lease.invoicing.InvoiceCalculationService.CalculationResult;
 import org.estatio.dom.tax.Tax;
-import org.estatio.dom.utils.TitleBuilder;
-import org.estatio.dom.valuetypes.LocalDateInterval;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -88,7 +88,10 @@ import lombok.Setter;
  * generated on a quarterly basis. The lease terms (by implementing
  * <tt>InvoiceSource</tt>) act as the source of <tt>InvoiceItem</tt>s.
  */
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"     // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -143,7 +146,10 @@ import lombok.Setter;
 
 })
 @Unique(name = "LeaseItem_lease_type_charge_startDate_sequence_UNQ", members = {"lease", "type", "charge", "startDate", "sequence"})
-@DomainObject(editing = Editing.DISABLED)
+@DomainObject(
+        editing = Editing.DISABLED,
+        objectType = "org.estatio.dom.lease.LeaseItem"
+)
 @DomainObjectLayout(bookmarking = BookmarkPolicy.AS_CHILD)
 public class LeaseItem
         extends UdoDomainObject2<LeaseItem>
@@ -194,7 +200,7 @@ public class LeaseItem
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.STATUS_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = LeaseItemStatus.Meta.MAX_LEN)
     @Getter @Setter
     private LeaseItemStatus status;
 
@@ -294,7 +300,7 @@ public class LeaseItem
     // //////////////////////////////////////
 
     @javax.jdo.annotations.Persistent(defaultFetchGroup = "true")
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = LeaseItemType.Meta.MAX_LEN)
     @Getter @Setter
     private LeaseItemType type;
 
@@ -363,6 +369,22 @@ public class LeaseItem
         return newItem;
     }
 
+    public LocalDate default0Copy() {
+        return getStartDate();
+    }
+
+    public InvoicingFrequency default1Copy() {
+        return getInvoicingFrequency();
+    }
+
+    public PaymentMethod default2Copy() {
+        return getPaymentMethod();
+    }
+
+    public Charge default3Copy() {
+        return getCharge();
+    }
+
     public List<Charge> choices3Copy() {
         return chargeRepository.chargesForCountry(this.getApplicationTenancy());
     }
@@ -418,7 +440,7 @@ public class LeaseItem
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.INVOICING_FREQUENCY_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = InvoicingFrequency.Meta.MAX_LEN)
     @Property(hidden = Where.PARENTED_TABLES)
     @Getter @Setter
     private InvoicingFrequency invoicingFrequency;
@@ -435,7 +457,7 @@ public class LeaseItem
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.PAYMENT_METHOD_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = PaymentMethod.Meta.MAX_LEN)
     @Getter @Setter
     private PaymentMethod paymentMethod;
 

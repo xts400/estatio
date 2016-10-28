@@ -32,17 +32,23 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.types.DescriptionType;
+import org.incode.module.base.dom.types.ReferenceType;
+import org.incode.module.base.dom.types.TitleType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.WithNameUnique;
-import org.estatio.dom.WithReferenceComparable;
+import org.incode.module.base.dom.with.WithNameUnique;
+import org.incode.module.base.dom.with.WithReferenceComparable;
 import org.estatio.dom.apptenancy.WithApplicationTenancyGlobal;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"     // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -59,7 +65,11 @@ import lombok.Setter;
                         + "FROM org.estatio.dom.lease.LeaseType "
                         + "WHERE reference == :reference")
 })
-@DomainObject(editing = Editing.DISABLED, bounded = true)
+@DomainObject(
+        editing = Editing.DISABLED,
+        bounded = true,
+        objectType = "org.estatio.dom.lease.LeaseType"
+)
 public class LeaseType
         extends UdoDomainObject2<LeaseType>
         implements WithReferenceComparable<LeaseType>, WithNameUnique, WithApplicationTenancyGlobal {
@@ -90,21 +100,21 @@ public class LeaseType
 
     // //////////////////////////////////////
 
-    @Column(allowsNull = "false", length = JdoColumnLength.REFERENCE)
+    @Column(allowsNull = "false", length = ReferenceType.Meta.MAX_LEN)
     @MemberOrder(sequence = "1")
     @Getter @Setter
     private String reference;
 
     // //////////////////////////////////////
 
-    @Column(allowsNull = "false", length = JdoColumnLength.TITLE)
+    @Column(allowsNull = "false", length = TitleType.Meta.MAX_LEN)
     @MemberOrder(sequence = "2")
     @Getter @Setter
     private String name;
 
     // //////////////////////////////////////
 
-    @Column(allowsNull = "true", length = JdoColumnLength.DESCRIPTION)
+    @Column(allowsNull = "true", length = DescriptionType.Meta.MAX_LEN)
     @Property(optionality = Optionality.OPTIONAL)
     @PropertyLayout(multiLine = 3)
     @MemberOrder(sequence = "3")

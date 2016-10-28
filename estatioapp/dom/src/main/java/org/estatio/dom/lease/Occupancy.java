@@ -30,6 +30,7 @@ import org.joda.time.LocalDate;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
+import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Editing;
 import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
@@ -41,13 +42,14 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.app.security.EstatioRole;
-import org.estatio.dom.JdoColumnLength;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+import org.incode.module.base.dom.with.WithIntervalMutable;
+import org.incode.module.country.dom.impl.Country;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.WithIntervalMutable;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Unit;
-import org.estatio.dom.geography.Country;
 import org.estatio.dom.lease.tags.Activity;
 import org.estatio.dom.lease.tags.ActivityRepository;
 import org.estatio.dom.lease.tags.Brand;
@@ -57,13 +59,15 @@ import org.estatio.dom.lease.tags.Sector;
 import org.estatio.dom.lease.tags.SectorRepository;
 import org.estatio.dom.lease.tags.UnitSize;
 import org.estatio.dom.lease.tags.UnitSizeRepository;
-import org.estatio.dom.utils.TitleBuilder;
-import org.estatio.dom.valuetypes.LocalDateInterval;
+import org.estatio.dom.roles.EstatioRole;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        , schema = "dbo"    // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -108,6 +112,9 @@ import lombok.Setter;
                         + "WHERE brand == :brand "
                         + "&& (:includeTerminated || endDate == null || endDate >= :date)")
 })
+@DomainObject(
+        objectType = "org.estatio.dom.lease.Occupancy"
+)
 public class Occupancy
         extends UdoDomainObject2<Occupancy>
         implements WithIntervalMutable<Occupancy>, WithApplicationTenancyProperty {
@@ -348,7 +355,7 @@ public class Occupancy
 
     private OccupancyReportingType reportTurnover;
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.OCCUPANCY_REPORTING_TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = OccupancyReportingType.Meta.MAX_LEN)
     @Property(editing = Editing.DISABLED, editingDisabledReason = "Change using action", hidden = Where.PARENTED_TABLES)
     public OccupancyReportingType getReportTurnover() {
         return reportTurnover;
@@ -362,7 +369,7 @@ public class Occupancy
 
     private OccupancyReportingType reportRent;
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.OCCUPANCY_REPORTING_TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = OccupancyReportingType.Meta.MAX_LEN)
     @Property(editing = Editing.DISABLED, editingDisabledReason = "Change using action", hidden = Where.PARENTED_TABLES)
     public OccupancyReportingType getReportRent() {
         return reportRent;
@@ -376,7 +383,7 @@ public class Occupancy
 
     private OccupancyReportingType reportOCR;
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.OCCUPANCY_REPORTING_TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = OccupancyReportingType.Meta.MAX_LEN)
     @Property(editing = Editing.DISABLED, editingDisabledReason = "Change using action", hidden = Where.PARENTED_TABLES)
     public OccupancyReportingType getReportOCR() {
         return reportOCR;
@@ -415,6 +422,15 @@ public class Occupancy
 
         public String title() {
             return title;
+        }
+
+        public static class Meta {
+
+            public final static int MAX_LEN = 30;
+
+            private Meta() {
+            }
+
         }
 
     }

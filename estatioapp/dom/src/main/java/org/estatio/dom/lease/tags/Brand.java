@@ -36,17 +36,21 @@ import org.apache.isis.applib.services.eventbus.ActionDomainEvent;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.types.NameType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.country.dom.impl.Country;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
 import org.estatio.dom.apptenancy.WithApplicationTenancyCountry;
 import org.estatio.dom.apptenancy.WithApplicationTenancyPathPersisted;
-import org.estatio.dom.geography.Country;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -85,7 +89,12 @@ import lombok.Setter;
                         + "FROM org.estatio.dom.lease.tags.Brand WHERE this.group != null "
                         + "ORDER BY this.group ")
 })
-@DomainObject(editing = Editing.DISABLED, autoCompleteRepository = BrandRepository.class, autoCompleteAction = "autoComplete")
+@DomainObject(
+        editing = Editing.DISABLED,
+        autoCompleteRepository = BrandRepository.class,
+        autoCompleteAction = "autoComplete",
+        objectType = "org.estatio.dom.lease.tags.Brand"
+)
 public class Brand
         extends UdoDomainObject2<Brand>
         implements WithApplicationTenancyCountry, WithApplicationTenancyPathPersisted {
@@ -121,7 +130,7 @@ public class Brand
 
     // //////////////////////////////////////
 
-    @Column(allowsNull = "false", length = JdoColumnLength.NAME)
+    @Column(allowsNull = "false", length = NameType.Meta.MAX_LEN)
     @Getter @Setter
     private String name;
 

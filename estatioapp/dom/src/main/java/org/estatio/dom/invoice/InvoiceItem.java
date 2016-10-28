@@ -51,18 +51,18 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.with.WithInterval;
+import org.incode.module.base.dom.types.NameType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.IsisMultilineLines;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.WithDescriptionGetter;
-import org.estatio.dom.WithInterval;
+import org.incode.module.base.dom.with.WithDescriptionGetter;
 import org.estatio.dom.apptenancy.WithApplicationTenancyPropertyLocal;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 import org.estatio.dom.lease.LeaseConstants;
 import org.estatio.dom.tax.Tax;
-import org.estatio.dom.utils.TitleBuilder;
-import org.estatio.dom.valuetypes.LocalDateInterval;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -75,17 +75,22 @@ import lombok.Setter;
  * decouples the <tt>invoice</tt> module from the <tt>lease</tt> module, and
  * provides a many-to-many between the two concepts.
  */
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"  // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
+@javax.jdo.annotations.Discriminator(
+        strategy = DiscriminatorStrategy.VALUE_MAP,
+        column = "discriminator",
+        value = "org.estatio.dom.invoice.InvoiceItem"
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
 @javax.jdo.annotations.Version(
         strategy = VersionStrategy.VERSION_NUMBER,
         column = "version")
-@javax.jdo.annotations.Discriminator(
-        strategy = DiscriminatorStrategy.CLASS_NAME,
-        column = "discriminator")
 @DomainObject(editing = Editing.DISABLED)
 @DomainObjectLayout(bookmarking = BookmarkPolicy.AS_CHILD)
 public abstract class InvoiceItem
@@ -203,8 +208,8 @@ public abstract class InvoiceItem
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.DESCRIPTION)
-    @PropertyLayout(typicalLength = JdoColumnLength.NAME, multiLine = IsisMultilineLines.NUMBER_OF_LINES)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = DescriptionType.Meta.MAX_LEN)
+    @PropertyLayout(typicalLength = DescriptionType.Meta.TYPICAL_LEN, multiLine = DescriptionType.Meta.MULTI_LINE)
     @Getter @Setter
     private String description;
 
@@ -374,5 +379,23 @@ public abstract class InvoiceItem
 
     @Inject
     private ChargeRepository chargeRepository;
+
+
+
+    public static class DescriptionType {
+
+        private DescriptionType() {}
+
+        public static class Meta {
+
+            public static final int MAX_LEN = org.incode.module.base.dom.types.DescriptionType.Meta.MAX_LEN;
+            public static final int TYPICAL_LEN = NameType.Meta.MAX_LEN;
+            public static final int MULTI_LINE = org.incode.module.base.dom.types.DescriptionType.Meta.MULTI_LINE;
+
+            private Meta() {}
+
+        }
+
+    }
 
 }

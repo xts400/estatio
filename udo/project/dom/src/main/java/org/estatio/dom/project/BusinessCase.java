@@ -25,14 +25,17 @@ import org.apache.isis.applib.services.i18n.TranslatableString;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.Chained;
+import org.incode.module.base.dom.Chained;
 import org.estatio.dom.UdoDomainObject;
 import org.estatio.dom.apptenancy.WithApplicationTenancyGlobalAndCountry;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@PersistenceCapable(identityType = IdentityType.DATASTORE)
+@PersistenceCapable(
+		identityType = IdentityType.DATASTORE
+		,schema = "dbo"	// Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @DatastoreIdentity(strategy = IdGeneratorStrategy.NATIVE, column = "id")
 @Version(strategy = VersionStrategy.VERSION_NUMBER, column = "version")
 @Queries({
@@ -57,7 +60,10 @@ import lombok.Setter;
                     "FROM org.estatio.dom.project.BusinessCase " +
                     "WHERE project == :project && next == null")                      
 })
-@DomainObject(editing=Editing.DISABLED)
+@DomainObject(
+		editing=Editing.DISABLED,
+		objectType = "org.estatio.dom.project.BusinessCase"		// TODO: externalize mapping
+)
 public class BusinessCase extends UdoDomainObject<BusinessCase> implements Chained<BusinessCase>, WithApplicationTenancyGlobalAndCountry{
 
 	public BusinessCase() {

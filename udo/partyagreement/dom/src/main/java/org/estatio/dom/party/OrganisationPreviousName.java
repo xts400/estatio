@@ -33,17 +33,22 @@ import javax.jdo.annotations.VersionStrategy;
 
 import org.joda.time.LocalDate;
 
+import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Editing;
 import org.apache.isis.applib.annotation.Property;
 import org.apache.isis.applib.annotation.Where;
 
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.types.NameType;
+
+import org.incode.module.base.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@PersistenceCapable(identityType = IdentityType.DATASTORE)
+@PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
 @DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
@@ -54,6 +59,9 @@ import lombok.Setter;
 )
 @Unique(
         name = "Organisation"
+)
+@DomainObject(
+        objectType = "org.estatio.dom.party.OrganisationPreviousName"
 )
 public class OrganisationPreviousName implements Comparable<OrganisationPreviousName> {
 
@@ -71,7 +79,7 @@ public class OrganisationPreviousName implements Comparable<OrganisationPrevious
 
     // //////////////////////////////////////
 
-    @Column(allowsNull = "false", length = JdoColumnLength.NAME)
+    @Column(allowsNull = "false", length = NameType.Meta.MAX_LEN)
     @Getter @Setter
     private String name;
 

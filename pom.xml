@@ -43,7 +43,7 @@ mvn clean install -DskipTests -o
 
     <groupId>org.estatio</groupId>
     <artifactId>estatio</artifactId>
-    <version>1.7.0-SNAPSHOT</version>
+    <version>1.8.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Estatio (Open Source)</name>
@@ -87,7 +87,7 @@ mvn clean install -DskipTests -o
         <isis-module-fakedata.version>1.13.0</isis-module-fakedata.version>
         <isis-module-pdfbox.version>1.13.0</isis-module-pdfbox.version>
         <isis-module-poly.version>1.13.0</isis-module-poly.version>
-        <isis-module-security.version>1.13.3</isis-module-security.version>
+        <isis-module-security.version>1.13.4</isis-module-security.version>
         <isis-module-sessionlogger.version>1.13.1</isis-module-sessionlogger.version>
         <isis-module-settings.version>1.13.0</isis-module-settings.version>
 
@@ -100,7 +100,17 @@ mvn clean install -DskipTests -o
         <isis-wicket-fullcalendar2.version>1.13.0</isis-wicket-fullcalendar2.version>
         <isis-wicket-gmap3.version>1.13.0</isis-wicket-gmap3.version>
 
-        <incode-module-commchannel.version>1.13.0</incode-module-commchannel.version>
+        <incode-module-base.version>1.13.1</incode-module-base.version>
+        <incode-module-country.version>1.13.0</incode-module-country.version>
+        <incode-module-document.version>1.13.0</incode-module-document.version>
+
+
+        <incode-module-docrendering-freemarker.version>1.13.0</incode-module-docrendering-freemarker.version>
+        <incode-module-docrendering-stringinterpolator.version>1.13.0</incode-module-docrendering-stringinterpolator.version>
+        <incode-module-docrendering-xdocreport.version>1.13.0</incode-module-docrendering-xdocreport.version>
+
+        <!-- TODO: change when this is moved out (EST-866) -->
+        <incode-module-communication.version>${project.version}</incode-module-communication.version>
 
         <datanucleus-maven-plugin.version>4.0.1</datanucleus-maven-plugin.version>
 
@@ -117,6 +127,7 @@ mvn clean install -DskipTests -o
 
         <compileSource>1.8</compileSource>
         <compileTarget>1.8</compileTarget>
+
     </properties>
 
     <repositories>
@@ -578,82 +589,90 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>org.incode.module.communications</groupId>
                 <artifactId>incode-module-communications-dom</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.incode.module.communications</groupId>
                 <artifactId>incode-module-communications-dom</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
 
-            <!-- TODO: update version when move out to separate module -->
             <dependency>
-                <groupId>org.incode.module.documents</groupId>
-                <artifactId>incode-module-documents-dom</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <groupId>org.incode.module.country</groupId>
+                <artifactId>incode-module-country-dom</artifactId>
+                <version>${incode-module-country.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.incode.module.documents</groupId>
-                <artifactId>incode-module-documents-dom</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
-                <type>test-jar</type>
-                <scope>test</scope>
-            </dependency>
-
-            <!-- TODO: update version when move out to separate module -->
-            <dependency>
-                <groupId>org.incode.module.docrendering</groupId>
-                <artifactId>incode-module-docrendering-stringinterpolator</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>org.incode.module.docrendering</groupId>
-                <artifactId>incode-module-docrendering-stringinterpolator</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <groupId>org.incode.module.country</groupId>
+                <artifactId>incode-module-country-dom</artifactId>
+                <version>${incode-module-country.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
 
-            <!-- TODO: update version when move out to separate module -->
+            <dependency>
+                <groupId>org.incode.module.document</groupId>
+                <artifactId>incode-module-document-dom</artifactId>
+                <version>${incode-module-document.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.incode.module.document</groupId>
+                <artifactId>incode-module-document-dom</artifactId>
+                <version>${incode-module-document.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.incode.module.docrendering</groupId>
-                <artifactId>incode-module-docrendering-freemarker</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <artifactId>incode-module-docrendering-stringinterpolator-dom</artifactId>
+                <version>${incode-module-docrendering-stringinterpolator.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.incode.module.docrendering</groupId>
-                <artifactId>incode-module-docrendering-freemarker</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <artifactId>incode-module-docrendering-stringinterpolator-dom</artifactId>
+                <version>${incode-module-docrendering-stringinterpolator.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
 
-            <!-- TODO: update version when move out to separate module -->
             <dependency>
                 <groupId>org.incode.module.docrendering</groupId>
-                <artifactId>incode-module-docrendering-xdocreport</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <artifactId>incode-module-docrendering-freemarker-dom</artifactId>
+                <version>${incode-module-docrendering-freemarker.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.incode.module.docrendering</groupId>
-                <artifactId>incode-module-docrendering-xdocreport</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <artifactId>incode-module-docrendering-freemarker-dom</artifactId>
+                <version>${incode-module-docrendering-freemarker.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
 
-            <!-- TODO: update version when move out to separate module -->
+            <dependency>
+                <groupId>org.incode.module.docrendering</groupId>
+                <artifactId>incode-module-docrendering-xdocreport-dom</artifactId>
+                <version>${incode-module-docrendering-xdocreport.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.incode.module.docrendering</groupId>
+                <artifactId>incode-module-docrendering-xdocreport-dom</artifactId>
+                <version>${incode-module-docrendering-xdocreport.version}</version>
+                <scope>test</scope>
+                <type>test-jar</type>
+            </dependency>
+
             <dependency>
                 <groupId>org.incode.module.base</groupId>
                 <artifactId>incode-module-base-dom</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${incode-module-base.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.incode.module.base</groupId>
                 <artifactId>incode-module-base-dom</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${incode-module-base.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -687,16 +706,15 @@ mvn clean install -DskipTests -o
             </dependency>
 
             <!-- UDO modules -->
-            
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-base</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-base</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -704,12 +722,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-link</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-link</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -717,12 +735,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-index</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-index</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -730,12 +748,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-project</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-project</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -743,12 +761,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-event</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-event</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -756,12 +774,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-settings</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-settings</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -769,12 +787,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-charge</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-charge</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -782,25 +800,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-partyagreement</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-partyagreement</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
-                <scope>test</scope>
-                <type>test-jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>udo-dom-apptenancy</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>udo-dom-apptenancy</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -808,25 +813,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-currency</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-currency</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
-                <scope>test</scope>
-                <type>test-jar</type>
-            </dependency>
-
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>udo-dom-geography</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>udo-dom-geography</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -834,12 +826,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-numerator</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-numerator</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -847,12 +839,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-tax</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>udo-dom-tax</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -863,12 +855,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>estatio-dom</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>estatio-dom</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -878,12 +870,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>estatio-impmgr</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>estatio-impmgr</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -891,12 +883,12 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>estatio-app</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>estatio-app</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <scope>test</scope>
                 <type>test-jar</type>
             </dependency>
@@ -904,19 +896,19 @@ mvn clean install -DskipTests -o
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>estatio-fixture</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>estatio-integtests</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>estatio-webapp</artifactId>
-                <version>1.7.0-SNAPSHOT</version>
+                <version>${project.version}</version>
             </dependency>
 
 
@@ -939,6 +931,16 @@ mvn clean install -DskipTests -o
                 <version>3.1</version>
             </dependency>
 
+            <!-- download:
+                 $ curl https://google-rfc-2445.googlecode.com/files/rfc2445-4Mar2011.jar > rfc2445-4Mar2011.jar
+                 install to ~/.m2/repo using:
+                 $ mvn install:install-file \
+                     -Dfile=rfc2445-4Mar2011.jar \
+                     -DgroupId=com.google \
+                     -DartifactId=rfc-2445 \
+                     -Dversion=0.0.20110304 \
+                     -Dpackaging=jar
+             -->
             <dependency>
                 <groupId>com.google</groupId>
                 <artifactId>rfc-2445</artifactId>
@@ -1151,10 +1153,8 @@ mvn clean install -DskipTests -o
             </activation>
             <modules>
                 <module>udo/base/dom</module>
-                <module>udo/apptenancy/dom</module>
                 <module>udo/charge/dom</module>
                 <module>udo/currency/dom</module>
-                <module>udo/geography/dom</module>
                 <module>udo/numerator/dom</module>
                 <module>udo/tax/dom</module>
                 <module>udo/event/dom</module>
@@ -1163,12 +1163,7 @@ mvn clean install -DskipTests -o
                 <module>udo/project/dom</module>
                 <module>udo/settings/dom</module>
                 <module>udo/partyagreement/dom</module>
-                <module>incode/base/dom</module>
                 <module>incode/communications/dom</module>
-                <module>incode/documents/dom</module>
-                <module>incode/docrendering-stringinterpolator</module>
-                <module>incode/docrendering-freemarker</module>
-                <module>incode/docrendering-xdocreport</module>
                 <module>estatioapp/app</module>
                 <module>estatioapp/impmgr</module>
                 <module>estatioapp/dom</module>
@@ -1181,10 +1176,8 @@ mvn clean install -DskipTests -o
             <id>quicktest</id>
             <modules>
                 <module>udo/base/dom</module>
-                <module>udo/apptenancy/dom</module>
                 <module>udo/charge/dom</module>
                 <module>udo/currency/dom</module>
-                <module>udo/geography/dom</module>
                 <module>udo/numerator/dom</module>
                 <module>udo/tax/dom</module>
                 <module>udo/event/dom</module>
@@ -1193,12 +1186,7 @@ mvn clean install -DskipTests -o
                 <module>udo/project/dom</module>
                 <module>udo/partyagreement/dom</module>
                 <module>udo/settings/dom</module>
-                <module>incode/base/dom</module>
                 <module>incode/communications/dom</module>
-                <module>incode/documents/dom</module>
-                <module>incode/docrendering-stringinterpolator</module>
-                <module>incode/docrendering-freemarker</module>
-                <module>incode/docrendering-xdocreport</module>
                 <module>estatioapp/app</module>
                 <module>estatioapp/impmgr</module>
                 <module>estatioapp/dom</module>
@@ -1210,10 +1198,8 @@ mvn clean install -DskipTests -o
             <id>extended</id>
             <modules>
                 <module>udo/base/dom</module>
-                <module>udo/apptenancy/dom</module>
                 <module>udo/charge/dom</module>
                 <module>udo/currency/dom</module>
-                <module>udo/geography/dom</module>
                 <module>udo/numerator/dom</module>
                 <module>udo/tax/dom</module>
                 <module>udo/event/dom</module>
@@ -1222,12 +1208,7 @@ mvn clean install -DskipTests -o
                 <module>udo/project/dom</module>
                 <module>udo/partyagreement/dom</module>
                 <module>udo/settings/dom</module>
-                <module>incode/base/dom</module>
                 <module>incode/communications/dom</module>
-                <module>incode/documents/dom</module>
-                <module>incode/docrendering-stringinterpolator</module>
-                <module>incode/docrendering-freemarker</module>
-                <module>incode/docrendering-xdocreport</module>
                 <module>estatioapp/app</module>
                 <module>estatioapp/impmgr</module>
                 <module>estatioapp/dom</module>
@@ -1244,10 +1225,8 @@ mvn clean install -DskipTests -o
             </properties>
             <modules>
                 <module>udo/base/dom</module>
-                <module>udo/apptenancy/dom</module>
                 <module>udo/charge/dom</module>
                 <module>udo/currency/dom</module>
-                <module>udo/geography/dom</module>
                 <module>udo/numerator/dom</module>
                 <module>udo/event/dom</module>
                 <module>udo/index/dom</module>
@@ -1255,12 +1234,7 @@ mvn clean install -DskipTests -o
                 <module>udo/project/dom</module>
                 <module>udo/partyagreement/dom</module>
                 <module>udo/settings/dom</module>
-                <module>incode/base/dom</module>
                 <module>incode/communications/dom</module>
-                <module>incode/documents/dom</module>
-                <module>incode/docrendering-stringinterpolator</module>
-                <module>incode/docrendering-freemarker</module>
-                <module>incode/docrendering-xdocreport</module>
                 <module>estatioapp/app</module>
                 <module>estatioapp/impmgr</module>
                 <module>estatioapp/dom</module>

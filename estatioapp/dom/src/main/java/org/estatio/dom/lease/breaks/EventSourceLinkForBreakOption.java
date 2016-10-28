@@ -31,11 +31,13 @@ import org.apache.isis.applib.services.bookmark.BookmarkService;
 import org.estatio.dom.event.EventSource;
 import org.estatio.dom.event.EventSourceLink;
 
-@javax.jdo.annotations.PersistenceCapable()
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo"     // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.NEW_TABLE)
 @DomainObject(
-        objectType = "lease.breaks.EventSourceLinkForBreakOption"
+        objectType = "org.estatio.dom.lease.breaks.EventSourceLinkForBreakOption"
 )
 public class EventSourceLinkForBreakOption extends EventSourceLink {
 

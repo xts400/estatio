@@ -55,20 +55,24 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.with.WithIntervalContiguous;
+import org.incode.module.base.dom.types.NameType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+import org.incode.module.communications.dom.impl.commchannel.CommunicationChannel;
+import org.incode.module.communications.dom.impl.commchannel.CommunicationChannelRepository;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.WithIntervalContiguous;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.communicationchannel.CommunicationChannel;
-import org.estatio.dom.communicationchannel.CommunicationChannelRepository;
 import org.estatio.dom.party.Party;
-import org.estatio.dom.utils.TitleBuilder;
-import org.estatio.dom.valuetypes.LocalDateInterval;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"        // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
@@ -122,7 +126,10 @@ import lombok.Setter;
 @Unique(
         name = "AgreementRole_agreement_party_type_startDate_UNQ",
         members = { "agreement", "party", "type", "startDate" })
-@DomainObject(editing = Editing.DISABLED)
+@DomainObject(
+        editing = Editing.DISABLED,
+        objectType = "org.estatio.dom.agreement.AgreementRole"
+)
 @DomainObjectLayout(bookmarking = BookmarkPolicy.AS_CHILD)
 public class AgreementRole
         extends UdoDomainObject2<AgreementRole>
@@ -170,7 +177,7 @@ public class AgreementRole
     @Getter @Setter
     private AgreementRoleType type;
 
-    @javax.jdo.annotations.Column(length = JdoColumnLength.NAME, allowsNull = "true")
+    @javax.jdo.annotations.Column(length = NameType.Meta.MAX_LEN, allowsNull = "true")
     @Getter @Setter
     private String externalReference;
 

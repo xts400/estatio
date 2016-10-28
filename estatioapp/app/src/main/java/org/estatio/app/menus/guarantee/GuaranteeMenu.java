@@ -36,7 +36,8 @@ import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.RestrictTo;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
-import org.estatio.dom.RegexValidation;
+import org.incode.module.base.dom.types.ReferenceType;
+
 import org.estatio.dom.UdoDomainService;
 import org.estatio.dom.agreement.AgreementRoleTypeRepository;
 import org.estatio.dom.agreement.AgreementTypeRepository;
@@ -45,7 +46,7 @@ import org.estatio.dom.guarantee.Guarantee;
 import org.estatio.dom.guarantee.GuaranteeRepository;
 import org.estatio.dom.guarantee.GuaranteeType;
 import org.estatio.dom.lease.Lease;
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.utils.StringUtils;
 
 @DomainService(nature = NatureOfService.VIEW_MENU_ONLY)
 @DomainServiceLayout(
@@ -65,7 +66,7 @@ public class GuaranteeMenu extends UdoDomainService<Guarantee> {
     @MemberOrder(sequence = "1")
     public Guarantee newGuarantee(
             final Lease lease,
-            final @Parameter(regexPattern = RegexValidation.REFERENCE) String reference,
+            final @Parameter(regexPattern = ReferenceType.Meta.REGEX) String reference,
             final String name,
             final GuaranteeType guaranteeType,
             final LocalDate startDate,

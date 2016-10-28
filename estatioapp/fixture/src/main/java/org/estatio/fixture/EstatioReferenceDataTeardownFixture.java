@@ -26,8 +26,8 @@ import org.apache.isis.applib.services.jdosupport.IsisJdoSupport;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeGroup;
 import org.estatio.dom.currency.Currency;
-import org.estatio.dom.geography.Country;
-import org.estatio.dom.geography.State;
+import org.incode.module.country.dom.impl.Country;
+import org.incode.module.country.dom.impl.State;
 import org.estatio.dom.index.Index;
 import org.estatio.dom.index.IndexBase;
 import org.estatio.dom.index.IndexValue;
@@ -65,12 +65,12 @@ public class EstatioReferenceDataTeardownFixture extends FixtureScript {
 
     protected void deleteFrom(final Class cls) {
         preDeleteFrom(cls);
-        deleteFrom(cls.getSimpleName());
+        doDeleteFrom(cls);
         postDeleteFrom(cls);
     }
 
-    protected void deleteFrom(final String table) {
-        isisJdoSupport.executeUpdate("DELETE FROM " + "\"" + table + "\"");
+    private void doDeleteFrom(final Class cls) {
+        isisJdoSupport.deleteAll(cls);
     }
 
     protected void preDeleteFrom(final Class cls) {}

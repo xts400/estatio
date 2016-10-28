@@ -47,9 +47,10 @@ import org.apache.isis.applib.services.i18n.TranslatableString;
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancies;
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.RegexValidation;
+import org.incode.module.base.dom.types.ReferenceType;
+
 import org.estatio.dom.UdoDomainObject;
-import org.estatio.dom.WithReferenceUnique;
+import org.incode.module.base.dom.with.WithReferenceUnique;
 import org.estatio.dom.apptenancy.WithApplicationTenancyGlobalAndCountry;
 import org.estatio.dom.apptenancy.WithApplicationTenancyPathPersisted;
 
@@ -58,7 +59,10 @@ import lombok.Setter;
 
 //import org.apache.isis.applib.annotation.Property;
 
-@PersistenceCapable(identityType = IdentityType.DATASTORE)
+@PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"  // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @DatastoreIdentity(strategy = IdGeneratorStrategy.NATIVE, column = "id")
 @Version(strategy = VersionStrategy.VERSION_NUMBER, column = "version")
 @Unique(members={"reference"})
@@ -79,7 +83,10 @@ import lombok.Setter;
                         "FROM org.estatio.dom.project.Program " +
                         "WHERE property == :property ")
 })
-@DomainObject(editing=Editing.DISABLED)
+@DomainObject(
+        editing=Editing.DISABLED,
+        objectType = "org.estatio.dom.project.Program"
+)
 public class Program 
 			extends UdoDomainObject<Program>
 			implements WithReferenceUnique, WithApplicationTenancyPathPersisted, WithApplicationTenancyGlobalAndCountry {
@@ -96,7 +103,7 @@ public class Program
     // //////////////////////////////////////
 
     @Column(allowsNull = "false")
-    @org.apache.isis.applib.annotation.Property(regexPattern = RegexValidation.REFERENCE)
+    @org.apache.isis.applib.annotation.Property(regexPattern = ReferenceType.Meta.REGEX)
     @PropertyLayout(describedAs = "Unique reference code for this program")
     @MemberOrder(sequence="1")
     @Getter @Setter

@@ -52,17 +52,21 @@ import org.apache.isis.applib.services.i18n.TranslatableString;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.JdoColumnScale;
-import org.estatio.dom.RegexValidation;
+import org.incode.module.base.dom.types.MoneyType;
+import org.incode.module.base.dom.types.ReferenceType;
+
 import org.estatio.dom.UdoDomainObject;
-import org.estatio.dom.WithReferenceUnique;
+import org.incode.module.base.dom.with.WithReferenceUnique;
 import org.estatio.dom.apptenancy.WithApplicationTenancyGlobalAndCountry;
 import org.estatio.dom.currency.Currency;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@PersistenceCapable(identityType = IdentityType.DATASTORE)
+@PersistenceCapable(
+		identityType = IdentityType.DATASTORE
+		,schema = "dbo"	// Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @DatastoreIdentity(strategy = IdGeneratorStrategy.NATIVE, column = "id")
 @Version(strategy = VersionStrategy.VERSION_NUMBER, column = "version")
 @Unique(members={"reference"})
@@ -76,7 +80,10 @@ import lombok.Setter;
 		@Query(name = "findByProgram", language = "JDOQL", value = "SELECT "
 				+ "FROM org.estatio.dom.project.Project "
 				+ "WHERE program == :program ") })
-@DomainObject(editing = Editing.DISABLED)
+@DomainObject(
+		editing = Editing.DISABLED,
+		objectType = "org.estatio.dom.project.Project"		// TODO: externalize mapping
+)
 public class Project extends UdoDomainObject<Project> implements
 		WithReferenceUnique, WithApplicationTenancyGlobalAndCountry {
 
@@ -92,7 +99,7 @@ public class Project extends UdoDomainObject<Project> implements
 	// //////////////////////////////////////
 
 	@Column(allowsNull = "false")
-	@Property(regexPattern = RegexValidation.REFERENCE)
+	@Property(regexPattern = ReferenceType.Meta.REGEX)
 	@PropertyLayout(describedAs = "Unique reference code for this project")
 	@MemberOrder(sequence="1")
 	@Getter @Setter
@@ -141,7 +148,7 @@ public class Project extends UdoDomainObject<Project> implements
 
 	// //////////////////////////////////////
 
-	@Column(allowsNull = "true", scale = JdoColumnScale.MONEY)
+	@Column(allowsNull = "true", scale = MoneyType.Meta.SCALE)
 	@MemberOrder(sequence="7")
     @Getter @Setter
     private BigDecimal estimatedCost;

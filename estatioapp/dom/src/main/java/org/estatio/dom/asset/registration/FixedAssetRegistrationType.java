@@ -21,30 +21,35 @@ package org.estatio.dom.asset.registration;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 
-import org.apache.isis.applib.DomainObjectContainer;
 import org.apache.isis.applib.NonRecoverableException;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Editing;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.Property;
 import org.apache.isis.applib.annotation.Where;
+import org.apache.isis.applib.services.factory.FactoryService;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.types.FqcnType;
+import org.incode.module.base.dom.types.TitleType;
+import org.incode.module.base.dom.utils.ClassUtils;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
+import org.incode.module.base.dom.PowerType;
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.PowerType;
-import org.estatio.dom.WithTitleComparable;
-import org.estatio.dom.WithTitleUnique;
+import org.incode.module.base.dom.with.WithTitleComparable;
+import org.incode.module.base.dom.with.WithTitleUnique;
 import org.estatio.dom.apptenancy.ApplicationTenancyConstants;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.utils.ClassUtils;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType=IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType=IdentityType.DATASTORE
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy=IdGeneratorStrategy.NATIVE, 
         column="id")
@@ -59,7 +64,11 @@ import lombok.Setter;
                         + "FROM org.estatio.dom.asset.registration.FixedAssetRegistrationType "
                         + "WHERE title == :title")
 })
-@DomainObject(editing = Editing.DISABLED, bounded = true)
+@DomainObject(
+        editing = Editing.DISABLED,
+        bounded = true,
+        objectType = "org.estatio.dom.asset.registration.FixedAssetRegistrationType"
+)
 public class FixedAssetRegistrationType 
         extends UdoDomainObject2<FixedAssetRegistrationType>
         implements WithTitleComparable<FixedAssetRegistrationType>, 
@@ -84,25 +93,24 @@ public class FixedAssetRegistrationType
         return TitleBuilder.start().withName(getTitle()).toString();
     }
 
-    @javax.jdo.annotations.Column(allowsNull="false", length=JdoColumnLength.TITLE)
+    @javax.jdo.annotations.Column(allowsNull="false", length= TitleType.Meta.MAX_LEN)
     @Getter @Setter
     private String title;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull="false", length=JdoColumnLength.FQCN)
+    @javax.jdo.annotations.Column(allowsNull="false", length= FqcnType.Meta.MAX_LEN)
     @Getter @Setter
     private String fullyQualifiedClassName;
 
     // //////////////////////////////////////
 
     @Programmatic
-    public FixedAssetRegistration create(final DomainObjectContainer container){ 
+    public FixedAssetRegistration create(final FactoryService factoryService){
         try {
             final Class<? extends FixedAssetRegistration> cls = 
                     ClassUtils.load(getFullyQualifiedClassName(), FixedAssetRegistration.class);
-            FixedAssetRegistration registration = 
-                container.newTransientInstance(cls);
+            FixedAssetRegistration registration = factoryService.instantiate(cls);
             registration.setType(this);
             return registration;
         } catch (Exception ex) {

@@ -43,6 +43,7 @@ import lombok.Setter;
 
 @PersistenceCapable(
         identityType = IdentityType.DATASTORE
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
 )
 @DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
@@ -68,7 +69,9 @@ import lombok.Setter;
                         "WHERE serviceChargeItem == :serviceChargeItem " +
                         "&& budgetCalculation == :budgetCalculation")
 })
-@DomainObject()
+@DomainObject(
+        objectType = "org.estatio.dom.budgetassignment.BudgetCalculationLink"
+)
 public class BudgetCalculationLink extends UdoDomainObject2<BudgetCalculationLink> implements WithApplicationTenancyProperty {
 
     public BudgetCalculationLink() {

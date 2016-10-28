@@ -18,8 +18,8 @@
  */
 package org.estatio.dom.lease.breaks;
 
-import org.estatio.dom.Titled;
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.Titled;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum BreakOptionEventType implements Titled {
 

@@ -23,7 +23,7 @@ Copyright 2014~2015 Dan Haywood
 	<parent>
         <groupId>org.estatio</groupId>
         <artifactId>estatio</artifactId>
-        <version>1.7.0-SNAPSHOT</version>
+        <version>1.8.0-SNAPSHOT</version>
         <relativePath>../../../pom.xml</relativePath>
     </parent>
 	
@@ -32,7 +32,7 @@ Copyright 2014~2015 Dan Haywood
     <artifactId>incode-module-communications-dom</artifactId>
 
     <!--
-        REINSTATE ONCE THIS MODULE MOVED TO ITS OWN GIT REPO.  FOR NOW, USE estatio.version
+        REINSTATE ONCE THIS MODULE MOVED TO ITS OWN GIT REPO (EST-866).  FOR NOW, USE estatio.version
 
         <version>1.14.0-SNAPSHOT</version>
     -->
@@ -82,10 +82,11 @@ Copyright 2014~2015 Dan Haywood
         <isis.version>1.13.0</isis.version>
         <isis-module-fakedata.version>1.13.0</isis-module-fakedata.version>
         <isis-module-poly.version>1.13.0</isis-module-poly.version>
+        <isis-module-security.version>1.13.4</isis-module-security.version>
 
-        <udo-dom-geography.version>1.7.0-SNAPSHOT</udo-dom-geography.version>
-        <incode-module-base.version>1.7.0-SNAPSHOT</incode-module-base.version>
-        <incode-module-documents.version>1.7.0-SNAPSHOT</incode-module-documents.version>
+        <incode-module-base.version>1.13.1</incode-module-base.version>
+        <incode-module-country.version>1.13.0</incode-module-country.version>
+        <incode-module-document.version>1.13.0</incode-module-document.version>
 
         <lombok.version>1.16.6</lombok.version>
         <axon-core.version>2.4.4</axon-core.version>
@@ -245,6 +246,23 @@ Copyright 2014~2015 Dan Haywood
                 <scope>import</scope>
             </dependency>
 
+            <!--
+            TODO: to remove, but only after have figured out/refactored WithApplicationTenancy and
+            removed dependency on UdoDomainObject
+            -->
+            <dependency>
+                <groupId>org.estatio</groupId>
+                <artifactId>udo-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.estatio</groupId>
+                <artifactId>udo-base</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.incode.module.base</groupId>
                 <artifactId>incode-module-base-dom</artifactId>
@@ -252,14 +270,14 @@ Copyright 2014~2015 Dan Haywood
             </dependency>
 
             <dependency>
-                <groupId>org.estatio</groupId>
-                <artifactId>udo-dom-geography</artifactId>
-                <version>${udo-dom-geography.version}</version>
+                <groupId>org.incode.module.country</groupId>
+                <artifactId>incode-module-country-dom</artifactId>
+                <version>${incode-module-country.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.estatio</groupId>
-                <artifactId>udo-dom-geography</artifactId>
-                <version>${udo-dom-geography.version}</version>
+                <groupId>org.incode.module.country</groupId>
+                <artifactId>incode-module-country-dom</artifactId>
+                <version>${incode-module-country.version}</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -269,11 +287,16 @@ Copyright 2014~2015 Dan Haywood
                 <artifactId>isis-module-poly-dom</artifactId>
                 <version>${isis-module-poly.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.isisaddons.module.security</groupId>
+                <artifactId>isis-module-security-dom</artifactId>
+                <version>${isis-module-security.version}</version>
+            </dependency>
 
             <dependency>
-                <groupId>org.incode.module.documents</groupId>
-                <artifactId>incode-module-documents-dom</artifactId>
-                <version>${incode-module-documents.version}</version>
+                <groupId>org.incode.module.document</groupId>
+                <artifactId>incode-module-document-dom</artifactId>
+                <version>${incode-module-document.version}</version>
             </dependency>
 
         </dependencies>
@@ -286,19 +309,22 @@ Copyright 2014~2015 Dan Haywood
             <version>${isis.version}</version>
         </dependency>
 
+
         <dependency>
             <groupId>org.isisaddons.module.poly</groupId>
             <artifactId>isis-module-poly-dom</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>org.incode.module.documents</groupId>
-            <artifactId>incode-module-documents-dom</artifactId>
+            <groupId>org.incode.module.document</groupId>
+            <artifactId>incode-module-document-dom</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.estatio</groupId>
-            <artifactId>udo-dom-geography</artifactId>
+            <groupId>org.incode.module.country</groupId>
+            <artifactId>incode-module-country-dom</artifactId>
         </dependency>
+
+
 
         <dependency>
             <groupId>org.apache.isis.core</groupId>
@@ -331,6 +357,33 @@ Copyright 2014~2015 Dan Haywood
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!--
+        TODO: to remove, but only after have figured out/refactored WithApplicationTenancy and
+        removed dependency on UdoDomainObject
+        -->
+        <dependency>
+            <groupId>org.estatio</groupId>
+            <artifactId>udo-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.estatio</groupId>
+            <artifactId>udo-base</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.incode.module.base</groupId>
+            <artifactId>incode-module-base-dom</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.incode.module.base</groupId>
+            <artifactId>incode-module-base-dom</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -373,12 +426,12 @@ Copyright 2014~2015 Dan Haywood
                         <artifactId>isis-maven-plugin</artifactId>
                         <version>${isis.version}</version>
                         <configuration>
-                            <appManifest>org.incode.module.documents.dom.templates.DocTemplatesModuleDomManifest</appManifest>
+                            <appManifest>org.incode.module.communications.dom.CommunicationsModuleDomManifest</appManifest>
                         </configuration>
                         <dependencies>
                             <dependency>
                                 <groupId>${project.groupId}</groupId>
-                                <artifactId>incode-module-doctemplates-dom</artifactId>
+                                <artifactId>incode-module-communications-dom</artifactId>
                                 <version>${project.version}</version>
                             </dependency>
                             <!--

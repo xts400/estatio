@@ -21,6 +21,7 @@ package org.estatio.domlink;
 
 import javax.jdo.annotations.IdentityType;
 
+import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.MemberGroupLayout;
 import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.Property;
@@ -29,18 +30,22 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.types.FqcnType;
+import org.incode.module.base.dom.types.NameType;
+import org.incode.module.base.dom.types.UrlTemplateType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
 import org.estatio.dom.apptenancy.WithApplicationTenancyPathPersisted;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable(
-        identityType = IdentityType.DATASTORE,
-        table = "Link")
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
                 name = "findByClassName", language = "JDOQL",
@@ -49,6 +54,9 @@ import lombok.Setter;
                         + "WHERE className == :className")
 })
 @javax.jdo.annotations.Unique(members = { "className", "name" })
+@DomainObject(
+        objectType = "org.estatio.domlink.Link"
+)
 @MemberGroupLayout(columnSpans = { 12, 0, 0, 12 })
 public class Link
         extends UdoDomainObject2<Link>
@@ -83,21 +91,21 @@ public class Link
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.FQCN)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = FqcnType.Meta.MAX_LEN)
     @MemberOrder(sequence = "1")
     @Getter @Setter
     private String className;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.NAME)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = NameType.Meta.MAX_LEN)
     @MemberOrder(sequence = "2")
     @Getter @Setter
     private String name;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.Link.URL_TEMPLATE)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = UrlTemplateType.Meta.MAX_LEN)
     @MemberOrder(sequence = "3")
     @Getter @Setter
     private String urlTemplate;

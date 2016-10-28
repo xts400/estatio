@@ -18,6 +18,7 @@
  */
 package org.estatio.dom.agreement;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -54,33 +55,38 @@ import org.apache.isis.applib.annotation.RenderType;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.annotation.Where;
 
-import org.estatio.dom.Chained;
+import org.incode.module.base.dom.Chained;
+import org.incode.module.base.dom.with.WithInterval;
+import org.incode.module.base.dom.with.WithIntervalMutable;
+import org.incode.module.base.dom.types.NameType;
+import org.incode.module.base.dom.types.ReferenceType;
+import org.incode.module.base.dom.utils.TitleBuilder;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.RegexValidation;
-import org.estatio.dom.WithInterval;
-import org.estatio.dom.WithIntervalMutable;
-import org.estatio.dom.WithNameGetter;
-import org.estatio.dom.WithReferenceGetter;
+import org.incode.module.base.dom.with.WithNameGetter;
+import org.incode.module.base.dom.with.WithReferenceGetter;
 import org.estatio.dom.party.Party;
-import org.estatio.dom.utils.TitleBuilder;
-import org.estatio.dom.utils.ValueUtils;
-import org.estatio.dom.valuetypes.LocalDateInterval;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
+@javax.jdo.annotations.Discriminator(
+        strategy = DiscriminatorStrategy.VALUE_MAP,
+        column = "discriminator",
+        value = "org.estatio.dom.agreement.Agreement"
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
 @javax.jdo.annotations.Version(
         strategy = VersionStrategy.VERSION_NUMBER,
         column = "version")
-@javax.jdo.annotations.Discriminator(
-        strategy = DiscriminatorStrategy.CLASS_NAME,
-        column = "discriminator")
 @javax.jdo.annotations.Indices({
         // to cover the 'findAssetsByReferenceOrName' query
         // both in this superclass and the subclasses
@@ -148,15 +154,15 @@ public abstract class Agreement
                 .toString();
     }
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.REFERENCE)
-    @Property(regexPattern = RegexValidation.REFERENCE)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = ReferenceType.Meta.MAX_LEN)
+    @Property(regexPattern = ReferenceType.Meta.REGEX)
     @PropertyLayout(describedAs = "Unique reference code for this agreement")
     @Getter @Setter
     private String reference;
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(length = JdoColumnLength.NAME)
+    @javax.jdo.annotations.Column(length = NameType.Meta.MAX_LEN)
     @Property(optionality = Optionality.OPTIONAL, hidden = Where.ALL_TABLES)
     @PropertyLayout(describedAs = "Optional name for this agreement")
     @Getter @Setter
@@ -219,8 +225,13 @@ public abstract class Agreement
         }
 
         // and return the party
-        final AgreementRole currentOrMostRecentRole = ValueUtils.firstElseNull(roles);
+        final AgreementRole currentOrMostRecentRole = firstElseNull(roles);
         return currentOrMostRecentRole;
+    }
+
+    private static <T> T firstElseNull(final Iterable<T> iterable) {
+        Iterator<T> iterator = iterable.iterator();
+        return iterator.hasNext() ? iterator.next() : null;
     }
 
     protected Party partyOf(final AgreementRole agreementRole) {

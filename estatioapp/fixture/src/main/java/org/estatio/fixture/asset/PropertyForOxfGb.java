@@ -19,15 +19,15 @@
 package org.estatio.fixture.asset;
 
 import org.estatio.dom.asset.PropertyType;
-import org.estatio.dom.geography.Country;
+import org.incode.module.country.dom.impl.Country;
 import org.estatio.dom.party.Party;
-import org.estatio.fixture.geography.CountriesRefData;
+import org.incode.module.country.fixture.CountriesRefData;
 import org.estatio.fixture.party.OrganisationForHelloWorldGb;
 import org.estatio.fixture.party.OrganisationForTopModelGb;
 import org.estatio.fixture.party.PersonForGinoVannelliGb;
 import org.estatio.fixture.security.tenancy.ApplicationTenancyForGb;
 
-import static org.estatio.integtests.VT.ld;
+import static org.incode.module.base.integtests.VT.ld;
 
 public class PropertyForOxfGb extends PropertyAbstract {
 

@@ -18,7 +18,7 @@
  */
 package org.estatio.dom.invoice;
 
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum InvoiceStatus {
 
@@ -35,4 +35,10 @@ public enum InvoiceStatus {
         return this.equals(InvoiceStatus.APPROVED) || this.equals(InvoiceStatus.NEW);
     }
 
+    public static class Meta {
+        private Meta() {}
+
+        public final static int MAX_LEN = 20;
+
+    }
 }

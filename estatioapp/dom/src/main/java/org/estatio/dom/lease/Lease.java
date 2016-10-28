@@ -62,10 +62,11 @@ import org.apache.isis.applib.services.wrapper.WrapperFactory;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.app.security.EstatioRole;
-import org.estatio.dom.EstatioUserRole;
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.RegexValidation;
+import org.incode.module.base.dom.types.NotesType;
+import org.incode.module.base.dom.utils.JodaPeriodUtils;
+import org.incode.module.base.dom.utils.StringUtils;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.agreement.Agreement;
 import org.estatio.dom.agreement.AgreementRole;
 import org.estatio.dom.agreement.AgreementRoleCommunicationChannel;
@@ -90,17 +91,20 @@ import org.estatio.dom.invoice.PaymentMethod;
 import org.estatio.dom.lease.breaks.BreakOption;
 import org.estatio.dom.lease.breaks.BreakOptionRepository;
 import org.estatio.dom.party.Party;
-import org.estatio.dom.utils.JodaPeriodUtils;
-import org.estatio.dom.utils.StringUtils;
-import org.estatio.dom.valuetypes.LocalDateInterval;
+import org.estatio.dom.roles.EstatioRole;
 
 import lombok.Getter;
 import lombok.Setter;
+import static org.apache.commons.lang3.StringUtils.left;
 
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.NEW_TABLE)
 // no @DatastoreIdentity nor @Version, since inherited from supertype
+@javax.jdo.annotations.Discriminator("org.estatio.dom.lease.Lease")
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
                 name = "findByReference", language = "JDOQL",
@@ -190,7 +194,7 @@ public class Lease
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.STATUS_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = LeaseStatus.Meta.MAX_LEN)
     @org.apache.isis.applib.annotation.Property(editing = Editing.DISABLED)
     @Getter @Setter
     private LeaseStatus status;
@@ -267,15 +271,30 @@ public class Lease
 
     // //////////////////////////////////////
 
+    @Getter @Setter
+    @Column(allowsNull = "true", length = ExternalReferenceType.Meta.MAX_LEN)
+    private String externalReference;
+
+    public Lease changeExternalReference(final String externalReference) {
+        setExternalReference(externalReference);
+        return this;
+    }
+
+    public String default0ChangeExternalReference(){
+        return getExternalReference();
+    }
+
     @javax.jdo.annotations.Column(name = "leaseTypeId", allowsNull = "true")
     @Getter @Setter
     private LeaseType leaseType;
 
     public Lease change(
             final String name,
-            final @Parameter(optionality = Optionality.OPTIONAL) LeaseType leaseType) {
+            @Parameter(optionality = Optionality.OPTIONAL)
+            final LeaseType leaseType) {
         setName(name);
         setLeaseType(leaseType);
+        setExternalReference(externalReference);
         return this;
     }
 
@@ -287,7 +306,7 @@ public class Lease
         return getLeaseType();
     }
 
-    @Column(allowsNull = "true", length = JdoColumnLength.NOTES)
+    @Column(allowsNull = "true", length = NotesType.Meta.MAX_LEN)
     @PropertyLayout(multiLine = 5, hidden = Where.ALL_TABLES)
     @Getter @Setter
     private String comments;
@@ -657,7 +676,7 @@ public class Lease
 
     public Lease newMandate(
             final BankAccount bankAccount,
-            final @Parameter(regexPattern = RegexValidation.REFERENCE, regexPatternReplacement = RegexValidation.REFERENCE_DESCRIPTION) String reference,
+            final @Parameter(regexPattern = org.incode.module.base.dom.types.ReferenceType.Meta.REGEX, regexPatternReplacement = org.incode.module.base.dom.types.ReferenceType.Meta.REGEX_DESCRIPTION) String reference,
             final LocalDate startDate,
             final @Parameter(optionality = Optionality.OPTIONAL) LocalDate endDate,
             final @Parameter(optionality = Optionality.OPTIONAL) SequenceType sequenceType,
@@ -845,7 +864,7 @@ public class Lease
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
     public Lease assign(
-            @Parameter(regexPattern = RegexValidation.REFERENCE, regexPatternReplacement = RegexValidation.REFERENCE_DESCRIPTION) final String reference,
+            @Parameter(regexPattern = org.incode.module.base.dom.types.ReferenceType.Meta.REGEX, regexPatternReplacement = org.incode.module.base.dom.types.ReferenceType.Meta.REGEX_DESCRIPTION) final String reference,
             final String name,
             final Party tenant,
             final LocalDate tenancyStartDate
@@ -948,7 +967,7 @@ public class Lease
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
     public Lease renew(
-            @Parameter(regexPattern = RegexValidation.Lease.REFERENCE, regexPatternReplacement = RegexValidation.Lease.REFERENCE_DESCRIPTION) final String reference,
+            @Parameter(regexPattern = ReferenceType.Meta.REGEX, regexPatternReplacement = ReferenceType.Meta.REGEX_DESCRIPTION) final String reference,
             final String name,
             final LocalDate startDate,
             final LocalDate endDate
@@ -984,7 +1003,46 @@ public class Lease
         return leaseRepository.findLeaseByReferenceElseNull(reference) == null ? null : "Lease reference already exists.";
     }
 
-    // //////////////////////////////////////
+    public String disableRenew() {
+        if(getNext() != null){
+            return "Cannot renew when there is a next lease";
+        }
+        return null;
+    }
+
+    public Lease renewKeepingThis(final LocalDate newStartDate, final LocalDate newEndDate) {
+        final String newReference = left(getReference(), 14).concat("_");
+        final String newName = getName().concat(" - Archived");
+        Lease prevLease = leaseRepository.newLease(
+                getApplicationTenancy(),
+                newReference,
+                newName,
+                getLeaseType(),
+                getStartDate(),
+                getEndDate(),
+                getTenancyStartDate(),
+                newStartDate.minusDays(1),
+                getPrimaryParty(),
+                getSecondaryParty());
+        prevLease.setNext(this);
+        prevLease.setComments(getComments());
+
+        setStartDate(newStartDate);
+        setEndDate(newEndDate);
+        setTenancyStartDate(newStartDate);
+        setTenancyEndDate(newEndDate);
+        return this;
+    }
+
+    public String disableRenewKeepingThis() {
+        if (getPrevious() != null) {
+            return "Previous lease found";
+        }
+        if (getNext() != null) {
+            return "Next lease found";
+        }
+        return null;
+    }
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
     public void remove() {
@@ -999,7 +1057,7 @@ public class Lease
     }
 
     public boolean hideRemove() {
-        return !EstatioUserRole.ADMIN_ROLE.isApplicableTo(getUser());
+        return !EstatioRole.ADMINISTRATOR.hasRoleWithSuffix(getUser());
     }
 
     @Programmatic
@@ -1010,8 +1068,6 @@ public class Lease
         }
         return dates;
     }
-
-    // //////////////////////////////////////
 
     public static class TerminateEvent extends ActionDomainEvent<Lease> {
         private static final long serialVersionUID = 1L;
@@ -1057,8 +1113,7 @@ public class Lease
     @Inject
     BankMandateRepository bankMandateRepository;
 
-    @Inject
-    private LeaseRepository leaseRepository;
+    @Inject LeaseRepository leaseRepository;
 
     @Inject
     UnitRepository unitRepository;
@@ -1074,5 +1129,40 @@ public class Lease
 
     @Inject
     private WrapperFactory wrapperFactory;
+
+
+
+    // //////////////////////////////////////
+
+    public static class ReferenceType {
+
+        private ReferenceType() {}
+
+        public static class Meta {
+
+            //(?=(?:.{11,15}|.{17}))([X,Z]{1}-)?([A-Z]{3}-([A-Z,0-9]{3,8})-[A-Z,0-9,\&+=_/-]{1,7})
+            //public static final String REGEX = "(?=.{11,17})([A-Z]{1}-)?([A-Z]{3}-([A-Z,0-9]{3,8})-[A-Z,0-9,\\&+=_/-]{1,7})";
+            //public static final String REGEX = "^([X,Z]-)?(?=.{11,15}$)([A-Z]{3})-([A-Z,0-9]{3,8})-([A-Z,0-9,\\&+=_/-]{1,7})$";
+            public static final String REGEX = "^([X,Z]-)?(?=.{8,15}$)([A-Z]{2,4})-([A-Z,0-9,\\&\\ \\+=_/-]{1,15})$";
+            public static final String REGEX_DESCRIPTION = "Only letters and numbers devided by at least 2 and at most 4 dashes:\"-\" totalling between 8 and 15 characters. ";
+
+            private Meta() {}
+
+        }
+
+    }
+
+    public static class ExternalReferenceType {
+
+        private ExternalReferenceType() {}
+
+        public static class Meta {
+
+            public static final int MAX_LEN = org.incode.module.base.dom.types.ReferenceType.Meta.MAX_LEN;
+
+            private Meta() {}
+
+        }
+    }
 
 }

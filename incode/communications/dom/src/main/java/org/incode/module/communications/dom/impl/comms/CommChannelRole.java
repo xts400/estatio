@@ -49,15 +49,15 @@ import org.apache.isis.applib.util.ObjectContracts;
 
 import org.incode.module.communications.dom.CommunicationsModule;
 
-import org.estatio.dom.communicationchannel.CommunicationChannel;
+import org.incode.module.communications.dom.impl.commchannel.CommunicationChannel;
+import org.incode.module.communications.dom.types.DescriptionType;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @PersistenceCapable(
         identityType=IdentityType.DATASTORE
-        //        ,
-        //        schema = "estatioCommunications"  // DN doesn't seem to allow this to be in a different schema...
+        , schema = "IncodeCommunications"
 )
 @DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
@@ -91,8 +91,7 @@ import lombok.Setter;
         // none yet
 })
 @DomainObject(
-        editing = Editing.DISABLED,
-        objectType = "estatioCommunications.CommChannelRole"
+        editing = Editing.DISABLED
 )
 @DomainObjectLayout(
         titleUiEvent = CommChannelRole.TitleUiEvent.class,
@@ -220,7 +219,7 @@ public class CommChannelRole implements Comparable<CommChannelRole> {
     //region > description (property)
     public static class DescriptionDomainEvent extends PropertyDomainEvent<String> { }
     @Getter @Setter
-    @Column(allowsNull = "true", length = CommunicationsModule.JdoColumnLength.DESCRIPTION)
+    @Column(allowsNull = "true", length = DescriptionType.Meta.MAX_LEN)
     @Property(
             domainEvent = DescriptionDomainEvent.class,
             editing = Editing.DISABLED

@@ -2,15 +2,13 @@ package org.estatio.dom.budgetassignment.viewmodels;
 
 import java.math.BigDecimal;
 
-import javax.jdo.annotations.Column;
-
 import org.apache.isis.applib.annotation.Auditing;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.Nature;
 
 import org.estatio.dom.asset.Unit;
-import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationResult;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationViewmodel;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.lease.Lease;
@@ -27,12 +25,12 @@ public class BudgetAssignmentResult {
             final Lease lease,
             final Unit unit,
             final Charge invoiceCharge,
-            final BigDecimal budgetedAmount
+            final BigDecimal budgetedValue
     ){
         this.leaseReference = lease.getReference();
         this.unit = unit.getReference();
         this.invoiceCharge = invoiceCharge.getReference();
-        this.budgetedAmount = budgetedAmount;
+        this.budgetedValue = budgetedValue;
     }
 
     @Getter @Setter
@@ -48,13 +46,12 @@ public class BudgetAssignmentResult {
     private String invoiceCharge;
 
     @Getter @Setter
-    @Column(scale = 2)
     @MemberOrder(sequence = "4")
-    private BigDecimal budgetedAmount;
+    private BigDecimal budgetedValue;
 
-    public void add(final BudgetCalculationResult calculationResult) {
+    public void add(final BudgetCalculationViewmodel calculationResult) {
         if (calculationResult.getCalculationType() == BudgetCalculationType.BUDGETED){
-            setBudgetedAmount(getBudgetedAmount().add(calculationResult.getValue()));
+            setBudgetedValue(getBudgetedValue().add(calculationResult.getValue()));
         }
     }
 }

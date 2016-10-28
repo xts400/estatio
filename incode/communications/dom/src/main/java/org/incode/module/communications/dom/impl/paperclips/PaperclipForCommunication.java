@@ -31,22 +31,19 @@ import org.apache.isis.applib.annotation.Mixin;
 import org.apache.isis.applib.annotation.NatureOfService;
 
 import org.incode.module.communications.dom.impl.comms.Communication;
-import org.incode.module.documents.dom.impl.paperclips.Paperclip;
-import org.incode.module.documents.dom.impl.paperclips.PaperclipRepository;
-import org.incode.module.documents.dom.mixins.T_documents;
+import org.incode.module.document.dom.impl.paperclips.Paperclip;
+import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
+import org.incode.module.document.dom.mixins.T_documents;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType= IdentityType.DATASTORE
-//        ,
-//        schema = "estatioCommunications"  // DN doesn't seem to allow this to be in a different schema...
+        , schema = "IncodeCommunications"
 )
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
-@DomainObject(
-        objectType = "estatioCommunications.PaperclipForCommunication"
-)
+@DomainObject()
 @DomainObjectLayout(
         bookmarking = BookmarkPolicy.AS_ROOT
 )

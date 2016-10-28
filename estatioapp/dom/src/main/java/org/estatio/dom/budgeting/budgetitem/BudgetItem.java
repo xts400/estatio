@@ -42,6 +42,8 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
@@ -52,14 +54,13 @@ import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableRepository;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @javax.jdo.annotations.PersistenceCapable(
         identityType = IdentityType.DATASTORE
-        //      ,schema = "budget"
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
 )
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
@@ -86,7 +87,9 @@ import lombok.Setter;
                     + "&& charge == :charge "
                     + "&& budget.startDate == :startDate")
 })
-@DomainObject()
+@DomainObject(
+        objectType = "org.estatio.dom.budgeting.budgetitem.BudgetItem"
+)
 public class BudgetItem extends UdoDomainObject2<BudgetItem>
         implements WithApplicationTenancyProperty, BudgetItemAllocationCreator {
 

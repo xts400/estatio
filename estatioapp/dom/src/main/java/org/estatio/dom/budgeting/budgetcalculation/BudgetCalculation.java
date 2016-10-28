@@ -21,7 +21,6 @@ package org.estatio.dom.budgeting.budgetcalculation;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
-import javax.inject.Inject;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.DatastoreIdentity;
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -46,21 +45,21 @@ import org.apache.isis.applib.services.timestamp.Timestampable;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.budgeting.Distributable;
 import org.estatio.dom.budgeting.allocation.BudgetItemAllocation;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @PersistenceCapable(
         identityType = IdentityType.DATASTORE
-//      ,schema = "budget"
+        ,schema = "dbo" // Isis' ObjectSpecId inferred from @DomainObject#objectType
 )
 @DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
@@ -102,9 +101,13 @@ import lombok.Setter;
                         "WHERE budgetItemAllocation == :budgetItemAllocation")
 })
 @Unique(name = "BudgetCalculation_budgetItemAllocation_keyItem_calculationType_status_UNQ", members = {"budgetItemAllocation", "keyItem", "calculationType", "status"})
-@DomainObject(auditing = Auditing.DISABLED, publishing = Publishing.DISABLED)
+@DomainObject(
+        auditing = Auditing.DISABLED,
+        publishing = Publishing.DISABLED,
+        objectType = "org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation"
+)
 public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
-        implements Distributable, WithApplicationTenancyProperty, Timestampable {
+        implements WithApplicationTenancyProperty, Timestampable {
 
     public BudgetCalculation() {
         super("budgetItemAllocation, keyItem");
@@ -131,11 +134,6 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     @Column(allowsNull = "false", name="keyItemId")
     @PropertyLayout(hidden = Where.REFERENCES_PARENT)
     private KeyItem keyItem;
-
-    @Getter @Setter
-    @Column(allowsNull = "false", scale = 6)
-    @PropertyLayout(hidden = Where.EVERYWHERE)
-    private BigDecimal sourceValue;
 
     @Getter @Setter
     @Column(allowsNull = "false")
@@ -180,11 +178,6 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     }
 
     @Programmatic
-    public BudgetCalculation createOrUpdateAssignedFromTemporary(){
-            return budgetCalculationRepository.updateOrCreateAssignedFromTemporary(this);
-    }
-
-    @Programmatic
     public void remove(){
         getContainer().remove(this);
     }
@@ -195,7 +188,5 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
         return getBudget().getAnnualFactor();
 
     }
-    @Inject
-    private BudgetCalculationRepository budgetCalculationRepository;
 
 }

@@ -21,10 +21,10 @@ package org.estatio.dom.documents.binders;
 
 import java.util.Collections;
 
-import org.incode.module.documents.dom.impl.applicability.Binder;
-import org.incode.module.documents.dom.impl.docs.DocumentTemplate;
+import org.incode.module.document.dom.impl.applicability.Binder;
+import org.incode.module.document.dom.impl.docs.DocumentTemplate;
 
-import org.estatio.dom.WithNameGetter;
+import org.incode.module.base.dom.with.WithNameGetter;
 
 import lombok.Data;
 

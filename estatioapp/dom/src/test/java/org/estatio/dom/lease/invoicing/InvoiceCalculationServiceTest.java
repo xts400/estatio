@@ -48,7 +48,7 @@ import org.estatio.dom.lease.invoicing.InvoiceCalculationService.CalculationResu
 import org.estatio.dom.tax.Tax;
 import org.estatio.dom.tax.TaxRate;
 import org.estatio.dom.tax.TaxRateRepository;
-import org.estatio.dom.valuetypes.LocalDateInterval;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
 import org.estatio.dom.appsettings.EstatioSettingsService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,12 +80,12 @@ public class InvoiceCalculationServiceTest {
         ) {
             List<CalculationResult> results = ic.calculateDueDateRange(
                     leaseTerm,
-                    new InvoiceCalculationParameters(
-                            leaseTerm,
-                            InvoiceRunType.NORMAL_RUN,
-                            startDueDate,
-                            startDueDate,
-                            nextDueDate == null ? startDueDate.plusDays(1) : nextDueDate));
+                    InvoiceCalculationParameters.builder()
+                            .leaseTerm(leaseTerm)
+                            .invoiceRunType(InvoiceRunType.NORMAL_RUN)
+                            .invoiceDueDate(startDueDate)
+                            .startDueDate(startDueDate)
+                            .nextDueDate(nextDueDate == null ? startDueDate.plusDays(1) : nextDueDate).build());
             for (int i = 0; i < results.size(); i++) {
                 assertThat(results.get(i).value().subtract(results.get(i).mockValue())).isEqualTo(new BigDecimal(values[i]).setScale(2, RoundingMode.HALF_UP));
             }

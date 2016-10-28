@@ -18,7 +18,7 @@
  */
 package org.estatio.dom.lease;
 
-import org.estatio.dom.ApplicationSettingCreatorTestAbstract;
+import org.estatio.dom.appsettings.ApplicationSettingCreatorTestAbstract;
 
 
 public class ApplicationSettingKeyTest {

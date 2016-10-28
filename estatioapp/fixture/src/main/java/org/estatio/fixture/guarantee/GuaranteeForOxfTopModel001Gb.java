@@ -31,12 +31,13 @@ import org.estatio.fixture.EstatioOperationalTeardownFixture;
 import org.estatio.fixture.lease.LeaseForOxfTopModel001Gb;
 import org.estatio.fixture.party.OrganisationForDagoBankGb;
 
-import static org.estatio.integtests.VT.bd;
-import static org.estatio.integtests.VT.ld;
+import static org.incode.module.base.integtests.VT.bd;
+import static org.incode.module.base.integtests.VT.ld;
 
 public class GuaranteeForOxfTopModel001Gb extends GuaranteeAbstract {
 
     public static final String LEASE_REFERENCE = LeaseForOxfTopModel001Gb.REF;
+    public static final String REFERENCE = LEASE_REFERENCE + "-D";
     public static final String PARTY_REF_BANK = OrganisationForDagoBankGb.REF;
 
     @Override
@@ -52,11 +53,16 @@ public class GuaranteeForOxfTopModel001Gb extends GuaranteeAbstract {
     private void createGuaranteeForOxfTopModel001(final ExecutionContext executionContext) {
 
         final Lease lease = leaseRepository.findLeaseByReference(LEASE_REFERENCE);
-        final String reference = lease.getReference() + "-D";
 
         final Guarantee guarantee = newGuarantee(
-                lease, reference, reference, GuaranteeType.BANK_GUARANTEE,
-                ld(2014, 1, 1), ld(2015, 1, 1), "Description", bd(50000),
+                lease,
+                REFERENCE,
+                REFERENCE,
+                GuaranteeType.BANK_GUARANTEE,
+                ld(2014, 1, 1),
+                ld(2015, 1, 1),
+                "Description",
+                bd(50000),
                 executionContext);
         guarantee.createRole(
                 agreementRoleTypeRepository.findByTitle(GuaranteeConstants.ART_BANK),

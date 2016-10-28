@@ -18,8 +18,8 @@
  */
 package org.estatio.dom.asset;
 
-import org.estatio.dom.TitledEnum;
-import org.estatio.dom.utils.StringUtils;
+import org.incode.module.base.dom.TitledEnum;
+import org.incode.module.base.dom.utils.StringUtils;
 
 public enum UnitType implements TitledEnum {
 
@@ -43,6 +43,12 @@ public enum UnitType implements TitledEnum {
 
     public String title() {
         return StringUtils.enumTitle(this.name());
+    }
+
+    public static class Meta {
+        private Meta(){}
+
+        public final static int MAX_LEN = 30;
     }
 
 }

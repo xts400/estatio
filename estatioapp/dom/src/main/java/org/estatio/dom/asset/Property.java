@@ -19,10 +19,8 @@
 package org.estatio.dom.asset;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.jdo.annotations.Column;
@@ -52,21 +50,23 @@ import org.isisaddons.wicket.gmap3.cpt.applib.Locatable;
 import org.isisaddons.wicket.gmap3.cpt.applib.Location;
 import org.isisaddons.wicket.gmap3.cpt.service.LocationLookupService;
 
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.RegexValidation;
+import org.incode.module.base.dom.types.ProperNameType;
+import org.incode.module.country.dom.impl.Country;
+
 import org.estatio.dom.apptenancy.WithApplicationTenancyPathPersisted;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.asset.ownership.FixedAssetOwnership;
 import org.estatio.dom.asset.ownership.FixedAssetOwnershipRepository;
-import org.estatio.dom.geography.Country;
 import org.estatio.dom.party.Party;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo" // Isis' ObjectSpecId inferred by @Discriminator
+)
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.NEW_TABLE)
+@javax.jdo.annotations.Discriminator("org.estatio.dom.asset.Property")
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
                 name = "findByReferenceOrName", language = "JDOQL",
@@ -116,7 +116,7 @@ public class Property
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = PropertyType.Meta.MAX_LEN)
     @Getter @Setter
     private PropertyType type;
 
@@ -149,7 +149,7 @@ public class Property
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.PROPER_NAME)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = ProperNameType.Meta.MAX_LEN)
     @Getter @Setter
     private String city;
 
@@ -216,7 +216,7 @@ public class Property
     )
     @MemberOrder(sequence = "1", name = "units")
     public Unit newUnit(
-            final @Parameter(regexPattern = RegexValidation.Unit.REFERENCE, regexPatternReplacement = RegexValidation.Unit.REFERENCE_DESCRIPTION) String reference,
+            final @Parameter(regexPattern = Unit.ReferenceType.Meta.REGEX, regexPatternReplacement = Unit.ReferenceType.Meta.REGEX_DESCRIPTION) String reference,
             final String name,
             final UnitType type) {
         return unitRepository.newUnit(this, reference, name, type);
@@ -269,5 +269,22 @@ public class Property
     @Inject
     FixedAssetOwnershipRepository fixedAssetOwnershipRepository;
 
+    // //////////////////////////////////////
+
+    public static class ReferenceType {
+
+        private ReferenceType() {}
+
+        public static class Meta {
+
+            /* Only 3 letters */
+            public static final String REGEX = "[A-Z,0-9]{2,4}";
+            public static final String REGEX_DESCRIPTION = "2 to 4 numbers or letters, e.g. XXX9";
+
+            private Meta() {}
+
+        }
+
+    }
 }
 

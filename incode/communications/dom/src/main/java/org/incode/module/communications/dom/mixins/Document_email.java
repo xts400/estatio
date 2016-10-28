@@ -32,6 +32,7 @@ import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.SemanticsOf;
+import org.apache.isis.applib.services.background.BackgroundService2;
 import org.apache.isis.applib.services.clock.ClockService;
 import org.apache.isis.applib.services.email.EmailService;
 import org.apache.isis.applib.services.queryresultscache.QueryResultsCache;
@@ -41,22 +42,20 @@ import org.apache.isis.applib.services.repository.RepositoryService;
 import org.isisaddons.module.security.app.user.MeService;
 import org.isisaddons.module.security.dom.user.ApplicationUser;
 
-import org.incode.module.communications.dom.CommunicationsModule;
+import org.incode.module.communications.dom.impl.commchannel.CommunicationChannel;
 import org.incode.module.communications.dom.impl.comms.CommChannelRoleType;
 import org.incode.module.communications.dom.impl.comms.Communication;
 import org.incode.module.communications.dom.spi.CommHeaderForEmail;
 import org.incode.module.communications.dom.spi.DocumentCommunicationSupport;
-import org.incode.module.documents.dom.DocumentsModule;
-import org.incode.module.documents.dom.impl.docs.Document;
-import org.incode.module.documents.dom.impl.docs.DocumentState;
-import org.incode.module.documents.dom.impl.docs.DocumentTemplate;
-import org.incode.module.documents.dom.impl.docs.DocumentTemplateRepository;
-import org.incode.module.documents.dom.impl.paperclips.PaperclipRepository;
-import org.incode.module.documents.dom.impl.types.DocumentType;
+import org.incode.module.document.dom.DocumentModule;
+import org.incode.module.document.dom.impl.docs.Document;
+import org.incode.module.document.dom.impl.docs.DocumentState;
+import org.incode.module.document.dom.impl.docs.DocumentTemplate;
+import org.incode.module.document.dom.impl.docs.DocumentTemplateRepository;
+import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
+import org.incode.module.document.dom.impl.types.DocumentType;
 
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.RegexValidation;
-import org.estatio.dom.communicationchannel.EmailAddress;
+import org.incode.module.communications.dom.impl.commchannel.EmailAddress;
 
 /**
  * Provides the ability to send an email.
@@ -72,7 +71,7 @@ public class Document_email  {
         this.document = document;
     }
 
-    public static class ActionDomainEvent extends DocumentsModule.ActionDomainEvent<Document_email> { }
+    public static class ActionDomainEvent extends DocumentModule.ActionDomainEvent<Document_email> { }
 
     @Action(
             semantics = SemanticsOf.NON_IDEMPOTENT,
@@ -83,29 +82,38 @@ public class Document_email  {
             final EmailAddress toChannel,
             @Parameter(
                     optionality = Optionality.OPTIONAL,
-                    maxLength = JdoColumnLength.EMAIL_ADDRESS,
-                    regexPattern = RegexValidation.CommunicationChannel.EMAIL,
-                    regexPatternReplacement = RegexValidation.CommunicationChannel.EMAIL_DESCRIPTION)
+                    maxLength = CommunicationChannel.EmailType.MAX_LEN,
+                    regexPattern = CommunicationChannel.EmailType.REGEX,
+                    regexPatternReplacement = CommunicationChannel.EmailType.REGEX_DESC)
             @ParameterLayout(named = "cc:")
             final String cc,
             @Parameter(
                     optionality = Optionality.OPTIONAL,
-                    maxLength = JdoColumnLength.EMAIL_ADDRESS,
-                    regexPattern = RegexValidation.CommunicationChannel.EMAIL,
-                    regexPatternReplacement = RegexValidation.CommunicationChannel.EMAIL_DESCRIPTION)
+                    maxLength = CommunicationChannel.EmailType.MAX_LEN,
+                    regexPattern = CommunicationChannel.EmailType.REGEX,
+                    regexPatternReplacement = CommunicationChannel.EmailType.REGEX_DESC)
             @ParameterLayout(named = "bcc:")
             final String bcc,
-            @Parameter(maxLength = CommunicationsModule.JdoColumnLength.SUBJECT)
-            @ParameterLayout(named = "Subject")
-            final String subject,
             @Parameter(optionality = Optionality.OPTIONAL)
             @ParameterLayout(named = "Covering note message", multiLine = EMAIL_COVERING_NOTE_MULTILINE)
             final String message) throws IOException {
 
-        // create comm and correspondents
-        final DateTime commSent = clockService.nowAsDateTime();
+        if(this.document.getState() == DocumentState.NOT_RENDERED) {
+            // can't send the email yet, so schedule to try again in shortly.
+            backgroundService.executeMixin(Document_email.class, document).$$(toChannel, cc, bcc, message);
+            return null;
+        }
 
-        final Communication communication = Communication.newEmail(document.getAtPath(), subject, commSent);
+        // create and attach cover note
+        final DocumentTemplate coverNoteTemplate = determineEmailCoverNoteTemplate();
+        final Document coverNoteDoc = coverNoteTemplate.createDocumentUsingBinding(this.document, message);
+
+        coverNoteDoc.render(coverNoteTemplate, this.document, message);
+
+        // create comm and correspondents
+        final DateTime queuedAt = clockService.nowAsDateTime();
+
+        final Communication communication = Communication.newEmail(document.getAtPath(), coverNoteDoc.getName(), queuedAt);
         serviceRegistry2.injectServicesInto(communication);
 
         communication.addCorrespondent(CommChannelRoleType.TO, toChannel);
@@ -118,19 +126,12 @@ public class Document_email  {
 
         repositoryService.persistAndFlush(communication);
 
-        // attach this doc to communication
+        // attach the doc and the cover note to communication
         paperclipRepository.attach(document, DocumentConstants.PAPERCLIP_ROLE_ATTACHMENT, communication);
-
-        // create and attach cover note
-        final DocumentTemplate coverNoteTemplate = determineEmailCoverNoteTemplate();
-        final Document coverNoteDoc = coverNoteTemplate.createDocumentUsingBinding(this.document, message);
-
-        coverNoteDoc.render(coverNoteTemplate, this.document, message);
-
         paperclipRepository.attach(coverNoteDoc, DocumentConstants.PAPERCLIP_ROLE_COVER, communication);
 
-        // schedule the email to be sent
-        communication.scheduleSend(subject);
+        // finally, schedule the email to be sent
+        communication.scheduleSend();
 
         return communication;
     }
@@ -171,10 +172,6 @@ public class Document_email  {
     }
 
     public String default3$$() {
-        return determineEmailHeader().getSubject();
-    }
-
-    public String default4$$() {
         return "";
     }
 
@@ -183,9 +180,7 @@ public class Document_email  {
         if(blankDocType == null) {
             return null;
         }
-        final List<DocumentTemplate> docTemplates = documentTemplateRepository
-                .findByTypeAndApplicableToAtPath(blankDocType, this.document.getAtPath());
-        return docTemplates.isEmpty() ? null : docTemplates.get(0);
+        return documentTemplateRepository.findFirstByTypeAndApplicableToAtPath(blankDocType, document.getAtPath());
     }
 
     private DocumentType determineEmailCoverNoteDocumentType() {
@@ -241,5 +236,8 @@ public class Document_email  {
 
     @Inject
     EmailService emailService;
+
+    @Inject
+    BackgroundService2 backgroundService;
 
 }

@@ -43,8 +43,7 @@ import org.apache.isis.applib.services.clock.ClockService;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.Dflt;
-import org.estatio.dom.RegexValidation;
+import org.incode.module.base.dom.Dflt;
 import org.estatio.dom.asset.EstatioApplicationTenancyRepositoryForProperty;
 import org.estatio.dom.asset.FixedAsset;
 import org.estatio.dom.asset.FixedAssetRepository;
@@ -56,10 +55,10 @@ import org.estatio.dom.lease.LeaseType;
 import org.estatio.dom.lease.LeaseTypeRepository;
 import org.estatio.dom.lease.tags.Brand;
 import org.estatio.dom.party.Party;
-import org.estatio.dom.utils.JodaPeriodUtils;
-import org.estatio.dom.utils.StringUtils;
-import org.estatio.dom.valuetypes.ApplicationTenancyLevel;
-import org.estatio.dom.valuetypes.LocalDateInterval;
+import org.incode.module.base.dom.utils.JodaPeriodUtils;
+import org.incode.module.base.dom.utils.StringUtils;
+import org.estatio.dom.apptenancy.ApplicationTenancyLevel;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
 
 @DomainService(nature = NatureOfService.VIEW_MENU_ONLY)
 @DomainServiceLayout(
@@ -74,7 +73,7 @@ public class LeaseMenu {
     public Lease newLease(
             // CHECKSTYLE:OFF ParameterNumber
             final ApplicationTenancy applicationTenancy,
-            final @Parameter(regexPattern = RegexValidation.Lease.REFERENCE, regexPatternReplacement = RegexValidation.Lease.REFERENCE_DESCRIPTION) String reference,
+            final @Parameter(regexPattern = Lease.ReferenceType.Meta.REGEX, regexPatternReplacement = Lease.ReferenceType.Meta.REGEX_DESCRIPTION) String reference,
             final String name,
             final LeaseType leaseType,
             final LocalDate startDate,

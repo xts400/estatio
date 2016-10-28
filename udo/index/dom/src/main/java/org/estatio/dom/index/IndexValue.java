@@ -27,6 +27,7 @@ import javax.jdo.annotations.VersionStrategy;
 import org.joda.time.LocalDate;
 
 import org.apache.isis.applib.annotation.Action;
+import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.annotation.Where;
@@ -34,11 +35,11 @@ import org.apache.isis.applib.services.eventbus.ActionDomainEvent;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.dom.with.WithStartDate;
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.UdoDomainObject2;
-import org.estatio.dom.JdoColumnScale;
-import org.estatio.dom.WithStartDate;
 import org.estatio.dom.apptenancy.WithApplicationTenancyCountry;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -48,7 +49,10 @@ import lombok.Setter;
  * (base)} from a particular {@link #getStartDate() point in time} (until
  * succeeded by some other value).
  */
-@javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE)
+@javax.jdo.annotations.PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @javax.jdo.annotations.DatastoreIdentity(
         strategy = IdGeneratorStrategy.NATIVE,
         column = "id")
@@ -72,6 +76,9 @@ import lombok.Setter;
 @javax.jdo.annotations.Unique(
         name = "IndexValue_indexBase_startDate_IDX",
         members = { "indexBase", "startDate" })
+@DomainObject(
+        objectType = "org.estatio.dom.index.IndexValue"
+)
 public class IndexValue
         extends UdoDomainObject2<IndexValue>
         implements WithStartDate, WithApplicationTenancyCountry {
@@ -106,7 +113,7 @@ public class IndexValue
     @Getter @Setter
     private IndexBase indexBase;
 
-    @javax.jdo.annotations.Column(scale = JdoColumnScale.IndexValue.INDEX_VALUE, allowsNull = "false")
+    @javax.jdo.annotations.Column(scale = ValueType.Meta.SCALE, allowsNull = "false")
     @Getter @Setter
     private BigDecimal value;
 
@@ -119,4 +126,20 @@ public class IndexValue
         private static final long serialVersionUID = 1L;
     }
 
+
+
+
+    public static class ValueType {
+
+        private ValueType() {}
+
+        public static class Meta {
+
+            public static final int SCALE = 4;
+
+            private Meta() {}
+
+        }
+
+    }
 }

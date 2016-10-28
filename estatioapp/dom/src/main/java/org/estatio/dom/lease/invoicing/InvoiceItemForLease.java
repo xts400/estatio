@@ -19,8 +19,6 @@
 package org.estatio.dom.lease.invoicing;
 
 import javax.inject.Inject;
-import javax.jdo.annotations.Index;
-import javax.jdo.annotations.Indices;
 import javax.jdo.annotations.InheritanceStrategy;
 
 import com.google.common.collect.Ordering;
@@ -32,6 +30,8 @@ import org.apache.isis.applib.annotation.Property;
 import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.Where;
 
+import org.incode.module.base.dom.utils.TitleBuilder;
+
 import org.estatio.dom.agreement.AgreementRoleTypeRepository;
 import org.estatio.dom.agreement.AgreementTypeRepository;
 import org.estatio.dom.asset.FixedAsset;
@@ -40,7 +40,6 @@ import org.estatio.dom.invoice.InvoiceItem;
 import org.estatio.dom.invoice.InvoiceSource;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseTerm;
-import org.estatio.dom.utils.TitleBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -50,9 +49,12 @@ import lombok.Setter;
  * {@link #getLeaseTerm() back} to the {@link LeaseTerm} that acts as the
  * <tt>InvoiceSource</tt> of this item's owning {@link Invoice}.
  */
-@javax.jdo.annotations.PersistenceCapable
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo"    // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(
         strategy = InheritanceStrategy.SUPERCLASS_TABLE)
+@javax.jdo.annotations.Discriminator("org.estatio.dom.lease.invoicing.InvoiceItemForLease")
 // no @DatastoreIdentity nor @Version, since inherited from supertype
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
@@ -94,10 +96,10 @@ import lombok.Setter;
                         "WHERE leaseTerm == :leaseTerm " +
                         "&& invoice.status == :invoiceStatus")
 })
-@Indices({
-        @Index(name = "InvoiceItemForLease_LeaseTerm_StartDate_EndDate_DueDate_IDX",
+@javax.jdo.annotations.Indices({
+        @javax.jdo.annotations.Index(name = "InvoiceItemForLease_LeaseTerm_StartDate_EndDate_DueDate_IDX",
                 members = { "leaseTerm", "startDate", "endDate", "dueDate" }),
-        @Index(name = "InvoiceItemForLease_LeaseTerm_StartDate_EndDate_IDX",
+        @javax.jdo.annotations.Index(name = "InvoiceItemForLease_LeaseTerm_StartDate_EndDate_IDX",
                 members = { "leaseTerm", "startDate", "endDate" }),
 
 })

@@ -23,12 +23,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.jdo.annotations.Column;
-import javax.jdo.annotations.Inheritance;
 import javax.jdo.annotations.InheritanceStrategy;
-import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
-import javax.jdo.annotations.Queries;
-import javax.jdo.annotations.Query;
 
 import org.joda.time.LocalDate;
 
@@ -36,22 +32,26 @@ import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.Programmatic;
 
-import org.estatio.dom.JdoColumnScale;
+import org.incode.module.base.dom.utils.MathUtils;
+
 import org.estatio.dom.index.Index;
 import org.estatio.dom.index.IndexRepository;
+import org.estatio.dom.index.IndexValue;
 import org.estatio.dom.index.Indexable;
 import org.estatio.dom.lease.indexation.IndexationCalculationMethod;
 import org.estatio.dom.lease.indexation.IndexationMethod;
 import org.estatio.dom.lease.indexation.IndexationService;
-import org.estatio.dom.utils.MathUtils;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@PersistenceCapable
-@Inheritance(strategy = InheritanceStrategy.SUPERCLASS_TABLE)
-@Queries({
-        @Query(
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo"     // Isis' ObjectSpecId inferred from @Discriminator
+)
+@javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.SUPERCLASS_TABLE)
+@javax.jdo.annotations.Discriminator("org.estatio.dom.lease.LeaseTermForIndexable")
+@javax.jdo.annotations.Queries({
+        @javax.jdo.annotations.Query(
                 name = "findByIndexAndDate", language = "JDOQL",
                 value = "SELECT "
                         + "FROM org.estatio.dom.lease.LeaseTermForIndexable "
@@ -90,7 +90,7 @@ public class LeaseTermForIndexable extends LeaseTerm implements Indexable {
 
     // ///////////////////////////////////////////
 
-    @Column(scale = JdoColumnScale.IndexValue.INDEX_VALUE, allowsNull = "true")
+    @Column(scale = IndexValue.ValueType.Meta.SCALE, allowsNull = "true")
     @Getter @Setter
     private BigDecimal baseIndexValue;
 
@@ -103,13 +103,13 @@ public class LeaseTermForIndexable extends LeaseTerm implements Indexable {
 
     // ///////////////////////////////////////////
 
-    @Column(scale = JdoColumnScale.IndexValue.INDEX_VALUE, allowsNull = "true")
+    @Column(scale = IndexValue.ValueType.Meta.SCALE, allowsNull = "true")
     @Getter @Setter
     private BigDecimal nextIndexValue;
 
     // //////////////////////////////////////
 
-    @Column(scale = JdoColumnScale.IndexValue.REBASE_FACTOR, allowsNull = "true")
+    @Column(scale = RebaseFactorType.Meta.SCALE, allowsNull = "true")
     @Getter @Setter
     private BigDecimal rebaseFactor;
 
@@ -314,4 +314,21 @@ public class LeaseTermForIndexable extends LeaseTerm implements Indexable {
 
     @Inject
     IndexationService indexationService;
+
+    // ///////////////////////////////////////////
+
+
+    public static class RebaseFactorType {
+
+        private RebaseFactorType() {}
+
+        public static class Meta {
+
+            public static final int SCALE = 3;
+
+            private Meta() {}
+
+        }
+
+    }
 }

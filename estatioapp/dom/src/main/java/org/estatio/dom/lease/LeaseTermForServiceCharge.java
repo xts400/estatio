@@ -31,13 +31,16 @@ import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.Property;
 
-import org.estatio.dom.utils.MathUtils;
+import org.incode.module.base.dom.utils.MathUtils;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo"     // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.SUPERCLASS_TABLE)
+@javax.jdo.annotations.Discriminator("org.estatio.dom.lease.LeaseTermForServiceCharge")
 @DomainObject(editing = Editing.DISABLED)
 public class LeaseTermForServiceCharge extends LeaseTerm {
 

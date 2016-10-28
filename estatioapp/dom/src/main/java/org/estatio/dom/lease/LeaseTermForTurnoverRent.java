@@ -33,19 +33,22 @@ import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.Property;
 
-import org.estatio.dom.JdoColumnLength;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.lease.invoicing.InvoiceCalculationService.CalculationResult;
-import org.estatio.dom.valuetypes.LocalDateInterval;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo"     // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.SUPERCLASS_TABLE)
+@javax.jdo.annotations.Discriminator("org.estatio.dom.lease.LeaseTermForTurnoverRent")
 public class LeaseTermForTurnoverRent extends LeaseTerm {
 
 
-    @javax.jdo.annotations.Column(allowsNull = "true", length = JdoColumnLength.LeaseTermForTurnoverRent.RENT_RULE)
+    @javax.jdo.annotations.Column(allowsNull = "true", length = RentRuleType.Meta.MAX_LEN)
     @Property(optionality = Optionality.OPTIONAL, editing = Editing.DISABLED)
     @Getter @Setter
     private String turnoverRentRule;
@@ -232,4 +235,19 @@ public class LeaseTermForTurnoverRent extends LeaseTerm {
         t.setContractualRent(getContractualRent());
     }
 
+    // //////////////////////////////////////
+
+    public static class RentRuleType {
+
+        private RentRuleType() {}
+
+        public static class Meta {
+
+            public static final int MAX_LEN = 254;
+
+            private Meta() {}
+
+        }
+
+    }
 }

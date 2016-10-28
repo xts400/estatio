@@ -21,15 +21,19 @@ import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.services.clock.ClockService;
 
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.WithInterval;
+import org.incode.module.base.dom.with.WithInterval;
+import org.incode.module.base.dom.types.DescriptionType;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.party.Party;
-import org.estatio.dom.valuetypes.LocalDateInterval;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@PersistenceCapable(identityType = IdentityType.DATASTORE)
+@PersistenceCapable(
+        identityType = IdentityType.DATASTORE
+        ,schema = "dbo"    // Isis' ObjectSpecId inferred from @DomainObject#objectType
+)
 @DatastoreIdentity(strategy = IdGeneratorStrategy.NATIVE, column = "id")
 @Version(strategy = VersionStrategy.VERSION_NUMBER, column = "version")
 @Queries({
@@ -38,7 +42,10 @@ import lombok.Setter;
                         + "FROM org.estatio.dom.party.relationship.PartyRelationship "
                         + "WHERE (to == :party || from == :party) ")
 })
-@DomainObject(editing = Editing.DISABLED)
+@DomainObject(
+        editing = Editing.DISABLED,
+        objectType = "org.estatio.dom.party.relationship.PartyRelationship"
+)
 public class PartyRelationship extends AbstractDomainObject implements WithInterval<PartyRelationship> {
 
     public String title() {
@@ -131,7 +138,7 @@ public class PartyRelationship extends AbstractDomainObject implements WithInter
 
     // //////////////////////////////////////
 
-    @Column(allowsNull = "true", length = JdoColumnLength.DESCRIPTION)
+    @Column(allowsNull = "true", length = DescriptionType.Meta.MAX_LEN)
     @Getter @Setter
     private String description;
 

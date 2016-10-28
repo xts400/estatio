@@ -21,7 +21,6 @@ package org.estatio.dom.asset;
 import java.math.BigDecimal;
 
 import javax.inject.Inject;
-import javax.jdo.annotations.DiscriminatorStrategy;
 import javax.jdo.annotations.InheritanceStrategy;
 
 import org.joda.time.LocalDate;
@@ -40,20 +39,20 @@ import org.apache.isis.applib.annotation.Where;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
-import org.estatio.dom.JdoColumnLength;
-import org.estatio.dom.WithIntervalMutable;
+import org.incode.module.base.dom.with.WithIntervalMutable;
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.lease.OccupancyRepository;
-import org.estatio.dom.valuetypes.LocalDateInterval;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@javax.jdo.annotations.PersistenceCapable
+@javax.jdo.annotations.PersistenceCapable(
+        schema = "dbo" // Isis' ObjectSpecId inferred from @Discriminator
+)
 @javax.jdo.annotations.Inheritance(strategy = InheritanceStrategy.NEW_TABLE)
-@javax.jdo.annotations.Discriminator(
-        strategy = DiscriminatorStrategy.CLASS_NAME,
-        column = "discriminator")
+@javax.jdo.annotations.Discriminator("org.estatio.dom.asset.Unit")
 @javax.jdo.annotations.Queries({
         @javax.jdo.annotations.Query(
                 name = "findByReferenceOrName", language = "JDOQL",
@@ -104,7 +103,7 @@ public class Unit
 
     // //////////////////////////////////////
 
-    @javax.jdo.annotations.Column(allowsNull = "false", length = JdoColumnLength.TYPE_ENUM)
+    @javax.jdo.annotations.Column(allowsNull = "false", length = UnitType.Meta.MAX_LEN)
     @Getter @Setter
     private UnitType type;
 
@@ -222,6 +221,21 @@ public class Unit
         return getChangeDates().validateChangeDates(startDate, endDate);
     }
 
+
+
+    @Action(semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE)
+    public Unit resetDates() {
+        setStartDate(null);
+        setEndDate(null);
+        return this;
+    }
+
+    public String disableResetDates() {
+        return getStartDate() == null && getEndDate() == null ? "Dates are already clear": null;
+    }
+
+
+
     // //////////////////////////////////////
 
     public Unit changeAsset(
@@ -278,6 +292,7 @@ public class Unit
 
 
     // ///////////////////////////////////////
+
     @Programmatic
     public boolean hasOccupancyOverlappingInterval(final LocalDateInterval localDateInterval) {
         if (occupancyRepository.occupanciesByUnitAndInterval(this, localDateInterval).size() > 0) {
@@ -289,4 +304,20 @@ public class Unit
     @Inject
     private OccupancyRepository occupancyRepository;
 
+    // ///////////////////////////////////////
+
+    public static class ReferenceType {
+
+        private ReferenceType() {}
+
+        public static class Meta {
+
+            public static final String REGEX = "(?=.{5,17})([A-Z]{1}-)?([A-Z]{2,4}-[A-Z,0-9,/,+,-]{1,11})";
+            public static final String REGEX_DESCRIPTION = "Only letters and numbers devided by at least 1 and at most 3 dashes:\"-\" totalling between 5 and 15 characters. ";
+
+            private Meta() {}
+
+        }
+
+    }
 }
