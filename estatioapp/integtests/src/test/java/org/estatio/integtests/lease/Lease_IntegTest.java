@@ -37,6 +37,9 @@ import org.apache.isis.applib.services.xactn.TransactionService;
 
 import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
+import org.incode.module.base.integtests.VT;
+
+import org.estatio.app.menus.lease.LeaseMenu;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 import org.estatio.dom.invoice.PaymentMethod;
@@ -44,11 +47,10 @@ import org.estatio.dom.lease.InvoicingFrequency;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseItem;
 import org.estatio.dom.lease.LeaseItemType;
-import org.estatio.app.menus.lease.LeaseMenu;
 import org.estatio.dom.lease.LeaseRepository;
 import org.estatio.dom.lease.LeaseTerm;
-import org.estatio.dom.party.PartyRepository;
 import org.estatio.dom.party.Party;
+import org.estatio.dom.party.PartyRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.charge.ChargeRefData;
 import org.estatio.fixture.lease.LeaseForOxfMediaX002Gb;
@@ -59,11 +61,10 @@ import org.estatio.fixture.lease.LeaseItemAndTermsForOxfPoison003Gb;
 import org.estatio.fixture.lease.LeaseItemAndTermsForOxfTopModel001;
 import org.estatio.fixture.party.OrganisationForMediaXGb;
 import org.estatio.integtests.EstatioIntegrationTest;
-import org.incode.module.base.integtests.VT;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.incode.module.base.integtests.VT.ld;
 import static org.hamcrest.Matchers.containsString;
+import static org.incode.module.base.integtests.VT.ld;
 
 public class Lease_IntegTest extends EstatioIntegrationTest {
 
@@ -88,6 +89,7 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
                 protected void execute(ExecutionContext executionContext) {
                     executionContext.executeChild(this, new EstatioBaseLineFixture());
                     executionContext.executeChild(this, new LeaseItemAndTermsForOxfTopModel001());
+                    executionContext.executeChild(this, new OrganisationForMediaXGb());
                 }
             });
         }
@@ -101,7 +103,7 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
             final LocalDate newStartDate = VT.ld(2014, 1, 1);
 
             // when
-            Lease newLease = lease.assign(
+            Lease newLease = wrap(lease).assign(
                     newReference,
                     newReference,
                     newParty,
@@ -120,8 +122,31 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
 
             assertThat(lease.getTenancyEndDate()).isEqualTo(newStartDate.minusDays(1));
         }
-    }
 
+        @Test
+        public void sadCase() throws Exception {
+            // given
+            final String newReference = "OXF-MEDIA-001";
+            final Lease lease = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF);
+            final Party newParty = partyRepository.findPartyByReference(OrganisationForMediaXGb.REF);
+            final LocalDate newStartDate = VT.ld(2017, 1, 3);
+
+            lease.changeDates(null, new LocalDate(2016, 8, 31));
+            lease.setTenancyEndDate(new LocalDate(2017, 1, 2));
+
+
+
+            // when
+            Lease newLease = wrap(lease).assign(
+                    newReference,
+                    newReference,
+                    newParty,
+                    newStartDate);
+
+            // then
+            assertThat(newLease).isNotNull();
+        }
+    }
 
     public static class FindItem extends Lease_IntegTest {
 
@@ -196,7 +221,6 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
             leasePoison = leaseRepository.findLeaseByReference(LeaseForOxfPoison003Gb.REF);
         }
 
-
         @Inject
         private ChargeRepository chargeRepository;
         @Inject
@@ -242,7 +266,6 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
                     leasePoison.getStartDate());
         }
 
-
     }
 
     public static class VerifyUntil extends Lease_IntegTest {
@@ -277,7 +300,6 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
         /**
          * Compare to tests that verify at the
          * {@link org.estatio.dom.lease.LeaseTerm} level.
-         *
          */
         @Test
         public void createsTermsForLeaseTermItems() throws Exception {
@@ -416,7 +438,6 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
         @Rule
         public ExpectedException expectedException = ExpectedException.none();
 
-
         @Before
         public void setupData() {
             runFixtureScript(new FixtureScript() {
@@ -469,7 +490,7 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
             });
             leaseTopModel1 = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF);
             leaseTopModel2a = leaseTopModel1.renew("OXF-TOPMODEL-002A", "Lease2", ld(2022, 7, 15), ld(2032, 7, 14));
-            leaseTopModel3 = leaseTopModel2a.renew("OXF-TOPMODEL-003", "lease3", ld(2032,7,15), ld(2042,7,14));
+            leaseTopModel3 = leaseTopModel2a.renew("OXF-TOPMODEL-003", "lease3", ld(2032, 7, 15), ld(2042, 7, 14));
             leaseTopModel2b = leaseRepository.newLease(
                     leaseTopModel2a.getApplicationTenancy(),
                     "OXF-TOPMODEL-002B",
@@ -486,7 +507,7 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
         }
 
         @Test
-        public void changePrevious () throws Exception {
+        public void changePrevious() throws Exception {
 
             // given
             assertThat(leaseTopModel2a.getReference()).isEqualTo("OXF-TOPMODEL-002A");
@@ -501,11 +522,9 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
             assertThat(leaseTopModel2b.getPrevious()).isNull();
             assertThat(leaseTopModel3.getPrevious()).isEqualTo(leaseTopModel2a);
 
-
             // when
             leaseTopModel3.changePrevious(leaseTopModel2b);
             transactionService.flushTransaction();
-
 
             // then
             assertThat(leaseTopModel2b.getNext()).isEqualTo(leaseTopModel3);
@@ -516,7 +535,6 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
         }
 
         @Inject private WrapperFactory wrapperFactory;
-
 
     }
 
@@ -538,11 +556,11 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
             leaseTopModel1 = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF);
             leaseTopModel2 = leaseTopModel1.renew("OXF-TOPMODEL-002", "Lease2", ld(2022, 7, 15), ld(2032, 7, 14));
             // work-a-round: make an extra one in order to get leaseTopModel2.getPrevious() set
-            leaseTopModel3 = leaseTopModel2.renew("OXF-TOPMODEL-003", "lease3", ld(2032,7,15), ld(2042,7,14));
+            leaseTopModel3 = leaseTopModel2.renew("OXF-TOPMODEL-003", "lease3", ld(2032, 7, 15), ld(2042, 7, 14));
         }
 
         @Test
-        public void changePreviousToNull () throws Exception {
+        public void changePreviousToNull() throws Exception {
 
             // given
             assertThat(leaseTopModel2.getReference()).isEqualTo("OXF-TOPMODEL-002");
@@ -551,7 +569,7 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
             assertThat(leaseTopModel2.getNext()).isEqualTo(leaseTopModel3);
             assertThat(leaseTopModel2.getPrevious()).isEqualTo(leaseTopModel1);
             //TODO: Datanucleus issue with bi-direcitonal relationship
-//            assertThat(leaseTopModel3.getPrevious()).isEqualTo(leaseTopModel2));
+            //            assertThat(leaseTopModel3.getPrevious()).isEqualTo(leaseTopModel2));
 
             // when
             leaseTopModel2.changePrevious(null);
@@ -577,7 +595,7 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
                 }
             });
         }
-        
+
         @Test
         public void xxx() throws Exception {
             Lease lease = leaseRepository.findLeaseByReference(LeaseForOxfPoison003Gb.REF);
@@ -586,8 +604,6 @@ public class Lease_IntegTest extends EstatioIntegrationTest {
             assertThat(lease.primaryOccupancy().get()).isEqualTo(lease.getOccupancies().first());
 
         }
-
-
 
     }
 }
