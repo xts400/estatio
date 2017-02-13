@@ -64,14 +64,16 @@ language governing permissions and limitations under the License.
     </developers>
 
     <properties>
-        <isis.version>1.13.2.20170206-2043</isis.version>
+        <isis.version>1.14.0-SNAPSHOT</isis.version>
+        <!--<isis.version>1.13.2.20170206-2043</isis.version>-->
 
         <isis-module-command.version>1.13.2</isis-module-command.version>
         <isis-module-excel.version>1.13.6</isis-module-excel.version>
         <isis-module-fakedata.version>1.13.0</isis-module-fakedata.version>
         <isis-module-pdfbox.version>1.13.0</isis-module-pdfbox.version>
         <isis-module-poly.version>1.13.0</isis-module-poly.version>
-        <isis-module-security.version>1.13.6</isis-module-security.version>
+        <isis-module-security.version>1.14.0-SNAPSHOT</isis-module-security.version>
+        <!--<isis-module-security.version>1.13.6</isis-module-security.version>-->
         <isis-module-sessionlogger.version>1.13.1</isis-module-sessionlogger.version>
         <isis-module-settings.version>1.13.0</isis-module-settings.version>
 
@@ -99,7 +101,8 @@ language governing permissions and limitations under the License.
         <incode-module-integtestsupport.version>1.13.1</incode-module-integtestsupport.version>
         <incode-module-fixturesupport.version>1.13.1</incode-module-fixturesupport.version>
 
-        <incode-module-communications.version>1.13.0</incode-module-communications.version>
+        <incode-module-communications.version>1.14.0-SNAPSHOT</incode-module-communications.version>
+        <!--<incode-module-communications.version>1.13.0</incode-module-communications.version>-->
 
         <mavendeps-isistesting.version>0.0.2</mavendeps-isistesting.version>
         <mavendeps-isisintellij.version>0.0.1</mavendeps-isisintellij.version>
