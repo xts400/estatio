@@ -23,6 +23,7 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
     }
 
     public BudgetCalculation createBudgetCalculation(
+            final BudgetItem budgetItem,
             final PartitionItem partitionItem,
             final KeyItem keyItem,
             final BigDecimal value,
@@ -33,9 +34,9 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
         budgetCalculation.setKeyItem(keyItem);
         budgetCalculation.setValue(value);
         budgetCalculation.setCalculationType(calculationType);
-        budgetCalculation.setBudget(partitionItem.getBudget());
-        budgetCalculation.setInvoiceCharge(partitionItem.getCharge());
-        budgetCalculation.setIncomingCharge(partitionItem.getBudgetItem().getCharge());
+        budgetCalculation.setBudgetItem(budgetItem);
+        budgetCalculation.setInvoiceCharge(partitionItem.getInvoiceCharge());
+        budgetCalculation.setIncomingCharge(budgetItem.getCharge());
         budgetCalculation.setUnit(keyItem.getUnit());
 
         persist(budgetCalculation);
@@ -44,22 +45,25 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
     }
 
     public BudgetCalculation findOrCreateBudgetCalculation(
+            final BudgetItem budgetItem,
             final PartitionItem partitionItem,
             final KeyItem keyItem,
             final BigDecimal value,
             final BudgetCalculationType calculationType) {
-        return findUnique(partitionItem, keyItem, calculationType)==null ?
-                createBudgetCalculation(partitionItem, keyItem, value, calculationType) :
-                findUnique(partitionItem, keyItem, calculationType);
+        return findUnique(budgetItem, partitionItem, keyItem, calculationType)==null ?
+                createBudgetCalculation(budgetItem, partitionItem, keyItem, value, calculationType) :
+                findUnique(budgetItem, partitionItem, keyItem, calculationType);
     }
 
     public BudgetCalculation findUnique(
+            final BudgetItem budgetItem,
             final PartitionItem partitionItem,
             final KeyItem keyItem,
             final BudgetCalculationType calculationType
-            ){
+    ){
         return uniqueMatch(
                 "findUnique",
+                "budgetItem", budgetItem,
                 "partitionItem", partitionItem,
                 "keyItem", keyItem,
                 "calculationType", calculationType);
@@ -85,13 +89,13 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
 
     public List<BudgetCalculation> findByBudgetAndCharge(final Budget budget, final Charge charge) {
         List<BudgetCalculation> result = new ArrayList<>();
-        for (BudgetItem budgetItem : budget.getItems()){
-            for (PartitionItem allocation : budgetItem.getPartitionItems()){
-                if (allocation.getCharge().equals(charge)) {
-                    result.addAll(findByPartitionItem(allocation));
-                }
-            }
-        }
+//        for (BudgetItem budgetItem : budget.getItems()){
+//            for (PartitionItem allocation : budgetItem.getPartitionItems()){
+//                if (allocation.getInvoiceCharge().equals(charge)) {
+//                    result.addAll(findByPartitionItem(allocation));
+//                }
+//            }
+//        }
         return result;
     }
 
@@ -119,20 +123,36 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
     public List<BudgetCalculation> findByBudgetItemAndCalculationType(final BudgetItem budgetItem, final BudgetCalculationType calculationType) {
 
         List<BudgetCalculation> result = new ArrayList<>();
-        for (PartitionItem allocation : budgetItem.getPartitionItems()) {
+//        for (PartitionItem allocation : budgetItem.getPartitionItems()) {
+//
+//            result.addAll(findByPartitionItemAndCalculationType(allocation, calculationType));
+//
+//        }
+        return result;
+    }
 
-            result.addAll(findByPartitionItemAndCalculationType(allocation, calculationType));
-
+    public List<BudgetCalculation> findByBudgetAndUnitAndInvoiceChargeAndType(final Budget budget, final Unit unit, final Charge invoiceCharge, final BudgetCalculationType type){
+        List<BudgetCalculation> result = new ArrayList<>();
+        for (BudgetItem budgetItem : budget.getItems()){
+            result.addAll(findByBudgetItemAndUnitAndInvoiceChargeAndType(budgetItem, unit, invoiceCharge, type));
         }
         return result;
     }
 
-    public List<BudgetCalculation> findByBudgetAndUnitAndInvoiceChargeAndType(final Budget budget, final Unit unit, final Charge invoiceCharge, final BudgetCalculationType type) {
-        return allMatches("findByBudgetAndUnitAndInvoiceChargeAndType", "budget", budget, "unit", unit, "invoiceCharge", invoiceCharge, "type", type);
+    private List<BudgetCalculation> findByBudgetItemAndUnitAndInvoiceChargeAndType(final BudgetItem budgetItem, final Unit unit, final Charge invoiceCharge, final BudgetCalculationType type) {
+        return allMatches("findByBudgetItemAndUnitAndInvoiceChargeAndType", "budgetItem", budgetItem, "unit", unit, "invoiceCharge", invoiceCharge, "type", type);
     }
 
-    public List<BudgetCalculation> findByBudgetAndUnitAndInvoiceChargeAndIncomingChargeAndType(final Budget budget, final Unit unit, final Charge invoiceCharge, final Charge incomingCharge, final BudgetCalculationType type) {
-        return allMatches("findByBudgetAndUnitAndInvoiceChargeAndIncomingChargeAndType", "budget", budget, "unit", unit, "invoiceCharge", invoiceCharge, "incomingCharge", incomingCharge, "type", type);
+    public List<BudgetCalculation> findByBudgetAndUnitAndInvoiceChargeAndIncomingChargeAndType(final Budget budget, final Unit unit, final Charge invoiceCharge, final Charge incomingCharge, final BudgetCalculationType type){
+        List<BudgetCalculation> result = new ArrayList<>();
+        for (BudgetItem budgetItem : budget.getItems()){
+            result.addAll(findByBudgetItemAndUnitAndInvoiceChargeAndIncomingChargeAndType(budgetItem, unit, invoiceCharge, incomingCharge, type));
+        }
+        return result;
+    }
+
+    private List<BudgetCalculation> findByBudgetItemAndUnitAndInvoiceChargeAndIncomingChargeAndType(final BudgetItem budgetItem, final Unit unit, final Charge invoiceCharge, final Charge incomingCharge, final BudgetCalculationType type) {
+        return allMatches("findByBudgetItemAndUnitAndInvoiceChargeAndIncomingChargeAndType", "budgetItem", budgetItem, "unit", unit, "invoiceCharge", invoiceCharge, "incomingCharge", incomingCharge, "type", type);
     }
 
 }

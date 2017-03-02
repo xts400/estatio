@@ -171,7 +171,8 @@ public class BudgetCalculationResult extends UdoDomainObject2<BudgetCalculationR
 
     @Programmatic
     BigDecimal getFractionOfYear(){
-        return getBudgetCalculationRun().getBudget().getPartitioningForBudgeting().getFractionOfYear();
+//        return getBudgetCalculationRun().getBudget().getPartitioningForBudgeting().getFractionOfYear(); // TODO !!
+        return BigDecimal.ONE;
     }
 
     @Programmatic

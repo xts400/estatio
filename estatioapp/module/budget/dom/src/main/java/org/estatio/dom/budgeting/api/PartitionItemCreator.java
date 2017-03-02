@@ -9,7 +9,7 @@ import org.estatio.dom.charge.Charge;
 public interface PartitionItemCreator {
 
     PartitionItem updateOrCreatePartitionItem(
-            final Charge allocationCharge,
+            final Charge invoiceCharge,
             final KeyTable keyTable,
             final BigDecimal percentage
     );

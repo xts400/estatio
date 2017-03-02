@@ -19,22 +19,16 @@
 package org.estatio.dom.budgeting.partioning;
 
 import java.math.BigDecimal;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import javax.inject.Inject;
 import javax.jdo.annotations.Column;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
-import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.Query;
 import javax.jdo.annotations.Unique;
 import javax.jdo.annotations.VersionStrategy;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
-import org.apache.isis.applib.annotation.Auditing;
-import org.apache.isis.applib.annotation.Contributed;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.PropertyLayout;
@@ -46,10 +40,6 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.budgeting.budget.Budget;
-import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
-import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
-import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.charge.Charge;
 
@@ -68,10 +58,10 @@ import lombok.Setter;
         column = "version")
 @javax.jdo.annotations.Queries({
         @Query(
-                name = "findByBudgetItem", language = "JDOQL",
+                name = "findByIncomingCharge", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.partioning.PartitionItem " +
-                        "WHERE budgetItem == :budgetItem "),
+                        "WHERE incomingCharge == :incomingCharge "),
         @Query(
                 name = "findByKeyTable", language = "JDOQL",
                 value = "SELECT " +
@@ -81,26 +71,25 @@ import lombok.Setter;
                 name = "findUnique", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.partioning.PartitionItem " +
-                        "WHERE partitioning == :partitioning && charge == :charge && budgetItem == :budgetItem && keyTable == :keyTable ")
+                        "WHERE partitioning == :partitioning && invoiceCharge == :invoiceCharge && incomingCharge == :incomingCharge && keyTable == :keyTable ")
 })
-@Unique(name = "PartitionItem_partitioning_charge_budgetItem_keyTable_UNQ", members = {"partitioning", "charge", "budgetItem", "keyTable"})
+@Unique(name = "PartitionItem_partitioning_invoiceCharge_incomingCharge_keyTable_UNQ", members = {"partitioning", "invoiceCharge", "incomingCharge", "keyTable"})
 @DomainObject(
-        auditing = Auditing.DISABLED,
         objectType = "org.estatio.dom.budgeting.partioning.PartitionItem"
 )
 public class PartitionItem extends UdoDomainObject2<PartitionItem> implements WithApplicationTenancyProperty {
 
     public PartitionItem() {
-        super("partitioning, budgetItem, charge, keyTable");
+        super("partitioning, incomingCharge, invoiceCharge, keyTable");
     }
 
     //region > identificatiom
     public String title() {
 
         return "Allocation of "
-                .concat(getBudgetItem().getCharge().getName()
+                .concat(getIncomingCharge().getName()
                 .concat(" on "))
-                .concat(getCharge().getName()
+                .concat(getInvoiceCharge().getName()
                 .concat(" for ")
                 .concat(getPercentage().setScale(2, BigDecimal.ROUND_HALF_UP).toString()
                 .concat("%")));
@@ -114,7 +103,7 @@ public class PartitionItem extends UdoDomainObject2<PartitionItem> implements Wi
 
     @Column(allowsNull = "false", name = "chargeId")
     @Getter @Setter
-    private Charge charge;
+    private Charge invoiceCharge;
 
     @Column(name="keyTableId", allowsNull = "false")
     @PropertyLayout(hidden = Where.REFERENCES_PARENT)
@@ -138,11 +127,9 @@ public class PartitionItem extends UdoDomainObject2<PartitionItem> implements Wi
         return null;
     }
 
-    @Column(allowsNull = "false", name = "budgetItemId")
-    @PropertyLayout(hidden = Where.REFERENCES_PARENT)
+    @Column(allowsNull = "false", name = "incomingChargeId")
     @Getter @Setter
-    private BudgetItem budgetItem;
-
+    private Charge incomingCharge;
 
     @Column(allowsNull = "false", scale = 6)
     @Getter @Setter
@@ -165,31 +152,17 @@ public class PartitionItem extends UdoDomainObject2<PartitionItem> implements Wi
         return null;
     }
 
-    @Persistent(mappedBy = "partitionItem", dependentElement = "true")
-    @Getter @Setter
-    private SortedSet<BudgetCalculation> calculations = new TreeSet<>();
-
     @Action(restrictTo = RestrictTo.PROTOTYPING, semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
-    public Budget remove() {
+    public Partitioning remove() {
         removeIfNotAlready(this);
-        return this.getBudgetItem().getBudget();
-    }
-
-    @Action(semantics = SemanticsOf.SAFE, hidden = Where.ALL_TABLES)
-    @ActionLayout(contributed = Contributed.AS_ASSOCIATION)
-    public Budget getBudget(){
-        return getBudgetItem().getBudget();
+        return this.getPartitioning();
     }
 
     @Override
     @MemberOrder(sequence = "7")
     @PropertyLayout(hidden = Where.EVERYWHERE)
     public ApplicationTenancy getApplicationTenancy() {
-        return getBudgetItem().getBudget().getApplicationTenancy();
+        return getPartitioning().getApplicationTenancy();
     }
-
-    @Inject
-    private BudgetCalculationRepository budgetCalculationRepository;
-
 
 }

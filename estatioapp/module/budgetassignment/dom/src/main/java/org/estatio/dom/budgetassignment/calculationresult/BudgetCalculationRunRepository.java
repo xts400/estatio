@@ -57,7 +57,7 @@ public class BudgetCalculationRunRepository extends UdoDomainRepositoryAndFactor
     }
 
     public List<BudgetCalculationRun> findByBudgetAndType(final Budget budget, final BudgetCalculationType type) {
-        return allMatches("findByBudgetAndType", "budget", budget, "type", type);
+        return allMatches("findByPropertyAndType", "budget", budget, "type", type);
     }
 
     public List<BudgetCalculationRun> findByBudgetAndTypeAndStatus(final Budget budget, final BudgetCalculationType type, final Status status) {

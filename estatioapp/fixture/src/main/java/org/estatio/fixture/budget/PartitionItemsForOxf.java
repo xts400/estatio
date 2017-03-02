@@ -24,6 +24,7 @@ import org.joda.time.LocalDate;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.partioning.Partitioning;
@@ -54,11 +55,11 @@ public class PartitionItemsForOxf extends PartitionItemAbstact {
         final List<KeyTable> keyTables = keyTableRepository.findByBudget(budget);
         KeyTable keyTable1 = keyTables.get(0);
         KeyTable keyTable2 = keyTables.get(1);
-        Partitioning partitioning = budget.getPartitionings().first();
+        Partitioning partitioning = partitioningRepository.findUnique(property, BudgetCalculationType.BUDGETED, startDate);
 
-        createPartitioningAndItem(partitioning, charge, keyTable1, budgetItem1, new BigDecimal(100), executionContext);
-        createPartitioningAndItem(partitioning, charge, keyTable1, budgetItem2, new BigDecimal(80), executionContext);
-        createPartitioningAndItem(partitioning, charge, keyTable2, budgetItem2, new BigDecimal(20), executionContext);
+        createPartitioningAndItem(partitioning, charge, keyTable1, budgetItem1.getCharge(), new BigDecimal(100), executionContext);
+        createPartitioningAndItem(partitioning, charge, keyTable1, budgetItem2.getCharge(), new BigDecimal(80), executionContext);
+        createPartitioningAndItem(partitioning, charge, keyTable2, budgetItem2.getCharge(), new BigDecimal(20), executionContext);
     }
 
 }

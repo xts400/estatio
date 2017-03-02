@@ -28,7 +28,7 @@ import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 import org.incode.module.unittestsupport.dom.bean.AbstractBeanPropertiesTest;
 
 import org.estatio.dom.asset.Unit;
-import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
 import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.charge.Charge;
@@ -45,7 +45,7 @@ public class BudgetCalculation_Test {
                     .withFixture(pojos(KeyItem.class, KeyItem.class))
                     .withFixture(pojos(Charge.class, Charge.class))
                     .withFixture(pojos(Unit.class, Unit.class))
-                    .withFixture(pojos(Budget.class, Budget.class))
+                    .withFixture(pojos(BudgetItem.class, BudgetItem.class))
                     .exercise(pojo);
         }
 

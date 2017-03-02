@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
-import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,9 +29,8 @@ import org.apache.isis.applib.DomainObjectContainer;
 import org.apache.isis.applib.query.Query;
 import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 
-
 import org.incode.module.unittestsupport.dom.repo.FinderInteraction;
-import org.estatio.dom.asset.Property;
+
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.charge.Charge;
 
@@ -106,27 +104,6 @@ public class BudgetItemRepository_Test {
             assertThat(finderInteraction.getArgumentsByParameterName().get("budget")).isEqualTo((Object) budget);
             assertThat(finderInteraction.getArgumentsByParameterName().get("charge")).isEqualTo((Object) charge);
             assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(2);
-        }
-
-    }
-
-    public static class FindByPropertyAndChargeAndStartDate extends BudgetItemRepository_Test {
-
-        @Test
-        public void happyCase() {
-
-            Property property = new Property();
-            Charge charge = new Charge();
-            LocalDate startDate = new LocalDate();
-            budgetItemRepository.findByPropertyAndChargeAndStartDate(property, charge, startDate);
-
-            assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.UNIQUE_MATCH);
-            assertThat(finderInteraction.getResultType()).isEqualTo(BudgetItem.class);
-            assertThat(finderInteraction.getQueryName()).isEqualTo("findByPropertyAndChargeAndStartDate");
-            assertThat(finderInteraction.getArgumentsByParameterName().get("property")).isEqualTo((Object) property);
-            assertThat(finderInteraction.getArgumentsByParameterName().get("charge")).isEqualTo((Object) charge);
-            assertThat(finderInteraction.getArgumentsByParameterName().get("startDate")).isEqualTo((Object) startDate);
-            assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(3);
         }
 
     }

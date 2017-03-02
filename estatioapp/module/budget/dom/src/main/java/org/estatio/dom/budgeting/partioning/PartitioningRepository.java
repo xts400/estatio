@@ -27,7 +27,7 @@ import org.apache.isis.applib.annotation.DomainServiceLayout;
 import org.apache.isis.applib.annotation.NatureOfService;
 
 import org.estatio.dom.UdoDomainRepositoryAndFactory;
-import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 
 @DomainService(repositoryFor = PartitionItem.class, nature = NatureOfService.DOMAIN)
@@ -39,12 +39,12 @@ public class PartitioningRepository extends UdoDomainRepositoryAndFactory<Partit
     }
 
     public Partitioning newPartitioning(
-            final Budget budget,
+            final Property property,
             final LocalDate startDate,
             final LocalDate endDate,
             final BudgetCalculationType type) {
         Partitioning partitioning = newTransientInstance(Partitioning.class);
-        partitioning.setBudget(budget);
+        partitioning.setProperty(property);
         partitioning.setStartDate(startDate);
         partitioning.setEndDate(endDate);
         partitioning.setType(type);
@@ -53,25 +53,25 @@ public class PartitioningRepository extends UdoDomainRepositoryAndFactory<Partit
     }
 
     public String validateNewPartitioning(
-            final Budget budget,
+            final Property property,
             final LocalDate startDate,
             final LocalDate endDate,
             final BudgetCalculationType type){
-        if (findUnique(budget, type, startDate)!=null){
+        if (findUnique(property, type, startDate)!=null){
             return "This partitioning already exists";
         }
-        if (type == BudgetCalculationType.BUDGETED && findByBudgetAndType(budget, BudgetCalculationType.BUDGETED).size() > 0){
+        if (type == BudgetCalculationType.BUDGETED && findByPropertyAndType(property, BudgetCalculationType.BUDGETED).size() > 0){
             return "Only one partitioning of type BUDGETED is supported";
         }
         return null;
     }
 
-    public Partitioning findUnique(final Budget budget, final BudgetCalculationType type, final LocalDate startDate){
-        return uniqueMatch("findUnique", "budget", budget, "type", type, "startDate", startDate);
+    public Partitioning findUnique(final Property property, final BudgetCalculationType type, final LocalDate startDate){
+        return uniqueMatch("findUnique", "property", property, "type", type, "startDate", startDate);
     }
 
-    public List<Partitioning> findByBudgetAndType(final Budget budget, final BudgetCalculationType type){
-        return allMatches("findByBudgetAndType", "budget", budget, "type", type);
+    public List<Partitioning> findByPropertyAndType(final Property property, final BudgetCalculationType type){
+        return allMatches("findByPropertyAndType", "property", property, "type", type);
     }
 
     public List<Partitioning> allPartitionings() {

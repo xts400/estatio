@@ -54,7 +54,6 @@ import org.incode.module.base.dom.utils.TitleBuilder;
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Unit;
-import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
 import org.estatio.dom.budgeting.partioning.PartitionItem;
@@ -78,7 +77,7 @@ import lombok.Setter;
                 name = "findUnique", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
-                        "WHERE partitionItem == :partitionItem " +
+                        "WHERE budgetItem == :budgetItem && partitionItem == :partitionItem " +
                         "&& keyItem == :keyItem " +
                         "&& calculationType == :calculationType"),
         @Query(
@@ -93,36 +92,36 @@ import lombok.Setter;
                         "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
                         "WHERE partitionItem == :partitionItem"),
         @Query(
-                name = "findByBudgetAndStatus", language = "JDOQL",
+                name = "findByBudgetItemAndStatus", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
-                        "WHERE budget == :budget && "
+                        "WHERE budgetItem == :budgetItem && "
                         + "status == :status"),
         @Query(
-                name = "findByBudgetAndUnitAndInvoiceChargeAndType", language = "JDOQL",
+                name = "findByBudgetItemAndUnitAndInvoiceChargeAndType", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
-                        "WHERE budget == :budget && "
+                        "WHERE budgetItem == :budgetItem && "
                         + "unit == :unit && "
                         + "invoiceCharge == :invoiceCharge && "
                         + "calculationType == :type"),
         @Query(
-                name = "findByBudgetAndUnitAndInvoiceChargeAndIncomingChargeAndType", language = "JDOQL",
+                name = "findByBudgetItemAndUnitAndInvoiceChargeAndIncomingChargeAndType", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation " +
-                        "WHERE budget == :budget && "
+                        "WHERE budgetItem == :budgetItem && "
                         + "unit == :unit && "
                         + "invoiceCharge == :invoiceCharge && "
                         + "incomingCharge == :incomingCharge && "
                         + "calculationType == :type")
 })
 @Indices({
-        @Index(name = "BudgetCalculation_budget_unit_invoiceCharge_type_IDX",
-                members = { "budget", "unit", "invoiceCharge", "calculationType" }),
-        @Index(name = "BudgetCalculation_budget_unit_invoiceCharge_incomingCharge_type_IDX",
-                members = { "budget", "unit", "invoiceCharge", "incomingCharge", "calculationType" })
+        @Index(name = "BudgetCalculation_budgetItem_unit_invoiceCharge_type_IDX",
+                members = { "budgetItem", "unit", "invoiceCharge", "calculationType" }),
+        @Index(name = "BudgetCalculation_budgetItem_unit_invoiceCharge_incomingCharge_type_IDX",
+                members = { "budgetItem", "unit", "invoiceCharge", "incomingCharge", "calculationType" })
 })
-@Unique(name = "BudgetCalculation_partitionItem_keyItem_calculationType_UNQ", members = {"partitionItem", "keyItem", "calculationType"})
+@Unique(name = "BudgetCalculation_budgetItem_partitionItem_keyItem_calculationType_UNQ", members = {"budgetItem", "partitionItem", "keyItem", "calculationType"})
 @DomainObject(
         auditing = Auditing.DISABLED,
         publishing = Publishing.DISABLED,
@@ -132,7 +131,7 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
         implements WithApplicationTenancyProperty, Timestampable {
 
     public BudgetCalculation() {
-        super("partitionItem, keyItem");
+        super("budgetItem, partitionItem, keyItem");
     }
 
     public String title(){
@@ -162,8 +161,8 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     private BudgetCalculationType calculationType;
 
     @Getter @Setter
-    @Column(name = "budgetId", allowsNull = "false")
-    private Budget budget;
+    @Column(name = "budgetItemId", allowsNull = "false")
+    private BudgetItem budgetItem;
 
     @Getter @Setter
     @Column(name = "unitId", allowsNull = "false")
@@ -196,12 +195,6 @@ public class BudgetCalculation extends UdoDomainObject2<BudgetCalculation>
     @PropertyLayout(hidden = Where.ALL_TABLES)
     @Column(allowsNull = "true")
     private String updatedBy;
-
-    @Action(semantics = SemanticsOf.SAFE)
-    @ActionLayout(contributed = Contributed.AS_ASSOCIATION, hidden = Where.ALL_TABLES)
-    public BudgetItem getBudgetItem(){
-        return this.getPartitionItem().getBudgetItem();
-    }
 
     @Action(semantics = SemanticsOf.SAFE)
     @ActionLayout(contributed = Contributed.AS_ASSOCIATION, hidden = Where.ALL_TABLES)

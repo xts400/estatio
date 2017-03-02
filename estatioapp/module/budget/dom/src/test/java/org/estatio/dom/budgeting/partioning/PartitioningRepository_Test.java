@@ -33,7 +33,7 @@ import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 
 import org.incode.module.unittestsupport.dom.repo.FinderInteraction;
 
-import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,15 +79,15 @@ public class PartitioningRepository_Test {
         @Test
         public void happyCase() {
 
-            Budget budget = new Budget();
+            Property property = new Property();
             BudgetCalculationType type = BudgetCalculationType.BUDGETED;
             LocalDate date = new LocalDate();
-            partitioningRepository.findUnique(budget, type, date);
+            partitioningRepository.findUnique(property, type, date);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.UNIQUE_MATCH);
             assertThat(finderInteraction.getResultType()).isEqualTo(Partitioning.class);
             assertThat(finderInteraction.getQueryName()).isEqualTo("findUnique");
-            assertThat(finderInteraction.getArgumentsByParameterName().get("budget")).isEqualTo((Object) budget);
+            assertThat(finderInteraction.getArgumentsByParameterName().get("property")).isEqualTo((Object) property);
             assertThat(finderInteraction.getArgumentsByParameterName().get("type")).isEqualTo((Object) type);
             assertThat(finderInteraction.getArgumentsByParameterName().get("startDate")).isEqualTo((Object) date);
             assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(3);
@@ -95,20 +95,19 @@ public class PartitioningRepository_Test {
 
     }
 
-    public static class FindByBudgetAndType extends PartitioningRepository_Test {
+    public static class FindByPropertyAndType extends PartitioningRepository_Test {
 
         @Test
         public void happyCase() {
 
-            Budget budget = new Budget();
+            Property property = new Property();
             BudgetCalculationType type = BudgetCalculationType.BUDGETED;
-            LocalDate date = new LocalDate();
-            partitioningRepository.findByBudgetAndType(budget, type);
+            partitioningRepository.findByPropertyAndType(property, type);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
             assertThat(finderInteraction.getResultType()).isEqualTo(Partitioning.class);
-            assertThat(finderInteraction.getQueryName()).isEqualTo("findByBudgetAndType");
-            assertThat(finderInteraction.getArgumentsByParameterName().get("budget")).isEqualTo((Object) budget);
+            assertThat(finderInteraction.getQueryName()).isEqualTo("findByPropertyAndType");
+            assertThat(finderInteraction.getArgumentsByParameterName().get("property")).isEqualTo((Object) property);
             assertThat(finderInteraction.getArgumentsByParameterName().get("type")).isEqualTo((Object) type);
             assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(2);
         }
@@ -135,7 +134,7 @@ public class PartitioningRepository_Test {
         public void newPartitioning() throws Exception {
 
             final Partitioning partitioning = new Partitioning();
-            final Budget budget = new Budget();
+            final Property property = new Property();
             final BudgetCalculationType type = BudgetCalculationType.BUDGETED;
             final LocalDate startDate = new LocalDate();
             final LocalDate endDate = new LocalDate();
@@ -151,10 +150,10 @@ public class PartitioningRepository_Test {
             });
 
             // when
-            Partitioning newPartitioning = partitioningRepository.newPartitioning(budget, startDate, endDate, type);
+            Partitioning newPartitioning = partitioningRepository.newPartitioning(property, startDate, endDate, type);
 
             // then
-            assertThat(newPartitioning.getBudget()).isEqualTo(budget);
+            assertThat(newPartitioning.getProperty()).isEqualTo(property);
             assertThat(newPartitioning.getStartDate()).isEqualTo(startDate);
             assertThat(newPartitioning.getEndDate()).isEqualTo(endDate);
             assertThat(newPartitioning.getType()).isEqualTo(type);
@@ -166,7 +165,7 @@ public class PartitioningRepository_Test {
 
             // given
             final Partitioning partitioning = new Partitioning();
-            final Budget budget = new Budget();
+            final Property property = new Property();
             final BudgetCalculationType type = BudgetCalculationType.BUDGETED;
             final LocalDate startDate = new LocalDate();
             final LocalDate endDate = new LocalDate();
@@ -176,33 +175,33 @@ public class PartitioningRepository_Test {
 
                 Partitioning somePartitioning = new Partitioning();
                 @Override
-                public Partitioning findUnique(final Budget budget, final BudgetCalculationType type, final LocalDate startDate){
+                public Partitioning findUnique(final Property property, final BudgetCalculationType type, final LocalDate startDate){
                     return somePartitioning;
                 }
                 @Override
-                public List<Partitioning> findByBudgetAndType(final Budget budget, final BudgetCalculationType type){
+                public List<Partitioning> findByPropertyAndType(final Property property, final BudgetCalculationType type){
                     return Arrays.asList(somePartitioning);
                 }
             };
 
             // then
-            assertThat(partitioningRepository.validateNewPartitioning(budget, startDate, endDate, type)).isEqualTo("This partitioning already exists");
+            assertThat(partitioningRepository.validateNewPartitioning(property, startDate, endDate, type)).isEqualTo("This partitioning already exists");
 
             // and when
             partitioningRepository = new PartitioningRepository(){
                 @Override
-                public Partitioning findUnique(final Budget budget, final BudgetCalculationType type, final LocalDate startDate){
+                public Partitioning findUnique(final Property property, final BudgetCalculationType type, final LocalDate startDate){
                     return null;
                 }
                 Partitioning somePartitioning = new Partitioning();
                 @Override
-                public List<Partitioning> findByBudgetAndType(final Budget budget, final BudgetCalculationType type){
+                public List<Partitioning> findByPropertyAndType(final Property property, final BudgetCalculationType type){
                     return Arrays.asList(somePartitioning);
                 }
             };
 
             // then
-            assertThat(partitioningRepository.validateNewPartitioning(budget, startDate, endDate, type)).isEqualTo("Only one partitioning of type BUDGETED is supported");
+            assertThat(partitioningRepository.validateNewPartitioning(property, startDate, endDate, type)).isEqualTo("Only one partitioning of type BUDGETED is supported");
 
         }
 

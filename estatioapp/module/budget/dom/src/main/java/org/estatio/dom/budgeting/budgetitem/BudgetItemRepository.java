@@ -23,8 +23,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.joda.time.LocalDate;
-
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.ActionLayout;
 import org.apache.isis.applib.annotation.DomainService;
@@ -35,7 +33,6 @@ import org.apache.isis.applib.annotation.RestrictTo;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
 import org.estatio.dom.UdoDomainRepositoryAndFactory;
-import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
@@ -107,11 +104,6 @@ public class BudgetItemRepository extends UdoDomainRepositoryAndFactory<BudgetIt
             final Charge charge
     ){
         return uniqueMatch("findByBudgetAndCharge", "budget", budget, "charge", charge);
-    }
-
-    @Programmatic
-    public BudgetItem findByPropertyAndChargeAndStartDate(final Property property, final Charge charge, final LocalDate startDate) {
-        return uniqueMatch("findByPropertyAndChargeAndStartDate", "property", property, "charge", charge, "startDate", startDate);
     }
 
     @Programmatic

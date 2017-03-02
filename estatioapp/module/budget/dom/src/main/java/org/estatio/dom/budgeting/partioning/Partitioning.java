@@ -49,7 +49,7 @@ import org.incode.module.base.dom.with.WithInterval;
 
 import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
-import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.charge.Charge;
 
@@ -71,14 +71,14 @@ import lombok.Setter;
                 name = "findUnique", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.partioning.Partitioning " +
-                        "WHERE budget == :budget && type == :type && startDate == :startDate "),
+                        "WHERE property == :property && type == :type && startDate == :startDate "),
         @Query(
-                name = "findByBudgetAndType", language = "JDOQL",
+                name = "findByPropertyAndType", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.partioning.Partitioning " +
-                        "WHERE budget == :budget && type == :type ")
+                        "WHERE property == :property && type == :type ")
 })
-@Unique(name = "Partitioning_budget_type_startDate_UNQ", members = {"budget", "type", "startDate"})
+@Unique(name = "Partitioning_property_type_startDate_UNQ", members = {"property", "type", "startDate"})
 @DomainObject(
         objectType = "org.estatio.dom.budgeting.partioning.Partitioning"
 )
@@ -86,23 +86,23 @@ public class Partitioning extends UdoDomainObject2<Partitioning>
         implements WithApplicationTenancyProperty, WithInterval<Partitioning> {
 
     public Partitioning() {
-        super("budget, type, startDate");
+        super("property, type, startDate");
     }
 
     public String title() {
 
         return TitleBuilder.start()
-                .withParent(getBudget())
+                .withParent(getProperty())
                 .withName(getType())
                 .withName(" ")
                 .withName(getStartDate())
                 .toString();
     }
 
-    @Column(allowsNull = "false", name = "budgetId")
+    @Column(allowsNull = "false", name = "propertyId")
     @PropertyLayout(hidden = Where.REFERENCES_PARENT)
     @Getter @Setter
-    private Budget budget;
+    private Property property;
 
     @Column(allowsNull = "true") //TODO: actually false, but interface WithInterval demands this
     @Getter @Setter
@@ -123,15 +123,15 @@ public class Partitioning extends UdoDomainObject2<Partitioning>
     @Override
     @PropertyLayout(hidden = Where.EVERYWHERE)
     public ApplicationTenancy getApplicationTenancy() {
-        return getBudget().getApplicationTenancy();
+        return getProperty().getApplicationTenancy();
     }
 
     @Programmatic
     public List<Charge> getDistinctInvoiceCharges() {
         List<Charge> results = new ArrayList<>();
         for (PartitionItem item : getItems()){
-            if (!results.contains(item.getCharge())){
-                results.add(item.getCharge());
+            if (!results.contains(item.getInvoiceCharge())){
+                results.add(item.getInvoiceCharge());
             }
         }
         return results;

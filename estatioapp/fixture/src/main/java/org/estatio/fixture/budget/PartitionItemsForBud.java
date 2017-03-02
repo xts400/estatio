@@ -23,6 +23,7 @@ import org.joda.time.LocalDate;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.partioning.Partitioning;
@@ -55,13 +56,13 @@ public class PartitionItemsForBud extends PartitionItemAbstact {
         Charge invoiceCharge2 = chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE2);
         KeyTable keyTable1 = keyTableRepository.findByBudgetAndName(budget, KeyTablesForBud.NAME_BY_AREA);
         KeyTable keyTable2 = keyTableRepository.findByBudgetAndName(budget, KeyTablesForBud.NAME_BY_COUNT);
-        Partitioning partitioning = budget.getPartitionings().first();
+        Partitioning partitioning = partitioningRepository.findUnique(property, BudgetCalculationType.BUDGETED, startDate);
 
-        createPartitioningAndItem(partitioning, invoiceCharge1, keyTable1, budgetItem1, new BigDecimal(100), executionContext);
-        createPartitioningAndItem(partitioning, invoiceCharge1, keyTable1, budgetItem2, new BigDecimal(80), executionContext);
-        createPartitioningAndItem(partitioning, invoiceCharge1, keyTable2, budgetItem2, new BigDecimal(20), executionContext);
-        createPartitioningAndItem(partitioning, invoiceCharge2, keyTable1, budgetItem3, new BigDecimal(90), executionContext);
-        createPartitioningAndItem(partitioning, invoiceCharge1, keyTable2, budgetItem3, new BigDecimal(10), executionContext);
+        createPartitioningAndItem(partitioning, invoiceCharge1, keyTable1, budgetItem1.getCharge(), new BigDecimal(100), executionContext);
+        createPartitioningAndItem(partitioning, invoiceCharge1, keyTable1, budgetItem2.getCharge(), new BigDecimal(80), executionContext);
+        createPartitioningAndItem(partitioning, invoiceCharge1, keyTable2, budgetItem2.getCharge(), new BigDecimal(20), executionContext);
+        createPartitioningAndItem(partitioning, invoiceCharge2, keyTable1, budgetItem3.getCharge(), new BigDecimal(90), executionContext);
+        createPartitioningAndItem(partitioning, invoiceCharge1, keyTable2, budgetItem3.getCharge(), new BigDecimal(10), executionContext);
     }
 
 }

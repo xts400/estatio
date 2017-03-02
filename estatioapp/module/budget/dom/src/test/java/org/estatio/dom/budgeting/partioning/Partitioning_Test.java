@@ -25,7 +25,7 @@ import org.junit.Test;
 
 import org.incode.module.unittestsupport.dom.bean.AbstractBeanPropertiesTest;
 
-import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.asset.Property;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -37,7 +37,7 @@ public class Partitioning_Test {
         public void test() {
             final Partitioning pojo = new Partitioning();
             newPojoTester()
-                    .withFixture(pojos(Budget.class, Budget.class))
+                    .withFixture(pojos(Property.class, Property.class))
                     .exercise(pojo);
         }
 

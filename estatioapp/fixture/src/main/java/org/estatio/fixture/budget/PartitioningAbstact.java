@@ -33,7 +33,7 @@ import org.estatio.dom.charge.ChargeRepository;
 public abstract class PartitioningAbstact extends FixtureScript {
 
     protected Partitioning createPartitioning(final Budget budget, final ExecutionContext executionContext){
-        Partitioning partitioning = partitioningRepository.newPartitioning(budget, budget.getStartDate(), budget.getEndDate(), BudgetCalculationType.BUDGETED);
+        Partitioning partitioning = partitioningRepository.newPartitioning(budget.getProperty(), budget.getStartDate(), budget.getEndDate(), BudgetCalculationType.BUDGETED);
         return executionContext.addResult(this, partitioning);
     }
 

@@ -46,7 +46,6 @@ import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.PropertyLayout;
-import org.apache.isis.applib.annotation.RestrictTo;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.annotation.Where;
 
@@ -69,7 +68,6 @@ import org.estatio.dom.budgeting.keytable.FoundationValueType;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableRepository;
 import org.estatio.dom.budgeting.keytable.KeyValueMethod;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.budgeting.partioning.Partitioning;
 import org.estatio.dom.budgeting.partioning.PartitioningRepository;
@@ -141,10 +139,6 @@ public class Budget extends UdoDomainObject2<Budget>
 
     @Persistent(mappedBy = "budget", dependentElement = "true")
     @Getter @Setter
-    private SortedSet<Partitioning> partitionings = new TreeSet<>();
-
-    @Persistent(mappedBy = "budget", dependentElement = "true")
-    @Getter @Setter
     private SortedSet<KeyTable> keyTables = new TreeSet<>();
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
@@ -162,21 +156,21 @@ public class Budget extends UdoDomainObject2<Budget>
         return budgetItemRepository.validateNewBudgetItem(this, charge);
     }
 
-    @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
-    @ActionLayout(contributed = Contributed.AS_ACTION)
-    @MemberOrder(name = "partitionings", sequence = "1")
-    public Budget newPartitioning(){
-        partitioningRepository.newPartitioning(this, getStartDate(), getEndDate(), BudgetCalculationType.ACTUAL);
-        return this;
-    }
-
-    public String validateNewPartitioning(){
-        return partitioningRepository.validateNewPartitioning(this, getStartDate(), getEndDate(), BudgetCalculationType.ACTUAL);
-    }
-
-    public String disableNewPartitioning(){
-        return partitioningRepository.findByBudgetAndType(this, BudgetCalculationType.ACTUAL).size()>0 ? "Partitioning for reconciliation already exists" : null;
-    }
+//    @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
+//    @ActionLayout(contributed = Contributed.AS_ACTION)
+//    @MemberOrder(name = "partitionings", sequence = "1")
+//    public Budget newPartitioning(){
+//        partitioningRepository.newPartitioning(this, getStartDate(), getEndDate(), BudgetCalculationType.ACTUAL);
+//        return this;
+//    }
+//
+//    public String validateNewPartitioning(){
+//        return partitioningRepository.validateNewPartitioning(this, getStartDate(), getEndDate(), BudgetCalculationType.ACTUAL);
+//    }
+//
+//    public String disableNewPartitioning(){
+//        return partitioningRepository.findByPropertyAndType(this, BudgetCalculationType.ACTUAL).size()>0 ? "Partitioning for reconciliation already exists" : null;
+//    }
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
     public KeyTable createKeyTable(
@@ -193,41 +187,41 @@ public class Budget extends UdoDomainObject2<Budget>
         return keyTableRepository.validateNewKeyTable(this, name, foundationValueType, keyValueMethod, 6);
     }
 
-    public Budget createNextBudget() {
-        LocalDate start = new LocalDate(getBudgetYear()+1, 01, 01);
-        LocalDate end = new LocalDate(getBudgetYear()+1, 12, 31);
-        Budget newBudget = budgetRepository.newBudget(getProperty(),start, end);
-        newBudget.findOrCreatePartitioningForBudgeting();
-        return copyCurrentTo(newBudget);
-    }
+//    public Budget createNextBudget() {
+//        LocalDate start = new LocalDate(getBudgetYear()+1, 01, 01);
+//        LocalDate end = new LocalDate(getBudgetYear()+1, 12, 31);
+//        Budget newBudget = budgetRepository.newBudget(getProperty(),start, end);
+//        newBudget.findOrCreatePartitioningForBudgeting();
+//        return copyCurrentTo(newBudget);
+//    }
+//
+//    public String validateCreateNextBudget() {
+//        if (budgetRepository.findByPropertyAndStartDate(getProperty(), new LocalDate(getBudgetYear()+1, 01, 01)) != null){
+//            return "This budget already exists";
+//        }
+//        return null;
+//    }
 
-    public String validateCreateNextBudget() {
-        if (budgetRepository.findByPropertyAndStartDate(getProperty(), new LocalDate(getBudgetYear()+1, 01, 01)) != null){
-            return "This budget already exists";
-        }
-        return null;
-    }
-
-    private Budget copyCurrentTo(final Budget newBudget) {
-        for (KeyTable keyTable : getKeyTables()){
-            keyTable.createCopyOn(newBudget);
-        }
-        for (BudgetItem item : getItems()){
-            item.createCopyOn(newBudget);
-        }
-        return newBudget;
-    }
+//    private Budget copyCurrentTo(final Budget newBudget) {
+//        for (KeyTable keyTable : getKeyTables()){
+//            keyTable.createCopyOn(newBudget);
+//        }
+//        for (BudgetItem item : getItems()){
+//            item.createCopyOn(newBudget);
+//        }
+//        return newBudget;
+//    }
 
     @Programmatic
     public List<Charge> getInvoiceCharges() {
         List<Charge> charges = new ArrayList<>();
-        for (BudgetItem budgetItem : getItems()) {
-            for (PartitionItem partitionItem : budgetItem.getPartitionItems()) {
-                if (!charges.contains(partitionItem.getCharge())) {
-                    charges.add(partitionItem.getCharge());
-                }
-            }
-        }
+//        for (BudgetItem budgetItem : getItems()) {
+//            for (PartitionItem partitionItem : budgetItem.getPartitionItems()) {
+//                if (!charges.contains(partitionItem.getInvoiceCharge())) {
+//                    charges.add(partitionItem.getInvoiceCharge());
+//                }
+//            }
+//        }            //TODO !!
         return charges;
     }
 
@@ -297,8 +291,8 @@ public class Budget extends UdoDomainObject2<Budget>
     }
 
     @Programmatic
-    public Partitioning getPartitioningForBudgeting(){
-        return partitioningRepository.findUnique(this, BudgetCalculationType.BUDGETED, getStartDate());
+    public Partitioning getPartitioningForBudgeting(){  // TODO !!
+        return partitioningRepository.findUnique(getProperty(), BudgetCalculationType.BUDGETED, getStartDate());
     }
 
     @Programmatic
@@ -306,25 +300,25 @@ public class Budget extends UdoDomainObject2<Budget>
         remove(this);
     }
 
-    @Action(restrictTo = RestrictTo.PROTOTYPING, semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
-    @ActionLayout()
-    public Budget removeAllBudgetItems() {
-        for (BudgetItem budgetItem : this.getItems()) {
-            for (PartitionItem pItem : budgetItem.getPartitionItems()){
-                pItem.remove();
-            }
-            getContainer().remove(budgetItem);
-            getContainer().flush();
-        }
-
-        return this;
-    }
+//    @Action(restrictTo = RestrictTo.PROTOTYPING, semantics = SemanticsOf.NON_IDEMPOTENT_ARE_YOU_SURE)
+//    @ActionLayout()
+//    public Budget removeAllBudgetItems() {
+//        for (BudgetItem budgetItem : this.getItems()) {
+//            for (PartitionItem pItem : budgetItem.getPartitionItems()){
+//                pItem.remove();
+//            }
+//            getContainer().remove(budgetItem);
+//            getContainer().flush();
+//        }
+//
+//        return this;
+//    }
 
     @Programmatic
     public Budget findOrCreatePartitioningForBudgeting(){
         Partitioning partitioningForBudgeting = getPartitioningForBudgeting();
         if (partitioningForBudgeting==null){
-            partitioningRepository.newPartitioning(this, getStartDate(), getEndDate(), BudgetCalculationType.BUDGETED);
+            partitioningRepository.newPartitioning(getProperty(), getStartDate(), getEndDate(), BudgetCalculationType.BUDGETED);
         }
         return this;
     }

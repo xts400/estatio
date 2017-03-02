@@ -12,26 +12,31 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableRepository;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.budgeting.partioning.Partitioning;
+import org.estatio.dom.budgeting.partioning.PartitioningRepository;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
-import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.budget.BudgetsForOxf;
+import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.charge.ChargeRefData;
 import org.estatio.integtests.EstatioIntegrationTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
+
+    @Inject
+    PartitioningRepository partitioningRepository;
 
     @Inject
     PartitionItemRepository partitionItemRepository;
@@ -67,15 +72,16 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
-            PartitionItem partitionItem = budget.getItems().first().getPartitionItems().get(0);
+            Partitioning partitioning = partitioningRepository.findUnique(budget.getProperty(), BudgetCalculationType.BUDGETED, budget.getStartDate());
+            PartitionItem partitionItem = partitionItemRepository.findByBudgetItem(budget.getItems().first()).get(0);
 
             //when, then
             assertThat(partitionItemRepository
                     .validateNewPartitionItem(
-                            budget.getPartitionings().first(),
-                            partitionItem.getCharge(),
+                            partitioning,
+                            partitionItem.getInvoiceCharge(),
                             partitionItem.getKeyTable(),
-                            partitionItem.getBudgetItem(),
+                            budget.getItems().first().getCharge(),
                             null)
             ).isEqualTo("This partition item already exists");
 
@@ -128,11 +134,11 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
             BudgetItem budgetItem = budget.getItems().first();
             KeyTable keyTable = keytablesRepository.findByBudget(budget).get(0);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);
-            Partitioning partitioning = budget.getPartitionings().first();
+            Partitioning partitioning = partitioningRepository.findUnique(budget.getProperty(), BudgetCalculationType.BUDGETED, budget.getStartDate());
             // when
-            final PartitionItem partitionItem = partitionItemRepository.findUnique(partitioning, charge, budgetItem, keyTable);
+            final PartitionItem partitionItem = partitionItemRepository.findUnique(partitioning, charge, budgetItem.getCharge(), keyTable);
             // then
-            assertThat(partitionItem.getBudgetItem()).isEqualTo(budgetItem);
+            assertThat(partitionItem.getIncomingCharge()).isEqualTo(budgetItem.getCharge());
             assertThat(partitionItem.getKeyTable()).isEqualTo(keyTable);
         }
 
@@ -154,19 +160,19 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
             BudgetItem budgetItem = budget.getItems().first();
             KeyTable keyTable = keytablesRepository.findByBudget(budget).get(0);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);
-            Partitioning partitioning = budget.getPartitionings().first();
+            Partitioning partitioning = partitioningRepository.findUnique(budget.getProperty(), BudgetCalculationType.BUDGETED, budget.getStartDate());
 
             origPercentage = new BigDecimal("100").setScale(6, BigDecimal.ROUND_HALF_UP);
             newPercentage = new BigDecimal("90").setScale(6, BigDecimal.ROUND_HALF_UP);
 
-            partitionItem = partitionItemRepository.findUnique(partitioning, charge, budgetItem, keyTable);
+            partitionItem = partitionItemRepository.findUnique(partitioning, charge, budgetItem.getCharge(), keyTable);
             assertThat(partitionItem.getPercentage()).isEqualTo(origPercentage);
 
             // when
-            partitionItem = partitionItemRepository.updateOrCreatePartitionItem(budget.getPartitionings().first(), budgetItem, charge, keyTable, newPercentage);
+            partitionItem = partitionItemRepository.updateOrCreatePartitionItem(partitioning, budgetItem.getCharge(), charge, keyTable, newPercentage);
 
             // then
-            assertThat(partitionItem.getBudgetItem()).isEqualTo(budgetItem);
+            assertThat(partitionItem.getIncomingCharge()).isEqualTo(budgetItem.getCharge());
             assertThat(partitionItem.getKeyTable()).isEqualTo(keyTable);
             assertThat(partitionItem.getPercentage()).isEqualTo(newPercentage);
         }

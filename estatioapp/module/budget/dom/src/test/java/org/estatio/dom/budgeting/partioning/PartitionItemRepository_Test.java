@@ -114,17 +114,17 @@ public class PartitionItemRepository_Test {
         public void happyCase() {
 
             Partitioning partitioning = new Partitioning();
-            Charge charge = new Charge();
-            BudgetItem budgetItem = new BudgetItem();
+            Charge invoiceCharge = new Charge();
+            Charge incomingCharge = new Charge();
             KeyTable keyTable = new KeyTable();
-            partitionItemRepository.findUnique(partitioning, charge, budgetItem, keyTable);
+            partitionItemRepository.findUnique(partitioning, invoiceCharge, incomingCharge, keyTable);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.UNIQUE_MATCH);
             assertThat(finderInteraction.getResultType()).isEqualTo(PartitionItem.class);
             assertThat(finderInteraction.getQueryName()).isEqualTo("findUnique");
             assertThat(finderInteraction.getArgumentsByParameterName().get("partitioning")).isEqualTo((Object) partitioning);
-            assertThat(finderInteraction.getArgumentsByParameterName().get("charge")).isEqualTo((Object) charge);
-            assertThat(finderInteraction.getArgumentsByParameterName().get("budgetItem")).isEqualTo((Object) budgetItem);
+            assertThat(finderInteraction.getArgumentsByParameterName().get("invoiceCharge")).isEqualTo((Object) invoiceCharge);
+            assertThat(finderInteraction.getArgumentsByParameterName().get("incomingCharge")).isEqualTo((Object) incomingCharge);
             assertThat(finderInteraction.getArgumentsByParameterName().get("keyTable")).isEqualTo((Object) keyTable);
             assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(4);
         }
@@ -145,7 +145,7 @@ public class PartitionItemRepository_Test {
         public void setup() {
             partitionItemRepository1 = new PartitionItemRepository() {
                 @Override
-                public PartitionItem findUnique(final Partitioning partitioning, final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
+                public PartitionItem findUnique(final Partitioning partitioning, final Charge invoiceCharge, final Charge incomingCharge, final KeyTable keyTable) {
                     return null;
                 }
             };
@@ -157,8 +157,8 @@ public class PartitionItemRepository_Test {
 
             final KeyTable keyTable = new KeyTable();
             final Partitioning partitioning = new Partitioning();
-            final Charge charge = new Charge();
-            final BudgetItem budgetItem = new BudgetItem();
+            final Charge invoiceCharge = new Charge();
+            final Charge incomingCharge = new Charge();
             final BigDecimal percentage = new BigDecimal("100.000000");
             final PartitionItem partitionItem = new PartitionItem();
 
@@ -173,12 +173,12 @@ public class PartitionItemRepository_Test {
             });
 
             // when
-            PartitionItem newPartitionItem = partitionItemRepository1.findOrCreatePartitionItem(partitioning, budgetItem, charge, keyTable, percentage);
+            PartitionItem newPartitionItem = partitionItemRepository1.findOrCreatePartitionItem(partitioning, incomingCharge, invoiceCharge, keyTable, percentage);
 
             // then
             assertThat(newPartitionItem.getPartitioning()).isEqualTo(partitioning);
-            assertThat(newPartitionItem.getCharge()).isEqualTo(charge);
-            assertThat(newPartitionItem.getBudgetItem()).isEqualTo(budgetItem);
+            assertThat(newPartitionItem.getInvoiceCharge()).isEqualTo(invoiceCharge);
+            assertThat(newPartitionItem.getIncomingCharge()).isEqualTo(incomingCharge);
             assertThat(newPartitionItem.getKeyTable()).isEqualTo(keyTable);
             assertThat(newPartitionItem.getPercentage()).isEqualTo(percentage);
 

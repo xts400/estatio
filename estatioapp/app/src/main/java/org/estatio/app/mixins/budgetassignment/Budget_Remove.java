@@ -23,8 +23,6 @@ import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.budgeting.budgetcalculation.Status;
-import org.estatio.dom.budgeting.budgetitem.BudgetItem;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseRepository;
@@ -71,12 +69,12 @@ public class Budget_Remove {
             }
         }
 
-        // delete partition items
-        for (BudgetItem budgetItem : budget.getItems()) {
-            for (PartitionItem item : partitionItemRepository.findByBudgetItem(budgetItem)) {
-                item.remove();
-            }
-        }
+//        // delete partition items
+//        for (BudgetItem budgetItem : budget.getItems()) {
+//            for (PartitionItem item : partitionItemRepository.findByBudgetItem(budgetItem)) {
+//                item.remove();
+//            }
+//        }
 
         budget.remove();
     }

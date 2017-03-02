@@ -130,19 +130,21 @@ public class PartitionItemImport implements ExcelFixtureRowHandler, Importable {
     }
 
     private Partitioning findOrCreatePartitioning(final Budget budget){
-        final Partitioning partitioning = partitioningRepository.findUnique(budget, BudgetCalculationType.BUDGETED, budget.getStartDate());
-        if (partitioning == null) {
-            return partitioningRepository.newPartitioning(budget, budget.getStartDate(), budget.getEndDate(), BudgetCalculationType.BUDGETED);
-        }
-        return partitioning;
+//        final Partitioning partitioning = partitioningRepository.findUnique(budget, BudgetCalculationType.BUDGETED, budget.getStartDate());
+//        if (partitioning == null) {
+//            return partitioningRepository.newPartitioning(budget, budget.getStartDate(), budget.getEndDate(), BudgetCalculationType.BUDGETED);
+//        }
+//        return partitioning;
+        return new Partitioning(); // TODO!!
     }
 
     private PartitionItem findOrCreatePartitionItem(final Partitioning partitioning, final Charge charge, final BudgetItem butgetItem, final KeyTable keyTable, final BigDecimal percentage) {
-        final PartitionItem partitionItem = partitionItemRepository.findUnique(partitioning, charge, butgetItem, keyTable);
-        if (partitionItem == null) {
-            return partitionItemRepository.newPartitionItem(partitioning, charge, keyTable, butgetItem, percentage);
-        }
-        return partitionItem;
+//        final PartitionItem partitionItem = partitionItemRepository.findUnique(partitioning, charge, butgetItem, keyTable);
+//        if (partitionItem == null) {
+//            return partitionItemRepository.newPartitionItem(partitioning, charge, keyTable, butgetItem, percentage);
+//        }
+//        return partitionItem;
+        return new PartitionItem(); // TODO!!
     }
 
     private BudgetItem findOrCreateBudgetItem(final Budget budget, final Charge charge, final BigDecimal value) {

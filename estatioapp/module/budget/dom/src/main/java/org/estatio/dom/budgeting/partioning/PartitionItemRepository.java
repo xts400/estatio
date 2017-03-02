@@ -47,15 +47,15 @@ public class PartitionItemRepository extends UdoDomainRepositoryAndFactory<Parti
 
     public PartitionItem newPartitionItem(
             final Partitioning partitioning,
-            final Charge charge,
+            final Charge invoiceCharge,
             final KeyTable keyTable,
-            final BudgetItem budgetItem,
+            final Charge incomingCharge,
             final BigDecimal percentage) {
         PartitionItem partitionItem = newTransientInstance(PartitionItem.class);
         partitionItem.setPartitioning(partitioning);
-        partitionItem.setCharge(charge);
+        partitionItem.setInvoiceCharge(invoiceCharge);
         partitionItem.setKeyTable(keyTable);
-        partitionItem.setBudgetItem(budgetItem);
+        partitionItem.setIncomingCharge(incomingCharge);
         partitionItem.setPercentage(percentage.setScale(6, BigDecimal.ROUND_HALF_UP));
         persistIfNotAlready(partitionItem);
         return partitionItem;
@@ -63,12 +63,12 @@ public class PartitionItemRepository extends UdoDomainRepositoryAndFactory<Parti
 
     public String validateNewPartitionItem(
             final Partitioning partitioning,
-            final Charge charge,
+            final Charge invoiceCharge,
             final KeyTable keyTable,
-            final BudgetItem budgetItem,
+            final Charge incomingCharge,
             final BigDecimal percentage
     ){
-        if(findUnique(partitioning, charge, budgetItem, keyTable) != null) {
+        if(findUnique(partitioning, invoiceCharge, incomingCharge, keyTable) != null) {
             return "This partition item already exists";
         }
         return null;
@@ -86,7 +86,7 @@ public class PartitionItemRepository extends UdoDomainRepositoryAndFactory<Parti
 
     @Programmatic
     public List<PartitionItem> findByBudgetItem(final BudgetItem budgetItem) {
-        return allMatches("findByBudgetItem", "budgetItem", budgetItem);
+        return allMatches("findByIncomingCharge", "incomingCharge", budgetItem.getCharge()); //TODO: this is not OK - There can be more budgets having items with same incomingCharge
     }
 
     @Programmatic
@@ -96,24 +96,24 @@ public class PartitionItemRepository extends UdoDomainRepositoryAndFactory<Parti
 
 
     @Programmatic
-    public PartitionItem findUnique(final Partitioning partitioning, final Charge charge, final BudgetItem budgetItem, final KeyTable keyTable) {
-        return uniqueMatch("findUnique", "partitioning", partitioning, "charge", charge, "budgetItem", budgetItem, "keyTable", keyTable);
+    public PartitionItem findUnique(final Partitioning partitioning, final Charge invoiceCharge, final Charge incomingCharge, final KeyTable keyTable) {
+        return uniqueMatch("findUnique", "partitioning", partitioning, "invoiceCharge", invoiceCharge, "incomingCharge", incomingCharge, "keyTable", keyTable);
     }
 
     @Programmatic
-    public PartitionItem findOrCreatePartitionItem(final Partitioning partitioning, final BudgetItem budgetItem, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
-        final PartitionItem partitionItem = findUnique(partitioning, invoiceCharge, budgetItem, keyTable);
+    public PartitionItem findOrCreatePartitionItem(final Partitioning partitioning, final Charge incomingCharge, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
+        final PartitionItem partitionItem = findUnique(partitioning, invoiceCharge, incomingCharge, keyTable);
         if (partitionItem == null) {
-            return newPartitionItem(partitioning, invoiceCharge, keyTable, budgetItem, percentage);
+            return newPartitionItem(partitioning, invoiceCharge, keyTable, incomingCharge, percentage);
         }
         return partitionItem;
     }
 
     @Programmatic
-    public PartitionItem updateOrCreatePartitionItem(final Partitioning partitioning, final BudgetItem budgetItem, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
-        final PartitionItem partitionItem = findUnique(partitioning, invoiceCharge, budgetItem, keyTable);
+    public PartitionItem updateOrCreatePartitionItem(final Partitioning partitioning, final Charge incomingCharge, final Charge invoiceCharge, final KeyTable keyTable, final BigDecimal percentage){
+        final PartitionItem partitionItem = findUnique(partitioning, invoiceCharge, incomingCharge, keyTable);
         if (partitionItem == null) {
-            return newPartitionItem(partitioning, invoiceCharge, keyTable, budgetItem, percentage);
+            return newPartitionItem(partitioning, invoiceCharge, keyTable, incomingCharge, percentage);
         } else {
             partitionItem.setPercentage(percentage);
         }

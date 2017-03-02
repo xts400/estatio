@@ -26,10 +26,10 @@ public class BudgetCalculationService {
         for (BudgetCalculationViewmodel result : getBudgetedCalculations(budget)){
             budgetCalculations.add(
                     budgetCalculationRepository.findOrCreateBudgetCalculation(
-                    result.getPartitionItem(),
-                    result.getKeyItem(),
-                    result.getValue(),
-                    result.getCalculationType())
+                            null, //TODO !!
+                            result.getPartitionItem(),
+                            result.getKeyItem(),
+                            result.getValue(), result.getCalculationType())
             );
         }
         return budgetCalculations;
@@ -75,11 +75,11 @@ public class BudgetCalculationService {
     private List<BudgetCalculationViewmodel> calculate(final BudgetItem budgetItem, final BudgetCalculationType type) {
 
         List<BudgetCalculationViewmodel> result = new ArrayList<>();
-        for (PartitionItem partitionItem : budgetItem.getPartitionItems()) {
-
-            result.addAll(calculate(partitionItem, type));
-
-        }
+//        for (PartitionItem partitionItem : budgetItem.getPartitionItems()) {
+//
+//            result.addAll(calculate(partitionItem, type));
+//
+//        }
 
         return result;
     }
@@ -88,19 +88,19 @@ public class BudgetCalculationService {
 
         List<BudgetCalculationViewmodel> results = new ArrayList<>();
 
-        switch (type) {
-            case BUDGETED:
-                BigDecimal budgetedTotal = percentageOf(partitionItem.getBudgetItem().getBudgetedValue(), partitionItem.getPercentage());
-                results.addAll(calculateForTotalAndType(partitionItem, budgetedTotal, BudgetCalculationType.BUDGETED));
-            break;
-
-            case ACTUAL:
-                if (partitionItem.getBudgetItem().getAuditedValue() != null) {
-                    BigDecimal auditedTotal = percentageOf(partitionItem.getBudgetItem().getAuditedValue(), partitionItem.getPercentage());
-                    results.addAll(calculateForTotalAndType(partitionItem, auditedTotal, BudgetCalculationType.ACTUAL));
-                }
-            break;
-        }
+//        switch (type) {
+//            case BUDGETED:
+//                BigDecimal budgetedTotal = percentageOf(partitionItem.getBudgetItem().getBudgetedValue(), partitionItem.getPercentage());
+//                results.addAll(calculateForTotalAndType(partitionItem, budgetedTotal, BudgetCalculationType.BUDGETED));
+//            break;
+//
+//            case ACTUAL:
+//                if (partitionItem.getBudgetItem().getAuditedValue() != null) {
+//                    BigDecimal auditedTotal = percentageOf(partitionItem.getBudgetItem().getAuditedValue(), partitionItem.getPercentage());
+//                    results.addAll(calculateForTotalAndType(partitionItem, auditedTotal, BudgetCalculationType.ACTUAL));
+//                }
+//            break;
+//        }
 
         return results;
     }

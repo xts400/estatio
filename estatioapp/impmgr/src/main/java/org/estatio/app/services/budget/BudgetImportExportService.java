@@ -41,6 +41,7 @@ import org.estatio.dom.budgetassignment.override.BudgetOverrideForMax;
 import org.estatio.dom.budgetassignment.override.BudgetOverrideRepository;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.lease.Lease;
 import org.estatio.dom.lease.LeaseRepository;
 
@@ -78,18 +79,18 @@ public class BudgetImportExportService {
         BigDecimal budgetedValue = item.getBudgetedValue();
         BigDecimal auditedValue = item.getAuditedValue();
 
-        if (item.getPartitionItems().size()==0){
+        if (partitionItemRepository.findByBudgetItem(item).size()==0){
             // create 1 line
             lines.add(new BudgetImportExport(propertyReference,budgetStartDate,budgetEndDate, budgetChargeReference,budgetedValue,auditedValue,null,null,null, null, null));
 
         } else {
             // create a line for each partion item
-            for (PartitionItem allocation : item.getPartitionItems()) {
-                String keyTableName = allocation.getKeyTable().getName();
-                String foundationValueType = allocation.getKeyTable().getFoundationValueType().toString();
-                String keyValueMethod = allocation.getKeyTable().getKeyValueMethod().toString();
-                String allocationChargeReference = allocation.getCharge().getReference();
-                BigDecimal percentage = allocation.getPercentage();
+            for (PartitionItem partitionItem : partitionItemRepository.findByBudgetItem(item)) {
+                String keyTableName = partitionItem.getKeyTable().getName();
+                String foundationValueType = partitionItem.getKeyTable().getFoundationValueType().toString();
+                String keyValueMethod = partitionItem.getKeyTable().getKeyValueMethod().toString();
+                String allocationChargeReference = partitionItem.getInvoiceCharge().getReference();
+                BigDecimal percentage = partitionItem.getPercentage();
                 lines.add(new BudgetImportExport(propertyReference, budgetStartDate, budgetEndDate, budgetChargeReference, budgetedValue, auditedValue, keyTableName, foundationValueType, keyValueMethod, allocationChargeReference, percentage));
             }
 
@@ -176,5 +177,8 @@ public class BudgetImportExportService {
 
     @Inject
     private ExcelService excelService;
+
+    @Inject
+    private PartitionItemRepository partitionItemRepository;
 
 }

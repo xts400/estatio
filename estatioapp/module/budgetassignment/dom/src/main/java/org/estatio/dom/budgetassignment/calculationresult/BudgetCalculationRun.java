@@ -60,7 +60,7 @@ import lombok.Setter;
                         "FROM org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationRun " +
                         "WHERE budget == :budget"),
         @Query(
-                name = "findByBudgetAndType", language = "JDOQL",
+                name = "findByPropertyAndType", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationRun " +
                         "WHERE budget == :budget && type == :type"),

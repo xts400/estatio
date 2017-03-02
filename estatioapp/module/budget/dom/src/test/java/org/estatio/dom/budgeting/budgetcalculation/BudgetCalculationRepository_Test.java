@@ -82,18 +82,20 @@ public class BudgetCalculationRepository_Test {
         @Test
         public void happyCase() {
 
+            BudgetItem budgetItem = new BudgetItem();
             PartitionItem partitionItem = new PartitionItem();
             KeyItem keyItem = new KeyItem();
             BudgetCalculationType calculationType = BudgetCalculationType.BUDGETED;
-            budgetCalculationRepository.findUnique(partitionItem, keyItem, calculationType);
+            budgetCalculationRepository.findUnique(budgetItem, partitionItem, keyItem, calculationType);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.UNIQUE_MATCH);
             assertThat(finderInteraction.getResultType()).isEqualTo(BudgetCalculation.class);
             assertThat(finderInteraction.getQueryName()).isEqualTo("findUnique");
+            assertThat(finderInteraction.getArgumentsByParameterName().get("budgetItem")).isEqualTo((Object) budgetItem);
             assertThat(finderInteraction.getArgumentsByParameterName().get("partitionItem")).isEqualTo((Object) partitionItem);
             assertThat(finderInteraction.getArgumentsByParameterName().get("keyItem")).isEqualTo((Object) keyItem);
             assertThat(finderInteraction.getArgumentsByParameterName().get("calculationType")).isEqualTo((Object) calculationType);
-            assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(3);
+            assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(4);
         }
 
     }
@@ -166,7 +168,7 @@ public class BudgetCalculationRepository_Test {
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
             assertThat(finderInteraction.getResultType()).isEqualTo(BudgetCalculation.class);
-            assertThat(finderInteraction.getQueryName()).isEqualTo("findByBudgetAndUnitAndInvoiceChargeAndType");
+            assertThat(finderInteraction.getQueryName()).isEqualTo("findByBudgetItemAndUnitAndInvoiceChargeAndType");
             assertThat(finderInteraction.getArgumentsByParameterName().get("budget")).isEqualTo((Object) budget);
             assertThat(finderInteraction.getArgumentsByParameterName().get("unit")).isEqualTo((Object) unit);
             assertThat(finderInteraction.getArgumentsByParameterName().get("invoiceCharge")).isEqualTo((Object) invoiceCharge);
@@ -189,7 +191,7 @@ public class BudgetCalculationRepository_Test {
             budgetCalculationRepository = new BudgetCalculationRepository() {
                 @Override
                 public BudgetCalculation findUnique(
-                        final PartitionItem partitionItem,
+                        final BudgetItem budgetItem, final PartitionItem partitionItem,
                         final KeyItem keyItem,
                         final BudgetCalculationType calculationType
                 ) {
@@ -211,17 +213,7 @@ public class BudgetCalculationRepository_Test {
                     return charge;
                 }
             };
-            PartitionItem partitionItem = new PartitionItem(){
-                @Override
-                public Budget getBudget(){
-                    return budget;
-                }
-
-                @Override
-                public BudgetItem getBudgetItem(){
-                    return budgetItem;
-                }
-            };
+            PartitionItem partitionItem = new PartitionItem();
             KeyItem keyItem = new KeyItem();
             BigDecimal value = new BigDecimal("100");
             final BudgetCalculation budgetCalculation = new BudgetCalculation();
@@ -236,7 +228,7 @@ public class BudgetCalculationRepository_Test {
             });
 
             //when
-            BudgetCalculation newBudgetCalculation = budgetCalculationRepository.createBudgetCalculation(partitionItem, keyItem, value, null);
+            BudgetCalculation newBudgetCalculation = budgetCalculationRepository.createBudgetCalculation(budgetItem, partitionItem, keyItem, value, null);
 
             //then
             assertThat(newBudgetCalculation.getPartitionItem()).isEqualTo(partitionItem);

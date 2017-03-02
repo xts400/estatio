@@ -39,7 +39,7 @@ public class Property_newBudgetContribution {
             final Property property,
             final int year) {
         Budget budget = budgetRepository.newBudget(property, new LocalDate(year, 01, 01), new LocalDate(year, 12, 31));
-        budget.findOrCreatePartitioningForBudgeting();
+//        budget.findOrCreatePartitioningForBudgeting(); //TODO !!
         return budget;
     }
 

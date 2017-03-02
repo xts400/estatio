@@ -29,8 +29,6 @@ import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetcalculation.Status;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.partioning.PartitionItem;
-import org.estatio.dom.budgeting.partioning.Partitioning;
-import org.estatio.dom.charge.Charge;
 import org.estatio.dom.invoice.PaymentMethod;
 import org.estatio.dom.lease.InvoicingFrequency;
 import org.estatio.dom.lease.Lease;
@@ -85,13 +83,13 @@ public class BudgetAssignmentService {
 
     public void createBudgetCalculationResults(final BudgetCalculationRun run){
 
-        run.removeCalculationResults();
-        for (Partitioning partitioning : run.getBudget().getPartitionings()){
-            for (Charge invoiceCharge : partitioning.getDistinctInvoiceCharges()){
-                BudgetCalculationResult result = run.createCalculationResult(invoiceCharge);
-                result.calculate();
-            }
-        }
+        run.removeCalculationResults(); //TODO !!
+//        for (Partitioning partitioning : run.getBudget().getPartitionings()){
+//            for (Charge invoiceCharge : partitioning.getDistinctInvoiceCharges()){
+//                BudgetCalculationResult result = run.createCalculationResult(invoiceCharge);
+//                result.calculate();
+//            }
+//        }
 
     }
 
