@@ -20,7 +20,8 @@ package org.estatio.dom.budgeting.keytable;
 import org.junit.Test;
 
 import org.incode.module.unittestsupport.dom.bean.AbstractBeanPropertiesTest;
-import org.estatio.dom.budgeting.budget.Budget;
+
+import org.estatio.dom.budgeting.partioning.Partitioning;
 
 public class KeyTable_Test {
 
@@ -30,7 +31,7 @@ public class KeyTable_Test {
         public void test() {
             final KeyTable pojo = new KeyTable();
             newPojoTester()
-                    .withFixture(pojos(Budget.class, Budget.class))
+                    .withFixture(pojos(Partitioning.class, Partitioning.class))
                     .exercise(pojo);
         }
 

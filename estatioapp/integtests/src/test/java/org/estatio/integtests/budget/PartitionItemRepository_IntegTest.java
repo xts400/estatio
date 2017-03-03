@@ -113,7 +113,7 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
-            KeyTable keyTable = keytablesRepository.findByBudget(budget).get(0);
+            KeyTable keyTable = keytablesRepository.findByPartioning(budget.getPartitioningForBudgeting()).get(0);
             // when
             final List<PartitionItem> partitionItemList = partitionItemRepository.findByKeyTable(keyTable);
             // then
@@ -132,7 +132,7 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
 
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
             BudgetItem budgetItem = budget.getItems().first();
-            KeyTable keyTable = keytablesRepository.findByBudget(budget).get(0);
+            KeyTable keyTable = keytablesRepository.findByPartioning(budget.getPartitioningForBudgeting()).get(0);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);
             Partitioning partitioning = partitioningRepository.findUnique(budget.getProperty(), BudgetCalculationType.BUDGETED, budget.getStartDate());
             // when
@@ -158,7 +158,7 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
 
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
             BudgetItem budgetItem = budget.getItems().first();
-            KeyTable keyTable = keytablesRepository.findByBudget(budget).get(0);
+            KeyTable keyTable = keytablesRepository.findByPartioning(budget.getPartitioningForBudgeting()).get(0);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);
             Partitioning partitioning = partitioningRepository.findUnique(budget.getProperty(), BudgetCalculationType.BUDGETED, budget.getStartDate());
 

@@ -114,7 +114,7 @@ public class BudgetImportExportManager {
     public List<KeyItemImportExportLineItem> getKeyItemLines() {
         List<KeyItemImportExportLineItem> result = new ArrayList<>();
         if (getBudget()==null){return result;} // for import from menu where budget unknown
-        for (KeyTable keyTable : this.getBudget().getKeyTables()){
+        for (KeyTable keyTable : this.getBudget().getPartitioningForBudgeting().getKeyTables()){
             result.addAll(keyItemImportExportService.items(keyTable.getItems()));
         }
         return result;
@@ -204,7 +204,7 @@ public class BudgetImportExportManager {
     private List<KeyTable> keyTablesToImport(final List<BudgetImportExport> lineItems){
         List<KeyTable> result = new ArrayList<>();
         for (BudgetImportExport lineItem :lineItems) {
-            KeyTable foundKeyTable = keyTableRepository.findByBudgetAndName(getBudget(), lineItem.getKeyTableName());
+            KeyTable foundKeyTable = keyTableRepository.findByPartitioningAndName(getBudget().getPartitioningForBudgeting(), lineItem.getKeyTableName());
             if (!result.contains(foundKeyTable)) {
                 result.add(foundKeyTable);
             }

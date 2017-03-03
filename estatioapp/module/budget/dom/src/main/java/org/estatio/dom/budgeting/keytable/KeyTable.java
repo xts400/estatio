@@ -64,6 +64,7 @@ import org.estatio.dom.budgeting.DistributionService;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
 import org.estatio.dom.budgeting.keyitem.KeyItemRepository;
+import org.estatio.dom.budgeting.partioning.Partitioning;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -80,23 +81,23 @@ import lombok.Setter;
         column = "version")
 @Queries({
         @Query(
-                name = "findByBudgetAndName", language = "JDOQL",
+                name = "findByPartitioningAndName", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.keytable.KeyTable " +
                         "WHERE name == :name "
-                        + "&& budget == :budget"),
+                        + "&& partitioning == :partitioning"),
         @Query(
-                name = "findByBudget", language = "JDOQL",
+                name = "findByPartioning", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.keytable.KeyTable " +
-                        "WHERE budget == :budget "),
+                        "WHERE partitioning == :partitioning "),
         @Query(
                 name = "findKeyTableByNameMatches", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.keytable.KeyTable " +
                         "WHERE name.toLowerCase().indexOf(:name) >= 0 ")
 })
-@Unique(name = "KeyTable_budget_name", members = { "budget", "name" })
+@Unique(name = "KeyTable_partitioning_name", members = { "partitioning", "name" })
 @DomainObject(
         autoCompleteRepository = KeyTableRepository.class,
         autoCompleteAction = "autoComplete",
@@ -105,13 +106,13 @@ import lombok.Setter;
 public class KeyTable extends UdoDomainObject2<Budget> implements WithApplicationTenancyProperty {
 
     public KeyTable() {
-        super("name, budget");
+        super("name, partitioning");
     }
 
     public String title() {
         return TitleBuilder
                 .start()
-                .withParent(getBudget())
+                .withParent(getPartitioning())
                 .withName(getName())
                 .toString();
     }
@@ -120,10 +121,10 @@ public class KeyTable extends UdoDomainObject2<Budget> implements WithApplicatio
         return this.getName();
     }
 
-    @Column(name = "budgetId", allowsNull = "false")
+    @Column(name = "partitionId", allowsNull = "false")
     @PropertyLayout(hidden = Where.PARENTED_TABLES)
     @Getter @Setter
-    private Budget budget;
+    private Partitioning partitioning;
 
     @Column(allowsNull = "false")
     @Getter @Setter
@@ -139,8 +140,8 @@ public class KeyTable extends UdoDomainObject2<Budget> implements WithApplicatio
         if (name.equals(null)) {
             return "Name can't be empty";
         }
-        if (keyTableRepository.findByBudgetAndName(getBudget(), name) != null) {
-            return "There is already a keytable with this name for this budget";
+        if (keyTableRepository.findByPartitioningAndName(getPartitioning(), name) != null) {
+            return "There is already a keytable with this name for this partitioning";
         }
         return null;
     }
@@ -254,7 +255,7 @@ public class KeyTable extends UdoDomainObject2<Budget> implements WithApplicatio
         */
         List<Distributable> input = new ArrayList<>();
 
-        for (Unit unit : unitRepository.findByProperty(this.getBudget().getProperty())) {
+        for (Unit unit : unitRepository.findByProperty(this.getPartitioning().getProperty())) {
 
             if (unitIntervalValidForThisKeyTable(unit)) {
                 BigDecimal sourceValue;
@@ -306,7 +307,7 @@ public class KeyTable extends UdoDomainObject2<Budget> implements WithApplicatio
     @Override
     @PropertyLayout(hidden = Where.EVERYWHERE)
     public ApplicationTenancy getApplicationTenancy() {
-        return getBudget().getProperty().getApplicationTenancy();
+        return getPartitioning().getProperty().getApplicationTenancy();
     }
 
     // //////////////////////////////////////
@@ -339,7 +340,7 @@ public class KeyTable extends UdoDomainObject2<Budget> implements WithApplicatio
 
     @Programmatic
     private boolean unitIntervalValidForThisKeyTable(final Unit unit) {
-        return unit.getInterval().contains(getBudget().getInterval());
+        return unit.getInterval().contains(getPartitioning().getInterval());
     }
 
     @Programmatic

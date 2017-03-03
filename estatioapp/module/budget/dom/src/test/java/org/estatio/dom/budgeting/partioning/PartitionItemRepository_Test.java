@@ -74,18 +74,24 @@ public class PartitionItemRepository_Test {
         };
     }
 
-    public static class FindByPartitionItem extends PartitionItemRepository_Test {
+    public static class FindByBudgetItem extends PartitionItemRepository_Test {
 
         @Test
         public void happyCase() {
 
-            BudgetItem budgetItem = new BudgetItem();
+            Charge charge = new Charge();
+            BudgetItem budgetItem = new BudgetItem(){
+                @Override
+                public Charge getCharge(){
+                    return charge;
+                }
+            };
             partitionItemRepository.findByBudgetItem(budgetItem);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
             assertThat(finderInteraction.getResultType()).isEqualTo(PartitionItem.class);
-            assertThat(finderInteraction.getQueryName()).isEqualTo("findByBudgetItem");
-            assertThat(finderInteraction.getArgumentsByParameterName().get("budgetItem")).isEqualTo((Object) budgetItem);
+            assertThat(finderInteraction.getQueryName()).isEqualTo("findByIncomingCharge");
+            assertThat(finderInteraction.getArgumentsByParameterName().get("incomingCharge")).isEqualTo((Object) budgetItem.getCharge());
             assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(1);
         }
 

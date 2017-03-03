@@ -51,6 +51,7 @@ import org.estatio.dom.UdoDomainObject2;
 import org.estatio.dom.apptenancy.WithApplicationTenancyProperty;
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
+import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.charge.Charge;
 
 import lombok.Getter;
@@ -119,6 +120,10 @@ public class Partitioning extends UdoDomainObject2<Partitioning>
     @Persistent(mappedBy = "partitioning")
     @Getter @Setter
     private SortedSet<PartitionItem> items = new TreeSet<>();
+
+    @Persistent(mappedBy = "partitioning")
+    @Getter @Setter
+    private SortedSet<KeyTable> keyTables = new TreeSet<>();
 
     @Override
     @PropertyLayout(hidden = Where.EVERYWHERE)

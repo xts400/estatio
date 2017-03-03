@@ -139,7 +139,7 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
         return result;
     }
 
-    private List<BudgetCalculation> findByBudgetItemAndUnitAndInvoiceChargeAndType(final BudgetItem budgetItem, final Unit unit, final Charge invoiceCharge, final BudgetCalculationType type) {
+    List<BudgetCalculation> findByBudgetItemAndUnitAndInvoiceChargeAndType(final BudgetItem budgetItem, final Unit unit, final Charge invoiceCharge, final BudgetCalculationType type) {
         return allMatches("findByBudgetItemAndUnitAndInvoiceChargeAndType", "budgetItem", budgetItem, "unit", unit, "invoiceCharge", invoiceCharge, "type", type);
     }
 
@@ -151,7 +151,7 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
         return result;
     }
 
-    private List<BudgetCalculation> findByBudgetItemAndUnitAndInvoiceChargeAndIncomingChargeAndType(final BudgetItem budgetItem, final Unit unit, final Charge invoiceCharge, final Charge incomingCharge, final BudgetCalculationType type) {
+    List<BudgetCalculation> findByBudgetItemAndUnitAndInvoiceChargeAndIncomingChargeAndType(final BudgetItem budgetItem, final Unit unit, final Charge invoiceCharge, final Charge incomingCharge, final BudgetCalculationType type) {
         return allMatches("findByBudgetItemAndUnitAndInvoiceChargeAndIncomingChargeAndType", "budgetItem", budgetItem, "unit", unit, "invoiceCharge", invoiceCharge, "incomingCharge", incomingCharge, "type", type);
     }
 

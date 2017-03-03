@@ -11,12 +11,13 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.asset.UnitRepository;
-import org.estatio.dom.budgeting.budget.Budget;
-import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
 import org.estatio.dom.budgeting.keyitem.KeyItemRepository;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableRepository;
+import org.estatio.dom.budgeting.partioning.Partitioning;
+import org.estatio.dom.budgeting.partioning.PartitioningRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
 import org.estatio.fixture.budget.BudgetsForOxf;
@@ -40,7 +41,7 @@ public class KeyItemRepository_IntegTest extends EstatioIntegrationTest {
     KeyTableRepository keyTableRepository;
 
     @Inject
-    BudgetRepository budgetRepository;
+    PartitioningRepository partitioningRepository;
 
     @Before
     public void setupData() {
@@ -59,9 +60,9 @@ public class KeyItemRepository_IntegTest extends EstatioIntegrationTest {
         public void happyCase() throws Exception {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Partitioning partitioning = partitioningRepository.findUnique(property, BudgetCalculationType.BUDGETED, BudgetsForOxf.BUDGET_2015_START_DATE);
             Unit unit = unitRepository.findByProperty(property).get(0);
-            KeyTable keyTable = keyTableRepository.findByBudget(budget).get(0);
+            KeyTable keyTable = keyTableRepository.findByPartioning(partitioning).get(0);
 
             // when
             final KeyItem item = keyItemRepository.findByKeyTableAndUnit(keyTable, unit);
@@ -69,7 +70,7 @@ public class KeyItemRepository_IntegTest extends EstatioIntegrationTest {
             // then
             assertThat(item.getUnit()).isEqualTo(unit);
             assertThat(item.getKeyTable()).isEqualTo(keyTable);
-            assertThat(item.getKeyTable().getBudget()).isEqualTo(budget);
+            assertThat(item.getKeyTable().getPartitioning()).isEqualTo(partitioning);
         }
 
     }

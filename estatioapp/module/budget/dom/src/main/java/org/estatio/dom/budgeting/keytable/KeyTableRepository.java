@@ -16,11 +16,19 @@
  */
 package org.estatio.dom.budgeting.keytable;
 
-import org.apache.isis.applib.annotation.*;
-import org.estatio.dom.UdoDomainRepositoryAndFactory;
-import org.estatio.dom.budgeting.budget.Budget;
-
 import java.util.List;
+
+import org.apache.isis.applib.annotation.Action;
+import org.apache.isis.applib.annotation.ActionLayout;
+import org.apache.isis.applib.annotation.DomainService;
+import org.apache.isis.applib.annotation.DomainServiceLayout;
+import org.apache.isis.applib.annotation.NatureOfService;
+import org.apache.isis.applib.annotation.Programmatic;
+import org.apache.isis.applib.annotation.SemanticsOf;
+import org.apache.isis.applib.annotation.Where;
+
+import org.estatio.dom.UdoDomainRepositoryAndFactory;
+import org.estatio.dom.budgeting.partioning.Partitioning;
 
 @DomainService(repositoryFor = KeyTable.class, nature = NatureOfService.DOMAIN)
 @DomainServiceLayout()
@@ -32,13 +40,13 @@ public class KeyTableRepository extends UdoDomainRepositoryAndFactory<KeyTable> 
 
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
     public KeyTable newKeyTable(
-            final Budget budget,
+            final Partitioning partitioning,
             final String name,
             final FoundationValueType foundationValueType,
             final KeyValueMethod keyValueMethod,
             final Integer numberOfDigits) {
         KeyTable keyTable = newTransientInstance();
-        keyTable.setBudget(budget);
+        keyTable.setPartitioning(partitioning);
         keyTable.setName(name);
         keyTable.setFoundationValueType(foundationValueType);
         keyTable.setKeyValueMethod(keyValueMethod);
@@ -49,13 +57,13 @@ public class KeyTableRepository extends UdoDomainRepositoryAndFactory<KeyTable> 
     }
 
     public String validateNewKeyTable(
-            final Budget budget,
+            final Partitioning partitioning,
             final String name,
             final FoundationValueType foundationValueType,
             final KeyValueMethod keyValueMethod,
             final Integer numberOfDigits) {
-        if (findByBudgetAndName(budget, name)!=null) {
-            return "There is already a keytable with this name for this budget";
+        if (findByPartitioningAndName(partitioning, name)!=null) {
+            return "There is already a keytable with this name for this partitioning";
         }
 
         return null;
@@ -63,17 +71,17 @@ public class KeyTableRepository extends UdoDomainRepositoryAndFactory<KeyTable> 
 
     @Programmatic
     public KeyTable findOrCreateBudgetKeyTable(
-            final Budget budget,
+            final Partitioning partitioning,
             final String name,
             final FoundationValueType foundationValueType,
             final KeyValueMethod keyValueMethod,
             final Integer precision
     ) {
-        final KeyTable keyTable = findByBudgetAndName(budget, name);
+        final KeyTable keyTable = findByPartitioningAndName(partitioning, name);
         if (keyTable !=null) {
             return keyTable;
         } else {
-            return newKeyTable(budget, name, foundationValueType, keyValueMethod, precision);
+            return newKeyTable(partitioning, name, foundationValueType, keyValueMethod, precision);
         }
     }
 
@@ -85,13 +93,13 @@ public class KeyTableRepository extends UdoDomainRepositoryAndFactory<KeyTable> 
 
 
     @Programmatic
-    public KeyTable findByBudgetAndName(final Budget budget, final String name) {
-        return uniqueMatch("findByBudgetAndName", "budget", budget, "name", name);
+    public KeyTable findByPartitioningAndName(final Partitioning partitioning, final String name) {
+        return uniqueMatch("findByPartitioningAndName", "partitioning", partitioning, "name", name);
     }
 
 
-    public List<KeyTable> findByBudget(Budget budget) {
-        return allMatches("findByBudget", "budget", budget);
+    public List<KeyTable> findByPartioning(Partitioning partitioning) {
+        return allMatches("findByPartioning", "partitioning", partitioning);
     }
 
 

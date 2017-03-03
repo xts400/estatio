@@ -54,8 +54,8 @@ public class PartitionItemsForBud extends PartitionItemAbstact {
         BudgetItem budgetItem3 = budgetItemRepository.findByBudgetAndCharge(budget, incomingCharge3);
         Charge invoiceCharge1 = chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE);
         Charge invoiceCharge2 = chargeRepository.findByReference(ChargeRefData.NL_SERVICE_CHARGE2);
-        KeyTable keyTable1 = keyTableRepository.findByBudgetAndName(budget, KeyTablesForBud.NAME_BY_AREA);
-        KeyTable keyTable2 = keyTableRepository.findByBudgetAndName(budget, KeyTablesForBud.NAME_BY_COUNT);
+        KeyTable keyTable1 = keyTableRepository.findByPartitioningAndName(budget.getPartitioningForBudgeting(), KeyTablesForBud.NAME_BY_AREA);
+        KeyTable keyTable2 = keyTableRepository.findByPartitioningAndName(budget.getPartitioningForBudgeting(), KeyTablesForBud.NAME_BY_COUNT);
         Partitioning partitioning = partitioningRepository.findUnique(property, BudgetCalculationType.BUDGETED, startDate);
 
         createPartitioningAndItem(partitioning, invoiceCharge1, keyTable1, budgetItem1.getCharge(), new BigDecimal(100), executionContext);

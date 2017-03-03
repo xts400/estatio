@@ -52,10 +52,11 @@ public class PartitionItemsForOxf extends PartitionItemAbstact {
         BudgetItem budgetItem1 = budget.getItems().first();
         BudgetItem budgetItem2 = budget.getItems().last();
         Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);
-        final List<KeyTable> keyTables = keyTableRepository.findByBudget(budget);
+        Partitioning partitioning = partitioningRepository.findUnique(property, BudgetCalculationType.BUDGETED, startDate);
+        final List<KeyTable> keyTables = keyTableRepository.findByPartioning(partitioning);
         KeyTable keyTable1 = keyTables.get(0);
         KeyTable keyTable2 = keyTables.get(1);
-        Partitioning partitioning = partitioningRepository.findUnique(property, BudgetCalculationType.BUDGETED, startDate);
+
 
         createPartitioningAndItem(partitioning, charge, keyTable1, budgetItem1.getCharge(), new BigDecimal(100), executionContext);
         createPartitioningAndItem(partitioning, charge, keyTable1, budgetItem2.getCharge(), new BigDecimal(80), executionContext);

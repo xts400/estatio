@@ -30,9 +30,9 @@ import org.apache.isis.applib.DomainObjectContainer;
 import org.apache.isis.applib.query.Query;
 import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 
-
 import org.incode.module.unittestsupport.dom.repo.FinderInteraction;
-import org.estatio.dom.budgeting.budget.Budget;
+
+import org.estatio.dom.budgeting.partioning.Partitioning;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -77,14 +77,14 @@ public class KeytableRepository_Test {
         @Test
         public void happyCase() {
 
-            Budget budget = new Budget();
+            Partitioning partitioning = new Partitioning();
             String name = "KeyTableName";
-            keyTableRepository.findByBudgetAndName(budget, name);
+            keyTableRepository.findByPartitioningAndName(partitioning, name);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.UNIQUE_MATCH);
             assertThat(finderInteraction.getResultType()).isEqualTo(KeyTable.class);
-            assertThat(finderInteraction.getQueryName()).isEqualTo("findByBudgetAndName");
-            assertThat(finderInteraction.getArgumentsByParameterName().get("budget")).isEqualTo((Object) budget);
+            assertThat(finderInteraction.getQueryName()).isEqualTo("findByPartitioningAndName");
+            assertThat(finderInteraction.getArgumentsByParameterName().get("partitioning")).isEqualTo((Object) partitioning);
             assertThat(finderInteraction.getArgumentsByParameterName().get("name")).isEqualTo((Object) name);
             assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(2);
         }
@@ -93,18 +93,18 @@ public class KeytableRepository_Test {
 
     }
 
-    public static class FindByBudget extends KeytableRepository_Test {
+    public static class FindByPartitioning extends KeytableRepository_Test {
 
         @Test
         public void happyCase() {
 
-            Budget budget = new Budget();
-            keyTableRepository.findByBudget(budget);
+            Partitioning partitioning = new Partitioning();
+            keyTableRepository.findByPartioning(partitioning);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
             assertThat(finderInteraction.getResultType()).isEqualTo(KeyTable.class);
-            assertThat(finderInteraction.getQueryName()).isEqualTo("findByBudget");
-            assertThat(finderInteraction.getArgumentsByParameterName().get("budget")).isEqualTo((Object) budget);
+            assertThat(finderInteraction.getQueryName()).isEqualTo("findByPartioning");
+            assertThat(finderInteraction.getArgumentsByParameterName().get("partitioning")).isEqualTo((Object) partitioning);
             assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(1);
         }
 
@@ -127,7 +127,7 @@ public class KeytableRepository_Test {
         public void setup() {
             keyTableRepositoryRepo = new KeyTableRepository() {
                 @Override
-                public List<KeyTable> findByBudget(final Budget budget) {
+                public List<KeyTable> findByPartioning(final Partitioning partitioning) {
                     return Arrays.asList(new KeyTable());
                 }
             };
@@ -138,7 +138,7 @@ public class KeytableRepository_Test {
         public void newKeyTable() {
 
             //given
-            Budget budget = new Budget();
+            Partitioning partitioning = new Partitioning();
             final KeyTable keyTable = new KeyTable();
 
             // expect
@@ -153,14 +153,14 @@ public class KeytableRepository_Test {
 
             //when
             KeyTable newKeyTable = keyTableRepositoryRepo.newKeyTable(
-                    budget,
+                    partitioning,
                     "new keyTable",
                     FoundationValueType.AREA,
                     KeyValueMethod.PERCENT,
                     6);
 
             //then
-            assertThat(newKeyTable.getBudget()).isEqualTo(budget);
+            assertThat(newKeyTable.getPartitioning()).isEqualTo(partitioning);
             assertThat(newKeyTable.getName()).isEqualTo("new keyTable");
             assertThat(newKeyTable.getFoundationValueType()).isEqualTo(FoundationValueType.AREA);
             assertThat(newKeyTable.getKeyValueMethod()).isEqualTo(KeyValueMethod.PERCENT);

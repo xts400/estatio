@@ -22,23 +22,23 @@ import javax.inject.Inject;
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.keytable.FoundationValueType;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableRepository;
 import org.estatio.dom.budgeting.keytable.KeyValueMethod;
+import org.estatio.dom.budgeting.partioning.Partitioning;
 
 public abstract class KeyTableAbstact extends FixtureScript {
 
     protected KeyTable createKeyTable(
-            final Budget budget,
+            final Partitioning partitioning,
             final String name,
             final FoundationValueType foundationValueType,
             final KeyValueMethod keyValueMethod,
             final Integer numberOfDigits,
             final ExecutionContext fixtureResults){
-        KeyTable keyTable = keyTableRepository.newKeyTable(budget, name, foundationValueType, keyValueMethod, numberOfDigits);
+        KeyTable keyTable = keyTableRepository.newKeyTable(partitioning, name, foundationValueType, keyValueMethod, numberOfDigits);
         keyTable.generateItems();
         return fixtureResults.addResult(this, keyTable);
     }

@@ -60,12 +60,12 @@ public class KeyItemImportExportLineItem
 
     public KeyItemImportExportLineItem(final KeyItem keyItem) {
         this.keyItem = keyItem;
-        this.propertyReference = keyItem.getKeyTable().getBudget().getProperty().getReference();
+        this.propertyReference = keyItem.getKeyTable().getPartitioning().getProperty().getReference();
         this.unitReference = keyItem.getUnit().getReference();
         this.sourceValue = keyItem.getSourceValue();
         this.keyValue = keyItem.getValue();
         this.keyTableName = keyItem.getKeyTable().getName();
-        this.startDate = keyItem.getKeyTable().getBudget().getStartDate();
+        this.startDate = keyItem.getKeyTable().getPartitioning().getStartDate();
     }
 
     public KeyItemImportExportLineItem(final KeyItemImportExportLineItem item) {
@@ -191,7 +191,7 @@ public class KeyItemImportExportLineItem
     public KeyTable getKeyTable() {
         if (keyTable == null) {
             Budget budget = budgetRepository.findByPropertyAndStartDate(getProperty(),getStartDate());
-            keyTable = keyTableRepository.findByBudgetAndName(budget, getKeyTableName());
+            keyTable = keyTableRepository.findByPartitioningAndName(budget.getPartitioningForBudgeting(), getKeyTableName());
         }
         return keyTable;
     }

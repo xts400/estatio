@@ -84,7 +84,7 @@ public class KeyTableIntegration_IntegTest extends EstatioIntegrationTest {
             //given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
-            keyTable = keyTableRepository.findByBudgetAndName(budget, KeyTablesForOxf.NAME_BY_AREA);
+            keyTable = keyTableRepository.findByPartitioningAndName(budget.getPartitioningForBudgeting(), KeyTablesForOxf.NAME_BY_AREA);
             assertThat(keyTable.getName()).isEqualTo(KeyTablesForOxf.NAME_BY_AREA);
             assertThat(keyTable.getFoundationValueType()).isEqualTo(KeyTablesForOxf.BUDGET_FOUNDATION_VALUE_TYPE);
             assertThat(keyTable.getKeyValueMethod()).isEqualTo(KeyTablesForOxf.BUDGET_KEY_VALUE_METHOD);
@@ -115,7 +115,7 @@ public class KeyTableIntegration_IntegTest extends EstatioIntegrationTest {
             //given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
-            keyTableByArea = keyTableRepository.findByBudgetAndName(budget, KeyTablesForOxf.NAME_BY_AREA);
+            keyTableByArea = keyTableRepository.findByPartitioningAndName(budget.getPartitioningForBudgeting(), KeyTablesForOxf.NAME_BY_AREA);
 
             //when
             wrap(keyTableByArea).generateItems();
@@ -133,7 +133,7 @@ public class KeyTableIntegration_IntegTest extends EstatioIntegrationTest {
             //given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
-            keyTableByArea = keyTableRepository.findByBudgetAndName(budget, KeyTablesForOxf.NAME_BY_AREA);
+            keyTableByArea = keyTableRepository.findByPartitioningAndName(budget.getPartitioningForBudgeting(), KeyTablesForOxf.NAME_BY_AREA);
             unitWithAreaNull = unitRepository.findUnitByReference("OXF-001");
             unitWithAreaNull.setArea(null);
 
@@ -159,7 +159,7 @@ public class KeyTableIntegration_IntegTest extends EstatioIntegrationTest {
             //given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
-            keyTableByArea = keyTableRepository.findByBudgetAndName(budget, KeyTablesForOxf.NAME_BY_AREA);
+            keyTableByArea = keyTableRepository.findByPartitioningAndName(budget.getPartitioningForBudgeting(), KeyTablesForOxf.NAME_BY_AREA);
 
             //when
             unitNotIncludedWithEndDateOnly = unitRepository.findUnitByReference("OXF-001");

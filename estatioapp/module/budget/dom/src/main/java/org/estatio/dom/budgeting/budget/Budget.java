@@ -137,10 +137,6 @@ public class Budget extends UdoDomainObject2<Budget>
     @Getter @Setter
     private SortedSet<BudgetItem> items = new TreeSet<>();
 
-    @Persistent(mappedBy = "budget", dependentElement = "true")
-    @Getter @Setter
-    private SortedSet<KeyTable> keyTables = new TreeSet<>();
-
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
     @ActionLayout(contributed = Contributed.AS_ACTION)
     @MemberOrder(name = "items", sequence = "1")
@@ -177,14 +173,14 @@ public class Budget extends UdoDomainObject2<Budget>
             final String name,
             final FoundationValueType foundationValueType,
             final KeyValueMethod keyValueMethod) {
-        return keyTableRepository.newKeyTable(this, name, foundationValueType, keyValueMethod, 6);
+        return keyTableRepository.newKeyTable(getPartitioningForBudgeting(), name, foundationValueType, keyValueMethod, 6);
     }
 
     public String validateCreateKeyTable(
             final String name,
             final FoundationValueType foundationValueType,
             final KeyValueMethod keyValueMethod) {
-        return keyTableRepository.validateNewKeyTable(this, name, foundationValueType, keyValueMethod, 6);
+        return keyTableRepository.validateNewKeyTable(getPartitioningForBudgeting(), name, foundationValueType, keyValueMethod, 6);
     }
 
 //    public Budget createNextBudget() {

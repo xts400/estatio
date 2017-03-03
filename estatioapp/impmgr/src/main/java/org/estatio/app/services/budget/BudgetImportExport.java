@@ -132,7 +132,7 @@ public class BudgetImportExport implements Importable {
     }
 
     private KeyTable findOrCreateKeyTable(final Budget budget, final String keyTableName, final String foundationValueType, final String keyValueMethod){
-       return keyTableRepository.findOrCreateBudgetKeyTable(budget, keyTableName, FoundationValueType.valueOf(foundationValueType), KeyValueMethod.valueOf(keyValueMethod), 6);
+       return keyTableRepository.findOrCreateBudgetKeyTable(budget.getPartitioningForBudgeting(), keyTableName, FoundationValueType.valueOf(foundationValueType), KeyValueMethod.valueOf(keyValueMethod), 6);
     }
 
     @Inject

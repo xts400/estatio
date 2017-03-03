@@ -139,7 +139,7 @@ ServiceChargeBudgetScenario_IntegTest extends EstatioIntegrationTest {
             property = propertyRepository.findPropertyByReference(PropertyForBudNl.REF);
             budget = budgetRepository.findByPropertyAndStartDate(property, BudgetForBud.BUDGET_2015_START_DATE);
             //**IMPORTANT!** truncate keytable
-            KeyTable key2 = budget.getKeyTables().last();
+            KeyTable key2 = budget.getPartitioningForBudgeting().getKeyTables().last();
             key2.getItems().last().deleteBudgetKeyItem();
 
             leasePoison = leaseRepository.findLeaseByReference(LeasesForBudNl.REF1);

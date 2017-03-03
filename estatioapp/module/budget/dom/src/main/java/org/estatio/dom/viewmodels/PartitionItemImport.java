@@ -107,14 +107,16 @@ public class PartitionItemImport implements ExcelFixtureRowHandler, Importable {
         if (property == null)
             throw new ApplicationException(String.format("Property with reference [%s] not found.", propertyReference));
         final Budget budget = budgetRepository.findOrCreateBudget(property, startDate, endDate);
-        final KeyTable keyTable = keyTableRepository.findOrCreateBudgetKeyTable(budget, keyTableName, FoundationValueType.MANUAL, KeyValueMethod.PERCENT, 6);
-        findOrCreateBudgetKeyItem(keyTable, unitRepository.findUnitByReference(unitReference), keyValue, sourceValue);
+
 
         final Charge charge = fetchCharge(budgetChargeReference);
         final BudgetItem butgetItem = findOrCreateBudgetItem(budget, charge, budgetValue);
         final Charge scheduleCharge = fetchCharge(invoiceChargeReference);
 
         final Partitioning partitioning = findOrCreatePartitioning(budget);
+        final KeyTable keyTable = keyTableRepository.findOrCreateBudgetKeyTable(partitioning, keyTableName, FoundationValueType.MANUAL, KeyValueMethod.PERCENT, 6);
+        findOrCreateBudgetKeyItem(keyTable, unitRepository.findUnitByReference(unitReference), keyValue, sourceValue);
+
         findOrCreatePartitionItem(partitioning, scheduleCharge, butgetItem, keyTable, percentage);
 
         return Lists.newArrayList();

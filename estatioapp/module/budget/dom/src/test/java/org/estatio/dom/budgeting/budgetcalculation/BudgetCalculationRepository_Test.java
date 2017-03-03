@@ -156,20 +156,20 @@ public class BudgetCalculationRepository_Test {
 
     }
 
-    public static class FindByBudgetAndInvoiceChargeAndType extends BudgetCalculationRepository_Test {
+    public static class FindByBudgetItemAndInvoiceChargeAndType extends BudgetCalculationRepository_Test {
 
         @Test
         public void happyCase() {
 
-            Budget budget = new Budget();
+            BudgetItem budgetItem = new BudgetItem();
             Charge invoiceCharge = new Charge();
             Unit unit = new Unit();
-            budgetCalculationRepository.findByBudgetAndUnitAndInvoiceChargeAndType(budget, unit, invoiceCharge, BudgetCalculationType.BUDGETED);
+            budgetCalculationRepository.findByBudgetItemAndUnitAndInvoiceChargeAndType(budgetItem, unit, invoiceCharge, BudgetCalculationType.BUDGETED);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.ALL_MATCHES);
             assertThat(finderInteraction.getResultType()).isEqualTo(BudgetCalculation.class);
             assertThat(finderInteraction.getQueryName()).isEqualTo("findByBudgetItemAndUnitAndInvoiceChargeAndType");
-            assertThat(finderInteraction.getArgumentsByParameterName().get("budget")).isEqualTo((Object) budget);
+            assertThat(finderInteraction.getArgumentsByParameterName().get("budgetItem")).isEqualTo((Object) budgetItem);
             assertThat(finderInteraction.getArgumentsByParameterName().get("unit")).isEqualTo((Object) unit);
             assertThat(finderInteraction.getArgumentsByParameterName().get("invoiceCharge")).isEqualTo((Object) invoiceCharge);
             assertThat(finderInteraction.getArgumentsByParameterName().get("type")).isEqualTo((Object) BudgetCalculationType.BUDGETED);
