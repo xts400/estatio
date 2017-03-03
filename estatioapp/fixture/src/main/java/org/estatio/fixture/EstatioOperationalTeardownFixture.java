@@ -126,11 +126,11 @@ public class EstatioOperationalTeardownFixture extends TeardownFixtureAbstract {
         deleteFrom(BudgetOverride.class);
         deleteFrom(BudgetCalculation.class);
         deleteFrom(PartitionItem.class);
+        deleteFrom(KeyItem.class);
+        deleteFrom(KeyTable.class);
         deleteFrom(Partitioning.class);
         deleteFrom(BudgetItemValue.class);
         deleteFrom(BudgetItem.class);
-        deleteFrom(KeyItem.class);
-        deleteFrom(KeyTable.class);
         deleteFrom(Budget.class);
 
         deleteFrom(PaperclipForInvoice.class);
