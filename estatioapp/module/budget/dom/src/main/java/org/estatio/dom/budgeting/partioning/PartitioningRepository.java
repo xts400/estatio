@@ -60,6 +60,7 @@ public class PartitioningRepository extends UdoDomainRepositoryAndFactory<Partit
         if (findUnique(property, type, startDate)!=null){
             return "This partitioning already exists";
         }
+        // TODO !! Not valid anymore
         if (type == BudgetCalculationType.BUDGETED && findByPropertyAndType(property, BudgetCalculationType.BUDGETED).size() > 0){
             return "Only one partitioning of type BUDGETED is supported";
         }

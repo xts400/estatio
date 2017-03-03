@@ -20,9 +20,10 @@ package org.estatio.fixture.budget;
 import org.joda.time.LocalDate;
 
 import org.estatio.dom.asset.Property;
-import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.keytable.FoundationValueType;
 import org.estatio.dom.budgeting.keytable.KeyValueMethod;
+import org.estatio.dom.budgeting.partioning.Partitioning;
 import org.estatio.fixture.asset.PropertyForOxfGb;
 
 public class KeyTablesForOxf extends KeyTableAbstact {
@@ -39,14 +40,14 @@ public class KeyTablesForOxf extends KeyTableAbstact {
     protected void execute(ExecutionContext executionContext) {
 
         // prereqs
-        executionContext.executeChild(this, new PropertyForOxfGb());
         executionContext.executeChild(this, new BudgetsForOxf());
+        executionContext.executeChild(this, new PartitioningForOxf());
 
         // exec
         Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-        Budget budget = budgetRepository.findByPropertyAndStartDate(property, START_DATE);
+        Partitioning partitioning = partitioningRepository.findUnique(property, BudgetCalculationType.BUDGETED, BudgetsForOxf.BUDGET_2015_START_DATE);
 
-        createKeyTable(budget.getPartitioningForBudgeting(), NAME_BY_AREA, BUDGET_FOUNDATION_VALUE_TYPE, BUDGET_KEY_VALUE_METHOD, NUMBER_OF_DIGITS, executionContext);
-        createKeyTable(budget.getPartitioningForBudgeting(), NAME_BY_COUNT, BUDGET_FOUNDATION_VALUE_TYPE2, BUDGET_KEY_VALUE_METHOD, NUMBER_OF_DIGITS, executionContext);
+        createKeyTable(partitioning, NAME_BY_AREA, BUDGET_FOUNDATION_VALUE_TYPE, BUDGET_KEY_VALUE_METHOD, NUMBER_OF_DIGITS, executionContext);
+        createKeyTable(partitioning, NAME_BY_COUNT, BUDGET_FOUNDATION_VALUE_TYPE2, BUDGET_KEY_VALUE_METHOD, NUMBER_OF_DIGITS, executionContext);
     }
 }

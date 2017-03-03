@@ -21,10 +21,12 @@ import java.math.BigDecimal;
 
 import javax.inject.Inject;
 
+import org.joda.time.LocalDate;
+
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
+import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemRepository;
@@ -39,8 +41,13 @@ import org.estatio.dom.charge.ChargeRepository;
 
 public abstract class PartitionItemAbstact extends FixtureScript {
 
-    protected Partitioning createPartitioning(final Budget budget, final ExecutionContext executionContext){
-        Partitioning partitioning = partitioningRepository.newPartitioning(budget.getProperty(), budget.getStartDate(), budget.getEndDate(), BudgetCalculationType.BUDGETED);
+    protected Partitioning createPartitioning(
+            final Property property,
+            final LocalDate startDate,
+            final LocalDate endDate,
+            final BudgetCalculationType type,
+            final ExecutionContext executionContext){
+        Partitioning partitioning = partitioningRepository.newPartitioning(property, startDate, endDate, type);
         return executionContext.addResult(this, partitioning);
     }
 
@@ -52,7 +59,7 @@ public abstract class PartitionItemAbstact extends FixtureScript {
             final BigDecimal percentage,
             final ExecutionContext fixtureResults
     ){
-        PartitionItem partitionItem = partitionItemRepository.newPartitionItem(partitioning, invoiceCharge,keyTable, incomingCharge, percentage);
+        PartitionItem partitionItem = partitionItemRepository.newPartitionItem(partitioning, invoiceCharge, keyTable, incomingCharge, percentage);
         return fixtureResults.addResult(this, partitionItem);
     }
 

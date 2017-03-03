@@ -182,6 +182,7 @@ public class BudgetItem extends UdoDomainObject2<BudgetItem>
     @Inject
     private PartitionItemRepository partitionItemRepository;
 
+    @Inject
     private BudgetItemValueRepository budgetItemValueRepository;
 
 }

@@ -343,13 +343,14 @@ public class KeyTable extends UdoDomainObject2<Budget> implements WithApplicatio
         return unit.getInterval().contains(getPartitioning().getInterval());
     }
 
-    @Programmatic
-    public void createCopyOn(final Budget newBudget) {
-        KeyTable copiedTable = newBudget.createKeyTable(getName(), getFoundationValueType(), getKeyValueMethod());
-        for (KeyItem item : getItems()){
-            copiedTable.newItem(item.getUnit(), item.getSourceValue(), item.getValue());
-        }
-    }
+    // TODO !!
+//    @Programmatic
+//    public void createCopyOn(final Budget newBudget) {
+//        KeyTable copiedTable = newBudget.createKeyTable(getName(), getFoundationValueType(), getKeyValueMethod());
+//        for (KeyItem item : getItems()){
+//            copiedTable.newItem(item.getUnit(), item.getSourceValue(), item.getValue());
+//        }
+//    }
 
     // //////////////////////////////////////
 

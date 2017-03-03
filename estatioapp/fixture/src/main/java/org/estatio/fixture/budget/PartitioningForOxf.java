@@ -21,6 +21,7 @@ import org.joda.time.LocalDate;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
 
@@ -38,7 +39,7 @@ public class PartitioningForOxf extends PartitionItemAbstact {
         LocalDate startDate = new LocalDate(2015, 01, 01);
         Budget budget = budgetRepository.findByPropertyAndStartDate(property, startDate);
 
-        createPartitioning(budget, executionContext);
+        createPartitioning(budget.getProperty(), budget.getStartDate(), budget.getEndDate(), BudgetCalculationType.BUDGETED, executionContext);
 
     }
 
