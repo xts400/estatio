@@ -70,7 +70,11 @@ public class BudgetCalculationRepository extends UdoDomainRepositoryAndFactory<B
     }
 
     public List<BudgetCalculation> findByBudgetAndStatus(Budget budget, Status status) {
-        return allMatches("findByBudgetAndStatus", "budget", budget, "status", status);
+        List<BudgetCalculation> result = new ArrayList<>();
+        for (BudgetItem item : budget.getItems()){
+            result.addAll(allMatches("findByBudgetItemAndStatus", "budgetItem", item, "status", status));
+        }
+        return result;
     }
 
     public List<BudgetCalculation> findByPartitionItemAndCalculationType(PartitionItem partitionItem, BudgetCalculationType calculationType) {
