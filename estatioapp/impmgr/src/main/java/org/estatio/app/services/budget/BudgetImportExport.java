@@ -19,6 +19,7 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemRepository;
 import org.estatio.dom.budgeting.keytable.FoundationValueType;
@@ -109,7 +110,7 @@ public class BudgetImportExport implements Importable {
         if (property == null) throw  new ApplicationException(String.format("Property with reference [%s] not found.", getPropertyReference()));
         Charge sourceCharge = fetchCharge(getBudgetChargeReference());
         Charge targetCharge = fetchCharge(getInvoiceChargeReference());
-        Budget budget = budgetRepository.findOrCreateBudget(property, getBudgetStartDate(), getBudgetEndDate());
+        Budget budget = budgetRepository.findOrCreateBudget(property, BudgetType.SERVICE_CHARGE, getBudgetStartDate(), getBudgetEndDate());
         KeyTable keyTable = findOrCreateKeyTable(budget, getKeyTableName(), getFoundationValueType(), getKeyValueMethod());
         PartitionItem partitionItem =
                 budget

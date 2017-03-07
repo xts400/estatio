@@ -13,6 +13,7 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
@@ -51,7 +52,7 @@ public class KeyTableRepository_IntegTest extends EstatioIntegrationTest {
         public void happyCase() throws Exception {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
 
             // when
             final KeyTable keyTable = keyTableRepository.findByBudgetAndName(budget, KeyTablesForOxf.NAME_BY_AREA);
@@ -69,7 +70,7 @@ public class KeyTableRepository_IntegTest extends EstatioIntegrationTest {
         public void happyCase() throws Exception {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
 
             // when
             final List<KeyTable> keyTables = keyTableRepository.findByBudget(budget);

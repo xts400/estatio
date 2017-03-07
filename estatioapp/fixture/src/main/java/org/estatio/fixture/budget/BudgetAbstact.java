@@ -29,6 +29,7 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemRepository;
@@ -43,10 +44,11 @@ public abstract class BudgetAbstact extends FixtureScript {
 
     protected Budget createBudget(
             final Property property,
+            final BudgetType budgetType,
             final LocalDate startDate,
             final LocalDate endDate,
             final ExecutionContext fixtureResults){
-        Budget budget = budgetRepository.newBudget(property, startDate, endDate);
+        Budget budget = budgetRepository.newBudget(property, budgetType, startDate, endDate);
         return fixtureResults.addResult(this, budget);
     }
 

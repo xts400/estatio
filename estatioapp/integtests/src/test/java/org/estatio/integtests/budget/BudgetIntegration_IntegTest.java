@@ -18,6 +18,7 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
@@ -85,7 +86,7 @@ public class BudgetIntegration_IntegTest extends EstatioIntegrationTest {
         public void setUp() throws Exception {
             propertyBud = propertyRepository.findPropertyByReference(PropertyForBudNl.REF);
             budgetsForBud = budgetRepository.findByProperty(propertyBud);
-            budget2015 = budgetRepository.findByPropertyAndStartDate(propertyBud, BudgetForBud.BUDGET_2015_START_DATE);
+            budget2015 = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(propertyBud, BudgetType.SERVICE_CHARGE, BudgetForBud.BUDGET_2015_START_DATE);
         }
 
         @Test
@@ -148,7 +149,7 @@ public class BudgetIntegration_IntegTest extends EstatioIntegrationTest {
         public void setUp() throws Exception {
             propertyOxf = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             budgetsForOxf = budgetRepository.findByProperty(propertyOxf);
-            budget2015 = budgetRepository.findByPropertyAndStartDate(propertyOxf, BudgetsForOxf.BUDGET_2015_START_DATE);
+            budget2015 = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(propertyOxf, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
         }
 
         @Rule

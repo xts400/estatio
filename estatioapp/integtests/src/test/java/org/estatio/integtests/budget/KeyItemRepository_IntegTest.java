@@ -13,6 +13,7 @@ import org.estatio.dom.asset.Unit;
 import org.estatio.dom.asset.UnitRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
 import org.estatio.dom.budgeting.keyitem.KeyItemRepository;
 import org.estatio.dom.budgeting.keytable.KeyTable;
@@ -59,7 +60,7 @@ public class KeyItemRepository_IntegTest extends EstatioIntegrationTest {
         public void happyCase() throws Exception {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             Unit unit = unitRepository.findByProperty(property).get(0);
             KeyTable keyTable = keyTableRepository.findByBudget(budget).get(0);
 

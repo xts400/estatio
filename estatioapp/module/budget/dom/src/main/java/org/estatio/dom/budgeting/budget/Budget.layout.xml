@@ -20,6 +20,7 @@
                         <col span="12">
                             <ns2:fieldSet name="Budget" id="budget" unreferencedProperties="true">
                                 <ns2:property id="property"/>
+                                <ns2:property id="budgetType"/>
                                 <ns2:property id="budgetYear"/>
                                 <ns2:property id="startDate"/>
                                 <ns2:property id="endDate" />

@@ -12,20 +12,21 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
-import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
-import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.keytable.KeyTableRepository;
+import org.estatio.dom.budgeting.partioning.PartitionItem;
+import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.budgeting.partioning.Partitioning;
 import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
-import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.budget.BudgetsForOxf;
+import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.charge.ChargeRefData;
 import org.estatio.integtests.EstatioIntegrationTest;
 
@@ -66,7 +67,7 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
 
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             PartitionItem partitionItem = budget.getItems().first().getPartitionItems().get(0);
 
             //when, then
@@ -89,7 +90,7 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
         public void happyCase() throws Exception {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             BudgetItem budgetItem = budget.getItems().last();
             // when
             final List<PartitionItem> partitionItemList = partitionItemRepository.findByBudgetItem(budgetItem);
@@ -106,7 +107,7 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
         public void happyCase() throws Exception {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             KeyTable keyTable = keytablesRepository.findByBudget(budget).get(0);
             // when
             final List<PartitionItem> partitionItemList = partitionItemRepository.findByKeyTable(keyTable);
@@ -124,7 +125,7 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
 
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             BudgetItem budgetItem = budget.getItems().first();
             KeyTable keyTable = keytablesRepository.findByBudget(budget).get(0);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);
@@ -150,7 +151,7 @@ public class PartitionItemRepository_IntegTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
 
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             BudgetItem budgetItem = budget.getItems().first();
             KeyTable keyTable = keytablesRepository.findByBudget(budget).get(0);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);

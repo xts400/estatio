@@ -37,16 +37,18 @@ public class Property_newBudgetContribution {
     @MemberOrder(name = "budgets", sequence = "1")
     public Budget newBudget(
             final Property property,
+            final BudgetType budgetType,
             final int year) {
-        Budget budget = budgetRepository.newBudget(property, new LocalDate(year, 01, 01), new LocalDate(year, 12, 31));
+        Budget budget = budgetRepository.newBudget(property, budgetType, new LocalDate(year, 01, 01), new LocalDate(year, 12, 31));
         budget.findOrCreatePartitioningForBudgeting();
         return budget;
     }
 
     public String validateNewBudget(
             final Property property,
+            final BudgetType budgetType,
             final int year) {
-        return budgetRepository.validateNewBudget(property, year);
+        return budgetRepository.validateNewBudget(property, budgetType, year);
     }
 
     @Inject

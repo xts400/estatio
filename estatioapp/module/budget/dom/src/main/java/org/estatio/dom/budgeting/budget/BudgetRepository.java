@@ -29,9 +29,10 @@ import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.SemanticsOf;
 
+import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+
 import org.estatio.dom.UdoDomainRepositoryAndFactory;
 import org.estatio.dom.asset.Property;
-import org.incode.module.base.dom.valuetypes.LocalDateInterval;
 
 @DomainService(repositoryFor = Budget.class, nature = NatureOfService.DOMAIN)
 @DomainServiceLayout()
@@ -46,10 +47,12 @@ public class BudgetRepository extends UdoDomainRepositoryAndFactory<Budget> {
     @Action(semantics = SemanticsOf.NON_IDEMPOTENT)
     public Budget newBudget(
             final Property property,
+            final BudgetType budgetType,
             final LocalDate startDate,
             final LocalDate endDate) {
         Budget budget = newTransientInstance();
         budget.setProperty(property);
+        budget.setBudgetType(budgetType);
         budget.setStartDate(startDate);
         budget.setEndDate(endDate);
         persistIfNotAlready(budget);
@@ -59,6 +62,7 @@ public class BudgetRepository extends UdoDomainRepositoryAndFactory<Budget> {
 
     public String validateNewBudget(
             final Property property,
+            final BudgetType budgetType,
             final LocalDate startDate,
             final LocalDate endDate) {
 
@@ -75,8 +79,8 @@ public class BudgetRepository extends UdoDomainRepositoryAndFactory<Budget> {
         }
 
         for (Budget budget : this.findByProperty(property)) {
-            if (budget.getInterval().overlaps(new LocalDateInterval(startDate, endDate))) {
-                return "A budget cannot overlap an existing budget.";
+            if (budget.getBudgetType()==budgetType && budget.getInterval().overlaps(new LocalDateInterval(startDate, endDate))) {
+                return "A budget cannot overlap an existing budget of the same type";
             }
         }
 
@@ -86,23 +90,25 @@ public class BudgetRepository extends UdoDomainRepositoryAndFactory<Budget> {
     @Programmatic
     public String validateNewBudget(
             final Property property,
+            final BudgetType budgetType,
             final int year) {
         if (year < 2000 || year > 3000){
             return "This is not a valid year";
         }
-        return validateNewBudget(property, new LocalDate(year, 01, 01), new LocalDate(year, 12, 31));
+        return validateNewBudget(property, budgetType, new LocalDate(year, 01, 01), new LocalDate(year, 12, 31));
     }
 
     @Programmatic
     public Budget findOrCreateBudget(
             final Property property,
+            final BudgetType budgetType,
             final LocalDate startDate,
             final LocalDate endDate) {
 
-        if (findByPropertyAndStartDate(property, startDate)!= null){
-            return findByPropertyAndStartDate(property, startDate);
+        if (findByPropertyAndBudgetTypeAndStartDate(property, budgetType, startDate)!= null){
+            return findByPropertyAndBudgetTypeAndStartDate(property, budgetType, startDate);
         } else {
-            return newBudget(property,startDate,endDate);
+            return newBudget(property, budgetType, startDate, endDate);
         }
     }
 
@@ -134,7 +140,7 @@ public class BudgetRepository extends UdoDomainRepositoryAndFactory<Budget> {
     }
 
     @Programmatic
-    public Budget findByPropertyAndStartDate(Property property, LocalDate startDate){
-        return uniqueMatch("findByPropertyAndStartDate", "property", property, "startDate", startDate);
+    public Budget findByPropertyAndBudgetTypeAndStartDate(Property property, final BudgetType budgetType, LocalDate startDate){
+        return uniqueMatch("findByPropertyAndBudgetTypeAndStartDate", "property", property, "budgetType", budgetType, "startDate", startDate);
     }
 }

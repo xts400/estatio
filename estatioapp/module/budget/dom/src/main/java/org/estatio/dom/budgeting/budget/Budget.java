@@ -96,12 +96,12 @@ import lombok.Setter;
                         "WHERE property == :property " +
                         "ORDER BY startDate DESC"),
         @Query(
-                name = "findByPropertyAndStartDate", language = "JDOQL",
+                name = "findByPropertyAndBudgetTypeAndStartDate", language = "JDOQL",
                 value = "SELECT " +
                         "FROM org.estatio.dom.budgeting.budget.Budget " +
-                        "WHERE property == :property && startDate == :startDate")
+                        "WHERE property == :property && budgetType == :budgetType && startDate == :startDate")
 })
-@Unique(name = "Budget_property_startDate_UNQ", members = { "property", "startDate" })
+@Unique(name = "Budget_property_budgetType_startDate_UNQ", members = { "property", "budgetType", "startDate" })
 @DomainObject(
         objectType = "org.estatio.dom.budgeting.budget.Budget"
 )
@@ -124,6 +124,10 @@ public class Budget extends UdoDomainObject2<Budget>
     @PropertyLayout(hidden = Where.PARENTED_TABLES)
     @Getter @Setter
     private Property property;
+
+    @Column(allowsNull = "false")
+    @Getter @Setter
+    private BudgetType budgetType;
 
     @Column(allowsNull = "true") // done because of inherited implementation WithStartDate
     @Getter @Setter
@@ -196,13 +200,13 @@ public class Budget extends UdoDomainObject2<Budget>
     public Budget createNextBudget() {
         LocalDate start = new LocalDate(getBudgetYear()+1, 01, 01);
         LocalDate end = new LocalDate(getBudgetYear()+1, 12, 31);
-        Budget newBudget = budgetRepository.newBudget(getProperty(),start, end);
+        Budget newBudget = budgetRepository.newBudget(getProperty(), getBudgetType(), start, end);
         newBudget.findOrCreatePartitioningForBudgeting();
         return copyCurrentTo(newBudget);
     }
 
     public String validateCreateNextBudget() {
-        if (budgetRepository.findByPropertyAndStartDate(getProperty(), new LocalDate(getBudgetYear()+1, 01, 01)) != null){
+        if (budgetRepository.findByPropertyAndBudgetTypeAndStartDate(getProperty(), getBudgetType(), new LocalDate(getBudgetYear()+1, 01, 01)) != null){
             return "This budget already exists";
         }
         return null;

@@ -24,6 +24,7 @@ import org.joda.time.LocalDate;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.partioning.Partitioning;
@@ -47,7 +48,7 @@ public class PartitionItemsForOxf extends PartitionItemAbstact {
         // exec
         Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
         LocalDate startDate = new LocalDate(2015, 01, 01);
-        Budget budget = budgetRepository.findByPropertyAndStartDate(property, startDate);
+        Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, startDate);
         BudgetItem budgetItem1 = budget.getItems().first();
         BudgetItem budgetItem2 = budget.getItems().last();
         Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);

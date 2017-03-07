@@ -17,11 +17,12 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.charge.Charge;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
-import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.budget.BudgetsForOxf;
+import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.charge.ChargeRefData;
 import org.estatio.integtests.EstatioIntegrationTest;
 
@@ -71,14 +72,14 @@ public class BudgetRepository_IntegTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             // when
-            final Budget budget = budgetRepository.findByPropertyAndStartDate(property, new LocalDate(2015, 01, 01));
+            final Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, new LocalDate(2015, 01, 01));
             // then
             assertThat(budget.getProperty()).isEqualTo(property);
             assertThat(budget.getStartDate()).isEqualTo(new LocalDate(2015, 01, 01));
             assertThat(budget.getEndDate()).isEqualTo(new LocalDate(2015, 12, 31));
 
             // and when
-            final Budget budgetNotToBeFound = budgetRepository.findByPropertyAndStartDate(property, new LocalDate(2015, 01, 02));
+            final Budget budgetNotToBeFound = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, new LocalDate(2015, 01, 02));
             //then
             assertThat(budgetNotToBeFound).isEqualTo(null);
         }
@@ -92,14 +93,14 @@ public class BudgetRepository_IntegTest extends EstatioIntegrationTest {
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
 
             // when (case existing budget found)
-            final Budget budget = budgetRepository.findOrCreateBudget(property, new LocalDate(2015, 01, 01), new LocalDate(2015, 12, 31));
+            final Budget budget = budgetRepository.findOrCreateBudget(property, BudgetType.SERVICE_CHARGE, new LocalDate(2015, 01, 01), new LocalDate(2015, 12, 31));
             // then
             assertThat(budget.getProperty()).isEqualTo(property);
             assertThat(budget.getStartDate()).isEqualTo(new LocalDate(2015, 01, 01));
             assertThat(budget.getEndDate()).isEqualTo(new LocalDate(2015, 12, 31));
 
             // and when (case no existing budget found)
-            final Budget budgetToBeCreated = budgetRepository.findOrCreateBudget(property, new LocalDate(2017, 01, 01), new LocalDate(2017, 12, 31));
+            final Budget budgetToBeCreated = budgetRepository.findOrCreateBudget(property, BudgetType.SERVICE_CHARGE, new LocalDate(2017, 01, 01), new LocalDate(2017, 12, 31));
             //then
             assertThat(budgetToBeCreated.getProperty()).isEqualTo(property);
             assertThat(budgetToBeCreated.getStartDate()).isEqualTo(new LocalDate(2017, 01, 01));
@@ -176,7 +177,7 @@ public class BudgetRepository_IntegTest extends EstatioIntegrationTest {
             expectedException.expectMessage("Reason: A budget should have an end date in the same year as start date");
 
             // when
-            wrap(budgetRepository).newBudget(property, new LocalDate(2010,01,01), new LocalDate(2011,01,01));
+            wrap(budgetRepository).newBudget(property, BudgetType.SERVICE_CHARGE, new LocalDate(2010,01,01), new LocalDate(2011,01,01));
 
         }
 
@@ -190,7 +191,7 @@ public class BudgetRepository_IntegTest extends EstatioIntegrationTest {
             expectedException.expect(InvalidException.class);
 
             // when
-            wrap(budgetRepository).newBudget(property, null, new LocalDate(2010,12,31));
+            wrap(budgetRepository).newBudget(property, BudgetType.SERVICE_CHARGE, null, new LocalDate(2010,12,31));
         }
 
         @Test
@@ -204,7 +205,7 @@ public class BudgetRepository_IntegTest extends EstatioIntegrationTest {
             expectedException.expectMessage("Reason: End date can not be before start date");
 
             // when
-            wrap(budgetRepository).newBudget(property, new LocalDate(2010,01,03), new LocalDate(2010,01,01));
+            wrap(budgetRepository).newBudget(property, BudgetType.SERVICE_CHARGE, new LocalDate(2010,01,03), new LocalDate(2010,01,01));
 
         }
 
@@ -220,7 +221,7 @@ public class BudgetRepository_IntegTest extends EstatioIntegrationTest {
             expectedException.expectMessage("Reason: A budget cannot overlap an existing budget");
 
             //when
-            wrap(budgetRepository).newBudget(property, new LocalDate(2015,12,30), new LocalDate(2015,12,31));
+            wrap(budgetRepository).newBudget(property, BudgetType.SERVICE_CHARGE, new LocalDate(2015,12,30), new LocalDate(2015,12,31));
 
         }
 

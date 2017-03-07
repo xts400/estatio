@@ -15,6 +15,7 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemValue;
@@ -50,7 +51,7 @@ public class BudgetItemValueRepository_IntegTest extends EstatioIntegrationTest 
 
         // given
         Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-        Budget budget = budgetRepository.findByPropertyAndStartDate(property, new LocalDate(2015, 01, 01));
+        Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, new LocalDate(2015, 01, 01));
         BudgetItem budgetItem = budget.getItems().first();
 
         assertThat(budgetItem.getValues().size()).isEqualTo(1);
@@ -68,7 +69,7 @@ public class BudgetItemValueRepository_IntegTest extends EstatioIntegrationTest 
 
         // given
         Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-        Budget budget = budgetRepository.findByPropertyAndStartDate(property, new LocalDate(2015, 01, 01));
+        Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, new LocalDate(2015, 01, 01));
         BudgetItem budgetItem = budget.getItems().first();
 
         // when
@@ -91,7 +92,7 @@ public class BudgetItemValueRepository_IntegTest extends EstatioIntegrationTest 
         // given
         LocalDate budgetStart = new LocalDate(2015, 01, 01);
         Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-        Budget budget = budgetRepository.findByPropertyAndStartDate(property, budgetStart);
+        Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, budgetStart);
         BudgetItem budgetItem = budget.getItems().first();
 
         assertThat(budgetItem.getValues().size()).isEqualTo(1);
@@ -113,7 +114,7 @@ public class BudgetItemValueRepository_IntegTest extends EstatioIntegrationTest 
         // given
         LocalDate budgetStart = new LocalDate(2015, 01, 01);
         Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-        Budget budget = budgetRepository.findByPropertyAndStartDate(property, budgetStart);
+        Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, budgetStart);
         BudgetItem budgetItem = budget.getItems().first();
 
         assertThat(budgetItem.getValues().size()).isEqualTo(1);

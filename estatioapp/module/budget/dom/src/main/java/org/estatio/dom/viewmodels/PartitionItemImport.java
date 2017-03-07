@@ -23,6 +23,7 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.asset.Unit;
 import org.estatio.dom.asset.UnitRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.partioning.PartitionItemRepository;
 import org.estatio.dom.budgeting.partioning.PartitionItem;
 import org.estatio.dom.budgeting.budget.Budget;
@@ -83,6 +84,9 @@ public class PartitionItemImport implements ExcelFixtureRowHandler, Importable {
     @Getter @Setter
     private BigDecimal percentage;
 
+    @Getter @Setter
+    private String budgetType;
+
 //    @Override
 //    public List<Class> importAfter() {
 //        return Lists.newArrayList(PropertyImport.class);
@@ -106,7 +110,13 @@ public class PartitionItemImport implements ExcelFixtureRowHandler, Importable {
         Property property = propertyRepository.findPropertyByReference(propertyReference);
         if (property == null)
             throw new ApplicationException(String.format("Property with reference [%s] not found.", propertyReference));
-        final Budget budget = budgetRepository.findOrCreateBudget(property, startDate, endDate);
+        BudgetType budgetTypeEnum;
+        if (getBudgetType()==null){
+            budgetTypeEnum = BudgetType.SERVICE_CHARGE; // default value makes import backwards compatible
+        } else {
+            budgetTypeEnum = BudgetType.valueOf(getBudgetType());
+        }
+        final Budget budget = budgetRepository.findOrCreateBudget(property, budgetTypeEnum, startDate, endDate);
         final KeyTable keyTable = keyTableRepository.findOrCreateBudgetKeyTable(budget, keyTableName, FoundationValueType.MANUAL, KeyValueMethod.PERCENT, 6);
         findOrCreateBudgetKeyItem(keyTable, unitRepository.findUnitByReference(unitReference), keyValue, sourceValue);
 

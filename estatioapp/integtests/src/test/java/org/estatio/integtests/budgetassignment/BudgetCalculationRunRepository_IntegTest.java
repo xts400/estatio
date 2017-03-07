@@ -15,6 +15,7 @@ import org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationRun;
 import org.estatio.dom.budgetassignment.calculationresult.BudgetCalculationRunRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetcalculation.Status;
 import org.estatio.dom.lease.Lease;
@@ -57,7 +58,7 @@ public class BudgetCalculationRunRepository_IntegTest extends EstatioIntegration
         });
         propertyOxf = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
         budgetsForOxf = budgetRepository.findByProperty(propertyOxf);
-        budget2015 = budgetRepository.findByPropertyAndStartDate(propertyOxf, BudgetsForOxf.BUDGET_2015_START_DATE);
+        budget2015 = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(propertyOxf, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
     }
 
     public static class FindOrCreate extends BudgetCalculationRunRepository_IntegTest {

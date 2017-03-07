@@ -30,9 +30,10 @@ import org.apache.isis.applib.DomainObjectContainer;
 import org.apache.isis.applib.query.Query;
 import org.apache.isis.core.unittestsupport.jmocking.JUnitRuleMockery2;
 
-import org.incode.module.unittestsupport.dom.repo.FinderInteraction;
-import org.estatio.dom.asset.Property;
 import org.incode.module.base.dom.valuetypes.LocalDateInterval;
+import org.incode.module.unittestsupport.dom.repo.FinderInteraction;
+
+import org.estatio.dom.asset.Property;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -96,14 +97,15 @@ public class BudgetRepository_Test {
 
             Property property = new Property();
             LocalDate startDate = new LocalDate();
-            budgetRepository.findByPropertyAndStartDate(property, startDate);
+            budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, startDate);
 
             assertThat(finderInteraction.getFinderMethod()).isEqualTo(FinderInteraction.FinderMethod.UNIQUE_MATCH);
             assertThat(finderInteraction.getResultType()).isEqualTo(Budget.class);
-            assertThat(finderInteraction.getQueryName()).isEqualTo("findByPropertyAndStartDate");
+            assertThat(finderInteraction.getQueryName()).isEqualTo("findByPropertyAndBudgetTypeAndStartDate");
             assertThat(finderInteraction.getArgumentsByParameterName().get("property")).isEqualTo((Object) property);
+            assertThat(finderInteraction.getArgumentsByParameterName().get("budgetType")).isEqualTo((Object) BudgetType.SERVICE_CHARGE);
             assertThat(finderInteraction.getArgumentsByParameterName().get("startDate")).isEqualTo((Object) startDate);
-            assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(2);
+            assertThat(finderInteraction.getArgumentsByParameterName()).hasSize(3);
         }
 
     }
@@ -146,7 +148,7 @@ public class BudgetRepository_Test {
             });
 
             //when
-            Budget newBudget = budgetRepository.newBudget(property, startDate, endDate);
+            Budget newBudget = budgetRepository.newBudget(property, BudgetType.SERVICE_CHARGE, startDate, endDate);
 
             //then
             assertThat(newBudget.getProperty()).isEqualTo(property);
@@ -170,12 +172,12 @@ public class BudgetRepository_Test {
             // when
             year = 1999;
             // then
-            assertThat(budgetRepository.validateNewBudget(property, year)).isEqualTo("This is not a valid year");
+            assertThat(budgetRepository.validateNewBudget(property, BudgetType.SERVICE_CHARGE, year)).isEqualTo("This is not a valid year");
 
             // when
             year = 3001;
             // then
-            assertThat(budgetRepository.validateNewBudget(property, year)).isEqualTo("This is not a valid year");
+            assertThat(budgetRepository.validateNewBudget(property, BudgetType.SERVICE_CHARGE, year)).isEqualTo("This is not a valid year");
 
         }
 

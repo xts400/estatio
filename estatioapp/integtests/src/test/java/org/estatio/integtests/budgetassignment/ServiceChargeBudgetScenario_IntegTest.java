@@ -32,6 +32,7 @@ import org.estatio.dom.budgetassignment.viewmodels.CalculationResultViewModel;
 import org.estatio.dom.budgetassignment.viewmodels.DetailedCalculationResultViewmodel;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
@@ -137,7 +138,7 @@ ServiceChargeBudgetScenario_IntegTest extends EstatioIntegrationTest {
         public void setup() {
             // given
             property = propertyRepository.findPropertyByReference(PropertyForBudNl.REF);
-            budget = budgetRepository.findByPropertyAndStartDate(property, BudgetForBud.BUDGET_2015_START_DATE);
+            budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetForBud.BUDGET_2015_START_DATE);
             //**IMPORTANT!** truncate keytable
             KeyTable key2 = budget.getKeyTables().last();
             key2.getItems().last().deleteBudgetKeyItem();

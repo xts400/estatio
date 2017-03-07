@@ -14,6 +14,7 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.partioning.Partitioning;
 import org.estatio.dom.budgeting.partioning.PartitioningRepository;
@@ -56,7 +57,7 @@ public class PartitioningRepository_IntegTest extends EstatioIntegrationTest {
 
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             assertThat(budget.getPartitionings().size()).isEqualTo(0);
 
             // when
@@ -78,7 +79,7 @@ public class PartitioningRepository_IntegTest extends EstatioIntegrationTest {
 
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             wrap(partitioningRepository).newPartitioning(budget, budget.getStartDate().plusDays(1), budget.getStartDate().plusDays(2), BudgetCalculationType.BUDGETED);
             assertThat(budget.getPartitionings().size()).isEqualTo(1);
 
@@ -96,7 +97,7 @@ public class PartitioningRepository_IntegTest extends EstatioIntegrationTest {
 
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             wrap(partitioningRepository).newPartitioning(budget, budget.getStartDate(), budget.getEndDate(), BudgetCalculationType.ACTUAL);
 
             // and expect

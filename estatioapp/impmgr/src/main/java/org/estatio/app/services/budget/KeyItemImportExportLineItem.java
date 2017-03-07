@@ -39,6 +39,7 @@ import org.estatio.dom.asset.Unit;
 import org.estatio.dom.asset.UnitRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.keyitem.KeyItem;
 import org.estatio.dom.budgeting.keyitem.KeyItemRepository;
 import org.estatio.dom.budgeting.keytable.KeyTable;
@@ -190,7 +191,7 @@ public class KeyItemImportExportLineItem
     @Programmatic
     public KeyTable getKeyTable() {
         if (keyTable == null) {
-            Budget budget = budgetRepository.findByPropertyAndStartDate(getProperty(),getStartDate());
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(getProperty(), BudgetType.SERVICE_CHARGE, getStartDate());
             keyTable = keyTableRepository.findByBudgetAndName(budget, getKeyTableName());
         }
         return keyTable;

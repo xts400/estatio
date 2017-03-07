@@ -21,6 +21,7 @@ import org.joda.time.LocalDate;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.keytable.FoundationValueType;
 import org.estatio.dom.budgeting.keytable.KeyValueMethod;
 import org.estatio.fixture.asset.PropertyForOxfGb;
@@ -44,7 +45,7 @@ public class KeyTablesForOxf extends KeyTableAbstact {
 
         // exec
         Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-        Budget budget = budgetRepository.findByPropertyAndStartDate(property, START_DATE);
+        Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, START_DATE);
 
         createKeyTable(budget, NAME_BY_AREA, BUDGET_FOUNDATION_VALUE_TYPE, BUDGET_KEY_VALUE_METHOD, NUMBER_OF_DIGITS, executionContext);
         createKeyTable(budget, NAME_BY_COUNT, BUDGET_FOUNDATION_VALUE_TYPE2, BUDGET_KEY_VALUE_METHOD, NUMBER_OF_DIGITS, executionContext);

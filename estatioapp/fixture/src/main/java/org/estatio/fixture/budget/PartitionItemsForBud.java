@@ -23,6 +23,7 @@ import org.joda.time.LocalDate;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.keytable.KeyTable;
 import org.estatio.dom.budgeting.partioning.Partitioning;
@@ -44,7 +45,7 @@ public class PartitionItemsForBud extends PartitionItemAbstact {
         // exec
         Property property = propertyRepository.findPropertyByReference(PropertyForBudNl.REF);
         LocalDate startDate = new LocalDate(2015, 01, 01);
-        Budget budget = budgetRepository.findByPropertyAndStartDate(property, startDate);
+        Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, startDate);
         Charge incomingCharge1 = chargeRepository.findByReference(ChargeRefData.NL_INCOMING_CHARGE_1);
         Charge incomingCharge2 = chargeRepository.findByReference(ChargeRefData.NL_INCOMING_CHARGE_2);
         Charge incomingCharge3 = chargeRepository.findByReference(ChargeRefData.NL_INCOMING_CHARGE_3);

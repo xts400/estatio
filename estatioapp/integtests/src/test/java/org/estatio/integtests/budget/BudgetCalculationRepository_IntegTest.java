@@ -14,6 +14,7 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculation;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationRepository;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationService;
@@ -26,8 +27,8 @@ import org.estatio.dom.charge.Charge;
 import org.estatio.dom.charge.ChargeRepository;
 import org.estatio.fixture.EstatioBaseLineFixture;
 import org.estatio.fixture.asset.PropertyForOxfGb;
-import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.budget.BudgetsForOxf;
+import org.estatio.fixture.budget.PartitionItemsForOxf;
 import org.estatio.fixture.charge.ChargeRefData;
 import org.estatio.integtests.EstatioIntegrationTest;
 
@@ -110,7 +111,7 @@ public class BudgetCalculationRepository_IntegTest extends EstatioIntegrationTes
 
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);
             Charge chargeNotToBeFound = chargeRepository.findByReference(ChargeRefData.GB_INCOMING_CHARGE_1);
             budgetCalculationService.calculatePersistedCalculations(budget);
@@ -137,7 +138,7 @@ public class BudgetCalculationRepository_IntegTest extends EstatioIntegrationTes
 
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             budgetCalculationService.calculatePersistedCalculations(budget);
 
             // when
@@ -162,7 +163,7 @@ public class BudgetCalculationRepository_IntegTest extends EstatioIntegrationTes
 
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             PartitionItem partitionItem = budget.getItems().first().getPartitionItems().get(0);
             budgetCalculationService.calculatePersistedCalculations(budget);
 
@@ -183,7 +184,7 @@ public class BudgetCalculationRepository_IntegTest extends EstatioIntegrationTes
 
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             PartitionItem partitionItem = budget.getItems().first().getPartitionItems().get(0);
             budgetCalculationService.calculatePersistedCalculations(budget);
 

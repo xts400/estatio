@@ -23,6 +23,7 @@ import org.joda.time.LocalDate;
 
 import org.estatio.dom.asset.Property;
 import org.estatio.dom.budgeting.budget.Budget;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemValue;
@@ -53,9 +54,9 @@ public class BudgetsForOxf extends BudgetAbstact {
     private void createBudget(final ExecutionContext executionContext, final Property property, final BigDecimal value1, final BigDecimal value2, final LocalDate budgetStartDate) {
         Budget newBudget = createBudget(
                 property,
+                BudgetType.SERVICE_CHARGE,
                 budgetStartDate,
-                budgetStartDate.plusYears(1).minusDays(1),
-                executionContext);
+                budgetStartDate.plusYears(1).minusDays(1), executionContext);
 
         BudgetItem item1 = createBudgetItem(newBudget,chargeRepository.findByReference(ChargeRefData.GB_INCOMING_CHARGE_1));
         BudgetItem item2 = createBudgetItem(newBudget,chargeRepository.findByReference(ChargeRefData.GB_INCOMING_CHARGE_2));

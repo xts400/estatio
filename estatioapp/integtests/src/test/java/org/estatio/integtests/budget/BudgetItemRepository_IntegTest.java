@@ -18,6 +18,7 @@ import org.estatio.dom.asset.Property;
 import org.estatio.dom.asset.PropertyRepository;
 import org.estatio.dom.budgeting.budget.Budget;
 import org.estatio.dom.budgeting.budget.BudgetRepository;
+import org.estatio.dom.budgeting.budget.BudgetType;
 import org.estatio.dom.budgeting.budgetcalculation.BudgetCalculationType;
 import org.estatio.dom.budgeting.budgetitem.BudgetItem;
 import org.estatio.dom.budgeting.budgetitem.BudgetItemRepository;
@@ -62,7 +63,7 @@ public class BudgetItemRepository_IntegTest extends EstatioIntegrationTest {
         public void happyCase() throws Exception {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, BudgetsForOxf.BUDGET_2015_START_DATE);
             // when
             final List<BudgetItem> budgetList = budgetItemRepository.findByBudget(budget);
             // then
@@ -79,7 +80,7 @@ public class BudgetItemRepository_IntegTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             LocalDate startDate = BudgetsForOxf.BUDGET_2016_START_DATE;
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, startDate);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, startDate);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_INCOMING_CHARGE_1);
             // when
             final BudgetItem item = budgetItemRepository.findByBudgetAndCharge(budget, charge);
@@ -121,7 +122,7 @@ public class BudgetItemRepository_IntegTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             LocalDate startDate = BudgetsForOxf.BUDGET_2016_START_DATE;
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, startDate);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, startDate);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_INCOMING_CHARGE_3);
             budgetedValue = new BigDecimal("1234.56");
 
@@ -151,7 +152,7 @@ public class BudgetItemRepository_IntegTest extends EstatioIntegrationTest {
             // given
             Property property = propertyRepository.findPropertyByReference(PropertyForOxfGb.REF);
             LocalDate startDate = BudgetsForOxf.BUDGET_2016_START_DATE;
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, startDate);
+            Budget budget = budgetRepository.findByPropertyAndBudgetTypeAndStartDate(property, BudgetType.SERVICE_CHARGE, startDate);
             Charge charge = chargeRepository.findByReference(ChargeRefData.GB_INCOMING_CHARGE_1);
             budgetedValue = new BigDecimal("1234.56");
 
