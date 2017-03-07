@@ -110,12 +110,13 @@ public class Budget extends UdoDomainObject2<Budget>
         implements WithIntervalMutable<Budget>, WithApplicationTenancyProperty, BudgetItemCreator {
 
     public Budget() {
-        super("property, startDate");
+        super("property, budgetType, startDate");
     }
 
     public String title() {
         return TitleBuilder.start()
                 .withParent(getProperty())
+                .withName(getBudgetType().name().concat(" "))
                 .withName(getBudgetYear())
                 .toString();
     }

@@ -56,6 +56,7 @@ public class Budget_Test {
 
             final Budget budget = new Budget();
             budget.setProperty(property);
+            budget.setBudgetType(BudgetType.SERVICE_CHARGE);
             LocalDate startDate = new LocalDate(2015, 1, 1);
             LocalDate endDate = new LocalDate(2016, 1, 1);
             budget.setStartDate(startDate);
@@ -68,7 +69,10 @@ public class Budget_Test {
             assertThat(budgetTitle).isEqualTo(
                     property.getClass().getSimpleName()
                             + " [" + property.getReference() + "]"
-                            + " > " + budget.getBudgetYear());
+                            + " > "
+                            + budget.getBudgetType().name()
+                            + " "
+                            + budget.getBudgetYear());
         }
     }
 

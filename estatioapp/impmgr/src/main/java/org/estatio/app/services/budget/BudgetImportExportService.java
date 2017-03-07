@@ -72,6 +72,7 @@ public class BudgetImportExportService {
         List<BudgetImportExport> lines = new ArrayList<>();
 
         String propertyReference = manager.getBudget().getProperty().getReference();
+        String budgetType = manager.getBudget().getBudgetType().name();
         LocalDate budgetStartDate = manager.getBudget().getStartDate();
         LocalDate budgetEndDate = manager.getBudget().getEndDate();
         String budgetChargeReference = item.getCharge().getReference();
@@ -80,7 +81,7 @@ public class BudgetImportExportService {
 
         if (item.getPartitionItems().size()==0){
             // create 1 line
-            lines.add(new BudgetImportExport(propertyReference,budgetStartDate,budgetEndDate, budgetChargeReference,budgetedValue,auditedValue,null,null,null, null, null));
+            lines.add(new BudgetImportExport(propertyReference, budgetType, budgetStartDate, budgetEndDate, budgetChargeReference, budgetedValue, auditedValue, null, null, null, null, null));
 
         } else {
             // create a line for each partion item
@@ -90,7 +91,7 @@ public class BudgetImportExportService {
                 String keyValueMethod = allocation.getKeyTable().getKeyValueMethod().toString();
                 String allocationChargeReference = allocation.getCharge().getReference();
                 BigDecimal percentage = allocation.getPercentage();
-                lines.add(new BudgetImportExport(propertyReference, budgetStartDate, budgetEndDate, budgetChargeReference, budgetedValue, auditedValue, keyTableName, foundationValueType, keyValueMethod, allocationChargeReference, percentage));
+                lines.add(new BudgetImportExport(propertyReference, budgetType, budgetStartDate, budgetEndDate, budgetChargeReference, budgetedValue, auditedValue, keyTableName, foundationValueType, keyValueMethod, allocationChargeReference, percentage));
             }
 
         }

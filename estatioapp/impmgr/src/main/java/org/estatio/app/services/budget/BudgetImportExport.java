@@ -49,6 +49,7 @@ public class BudgetImportExport implements Importable {
 
     public BudgetImportExport(
             final String propertyReference,
+            final String budgetType,
             final LocalDate budgetStartDate,
             final LocalDate budgetEndDate,
             final String budgetChargeReference,
@@ -59,8 +60,9 @@ public class BudgetImportExport implements Importable {
             final String keyValueMethod,
             final String invoiceChargeReference,
             final BigDecimal percentage
-            ){
+    ){
         this.propertyReference = propertyReference;
+        this.budgetType = budgetType;
         this.budgetStartDate = budgetStartDate;
         this.budgetEndDate = budgetEndDate;
         this.budgetChargeReference = budgetChargeReference;
@@ -75,6 +77,8 @@ public class BudgetImportExport implements Importable {
 
     @Getter @Setter
     private String propertyReference;
+    @Getter @Setter
+    private String budgetType;
     @Getter @Setter
     private LocalDate budgetStartDate;
     @Getter @Setter
@@ -110,7 +114,13 @@ public class BudgetImportExport implements Importable {
         if (property == null) throw  new ApplicationException(String.format("Property with reference [%s] not found.", getPropertyReference()));
         Charge sourceCharge = fetchCharge(getBudgetChargeReference());
         Charge targetCharge = fetchCharge(getInvoiceChargeReference());
-        Budget budget = budgetRepository.findOrCreateBudget(property, BudgetType.SERVICE_CHARGE, getBudgetStartDate(), getBudgetEndDate());
+        BudgetType budgetTypeEnum;
+        if (getBudgetType()==null){
+            budgetTypeEnum = BudgetType.SERVICE_CHARGE; // default for backwards compatibility
+        } else {
+            budgetTypeEnum = BudgetType.valueOf(getBudgetType());
+        }
+        Budget budget = budgetRepository.findOrCreateBudget(property, budgetTypeEnum, getBudgetStartDate(), getBudgetEndDate());
         KeyTable keyTable = findOrCreateKeyTable(budget, getKeyTableName(), getFoundationValueType(), getKeyValueMethod());
         PartitionItem partitionItem =
                 budget
