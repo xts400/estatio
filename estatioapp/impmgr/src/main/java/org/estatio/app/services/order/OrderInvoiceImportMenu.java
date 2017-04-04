@@ -16,8 +16,6 @@
  */
 package org.estatio.app.services.order;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.apache.isis.applib.annotation.Action;
@@ -40,14 +38,12 @@ public class OrderInvoiceImportMenu {
 
     @Action(semantics = SemanticsOf.IDEMPOTENT)
     @MemberOrder(sequence = "1")
-    public OrderInvoiceImportManager importOrdersAndInvoicesNotWorking(final Blob spreadSheet) {
-        return new OrderInvoiceImportManager(spreadSheet);
+    public Blob importOrdersAndInvoices(final String sheetNameStartsWith, final Blob spreadSheet) {
+        return orderInvoiceImportService.createSheet(orderInvoiceImportService.createLines(sheetNameStartsWith, spreadSheet));
     }
 
-    @Action(semantics = SemanticsOf.IDEMPOTENT)
-    @MemberOrder(sequence = "1")
-    public List<OrderInvoiceImportLine> importOrdersAndInvoicesWorking(final Blob spreadSheet) {
-        return orderInvoiceImportService.createLines(spreadSheet);
+    public String default0ImportOrdersAndInvoices(){
+        return "budget travaux";
     }
 
     @Inject

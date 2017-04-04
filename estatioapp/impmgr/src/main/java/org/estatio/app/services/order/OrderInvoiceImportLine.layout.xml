@@ -10,7 +10,7 @@
                 <ns2:property id="orderNumber" />
                 <ns2:property id="charge" />
                 <ns2:property id="entryDate" />
-                <ns2:property id="odrerDate" />
+                <ns2:property id="orderDate" />
                 <ns2:property id="seller" />
                 <ns2:property id="orderDescription" />
                 <ns2:property id="netAmount" />

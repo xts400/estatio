@@ -24,6 +24,7 @@ import javax.inject.Inject;
 
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
+import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.value.Blob;
 
 import org.isisaddons.module.excel.dom.ExcelService;
@@ -40,12 +41,12 @@ public class OrderInvoiceImportService {
         }
     }
 
-    public List<OrderInvoiceImportLine> createLines(final Blob spreadsheet){
+    public List<OrderInvoiceImportLine> createLines(final String sheetNameMatcher, final Blob spreadsheet){
         List<OrderInvoiceImportLine> result = new ArrayList<>();
         List<List<?>> res = excelService.fromExcel(
                 spreadsheet,
                 sheetName -> {
-                    if(sheetName.startsWith("OrderInvoice")) {
+                    if(sheetName.startsWith(sheetNameMatcher)) {
                         return new WorksheetSpec(
                                 OrderInvoiceImportLine.class,
                                 sheetName,
@@ -68,6 +69,10 @@ public class OrderInvoiceImportService {
         return result;
     }
 
+    @Programmatic
+    public Blob createSheet(final List<OrderInvoiceImportLine> lines){
+        return excelService.toExcel(lines, OrderInvoiceImportLine.class, "OrderInvoiceImportLine", "result.xlsx");
+    }
 
     @Inject
     private ExcelService excelService;
