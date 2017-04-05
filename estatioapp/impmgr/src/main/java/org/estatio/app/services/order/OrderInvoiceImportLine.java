@@ -127,50 +127,63 @@ public class OrderInvoiceImportLine implements FixtureAwareRowHandler<OrderInvoi
             setRowCounter(1);
         } else {
             setRowCounter(previousRow.getRowCounter() + 1);
+
+            // support sparse population for charge
             if (getCharge() == null && previousRow.getCharge() != null) {
                 setCharge(previousRow.getCharge());
             }
+            // support sparse population for project reference
             if (getProjectReference() == null && previousRow.getProjectReference() != null){
                 setProjectReference(previousRow.getProjectReference());
             }
+            // support sparse population for period
             if (getPeriod() == null && previousRow.getPeriod() != null){
                 setPeriod(previousRow.getPeriod());
             }
+            // support sparse population for tax
             if (getTax() == null && previousRow.getTax() != null){
                 setTax(previousRow.getTax());
+            }
+
+            // copy seller and order description when multiple invoice lines
+            if (getEntryDate()==null && invoiceNumberToUse()!=null){
+                if (getSeller()==null && previousRow.getSeller()!=null){
+                    setSeller(previousRow.getSeller());
+                }
+                if (getOrderDescription()==null && previousRow.getOrderDescription()!=null){
+                    setOrderDescription(previousRow.getOrderDescription());
+                }
             }
         }
 
         OrderInvoiceImportLine lineItem = null;
 
-        setStatus(validateRow());
-
-        if (entryDate!=null || (invoiceNumber != null && invoiceNumber.matches(".*\\d.*"))) {
+        if (getEntryDate()!=null || invoiceNumberToUse()!=null) {
             lineItem = new OrderInvoiceImportLine(
-                    rowCounter,
-                    status,
-                    clean(orderNumber),
-                    charge,
-                    entryDate,
-                    orderDate,
-                    seller,
-                    orderDescription,
-                    netAmount!=null ? netAmount.setScale(2, BigDecimal.ROUND_HALF_UP):null,
-                    vatAmount!=null ? vatAmount.setScale(2, BigDecimal.ROUND_HALF_UP):null,
-                    grossAmountToUse()!=null ? grossAmountToUse().setScale(2, BigDecimal.ROUND_HALF_UP):null,
-                    clean(orderApprovedBy),
-                    orderApprovedOn,
-                    projectReference,
-                    period,
+                    getRowCounter(),
+                    validateRow(),
+                    clean(getOrderNumber()),
+                    getCharge(),
+                    getEntryDate(),
+                    getOrderDate(),
+                    getSeller(),
+                    getOrderDescription(),
+                    netAmountToUse(),
+                    vatAmountToUse(),
+                    grossAmountToUse(),
+                    clean(getOrderApprovedBy()),
+                    getOrderApprovedOn(),
+                    getProjectReference(),
+                    getPeriod(),
                     taxToUse(),
-                    clean(invoiceNumber),
+                    invoiceNumberToUse(),
                     invoiceDescriptionToUse(),
-                    invoiceNetAmountToUse()!=null?invoiceNetAmountToUse().setScale(2, BigDecimal.ROUND_HALF_UP):null,
-                    invoiceVatAmountToUse()!=null?invoiceVatAmountToUse().setScale(2, BigDecimal.ROUND_HALF_UP):null,
-                    invoiceGrossAmountToUse()!=null?invoiceGrossAmountToUse().setScale(2, BigDecimal.ROUND_HALF_UP):null,
+                    invoiceNetAmountToUse(),
+                    invoiceVatAmountToUse(),
+                    invoiceGrossAmountToUse(),
                     invoiceTaxToUse(),
-                    this.executionContext,
-                    this.excelFixture2
+                    null,
+                    null
             );
         }
 
@@ -210,21 +223,36 @@ public class OrderInvoiceImportLine implements FixtureAwareRowHandler<OrderInvoi
         return result;
     }
 
+    private BigDecimal netAmountToUse(){
+        return getNetAmount()!=null ? getNetAmount().setScale(2, BigDecimal.ROUND_HALF_UP):null;
+    }
+
+    private BigDecimal vatAmountToUse(){
+        return getVatAmount()!=null ? getVatAmount().setScale(2, BigDecimal.ROUND_HALF_UP):null;
+    }
+
     private BigDecimal grossAmountToUse(){
         if (getGrossAmount() != null){
-            return getGrossAmount();
+            return getGrossAmount().setScale(2, BigDecimal.ROUND_HALF_UP);
         }
         if (getNetAmount()!= null && getVatAmount() != null) {
-            return getNetAmount().add(getVatAmount());
+            return getNetAmount().add(getVatAmount()).setScale(2, BigDecimal.ROUND_HALF_UP);
         }
         if (getNetAmount()!= null && taxToUse().equals("FRE")){
-            return getNetAmount();
+            return getNetAmount().setScale(2, BigDecimal.ROUND_HALF_UP);
         }
         return null;
     }
 
     private String taxToUse(){
         return getTax() != null ? convert(getTax()) : null;
+    }
+
+    private String invoiceNumberToUse(){
+        if (getInvoiceNumber()==null || !getInvoiceNumber().matches(".*\\d.*")){
+            return null;
+        }
+        return clean(getInvoiceNumber());
     }
 
     private String invoiceTaxToUse(){
@@ -238,21 +266,21 @@ public class OrderInvoiceImportLine implements FixtureAwareRowHandler<OrderInvoi
         if (getInvoiceNumber()==null){
             return null;
         }
-        return getInvoiceNetAmount() != null ? getInvoiceNetAmount() : getNetAmount();
+        return getInvoiceNetAmount() != null ? getInvoiceNetAmount().setScale(2, BigDecimal.ROUND_HALF_UP) : netAmountToUse();
     }
 
     private BigDecimal invoiceGrossAmountToUse(){
         if (getInvoiceNumber()==null){
             return null;
         }
-        return getInvoiceGrossAmount() !=null ? getInvoiceGrossAmount() : grossAmountToUse();
+        return getInvoiceGrossAmount() !=null ? getInvoiceGrossAmount().setScale(2, BigDecimal.ROUND_HALF_UP) : grossAmountToUse();
     }
 
     private BigDecimal invoiceVatAmountToUse(){
         if (getInvoiceNumber()==null){
             return null;
         }
-        return getInvoiceVatAmount() != null ? getInvoiceVatAmount() : getVatAmount();
+        return getInvoiceVatAmount() != null ? getInvoiceVatAmount().setScale(2, BigDecimal.ROUND_HALF_UP) : vatAmountToUse();
     }
 
     private String invoiceDescriptionToUse(){
@@ -280,9 +308,6 @@ public class OrderInvoiceImportLine implements FixtureAwareRowHandler<OrderInvoi
         }
         // order validation
         if (getEntryDate()!=null) {
-            if (getOrderNumber() == null || getOrderNumber().equals("")) {
-                b.append("no ordernumber; ");
-            }
             if (getVatAmount() == null && taxToUse()!=null && !taxToUse().equals("FRE")) {
                 b.append("no vat amount; ");
             }
@@ -318,12 +343,13 @@ public class OrderInvoiceImportLine implements FixtureAwareRowHandler<OrderInvoi
                 "PROJECT MANAGEMENT",
                 "TAX",
                 "WORKS",
-                "RELOCATION FEES",
-                "ARCHITECT FEES",
+                "RELOCATION / DISPOSSESSION INDEMNITY",
+                "ARCHITECT / GEOMETRICIAN FEES",
                 "LEGAL FEES",
                 "MARKETING",
-                "INSTALLATION WORKS",
+                "TENANT INSTALLATION WORKS",
                 "SECURITY AGENTS",
+                "LETTING FEES",
                 "OTHER"
         );
         if (getCharge()!=null && !charges.contains(getCharge())){
