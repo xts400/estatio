@@ -12,6 +12,8 @@ import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.Programmatic;
+import org.apache.isis.applib.annotation.PromptStyle;
+import org.apache.isis.applib.annotation.PropertyLayout;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.services.clock.ClockService;
 
@@ -93,6 +95,7 @@ public class IncomingOrderAndInvoiceViewModel extends HasDocumentAbstract {
         return this;
     }
 
+    @PropertyLayout(promptStyle = PromptStyle.INLINE)
     private String description;
     @Action(
             semantics = SemanticsOf.IDEMPOTENT
