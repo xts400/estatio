@@ -40,10 +40,12 @@
                                     <fieldSet name="Order" unreferencedProperties="false">
                                         <action id="changeOrderDetails"/>
                                         <property id="orderNumber"/>
-                                        <property id="buyer"/>
-                                        <property id="seller"/>
-                                        <property id="sellerOrderReference"/>
-                                        <property id="orderDate"/>
+                                        <property id="buyer">
+                                            <action id="changeBuyer" promptStyle="INLINE" position="RIGHT"/>
+                                        </property>
+                                        <property id="seller" promptStyle="INLINE"/>
+                                        <property id="sellerOrderReference" promptStyle="INLINE"/>
+                                        <property id="orderDate" promptStyle="INLINE"/>
                                     </fieldSet>
                                     <fieldSet name="Order Item" unreferencedProperties="false">
                                         <action id="changeItemDetails"/>
@@ -55,9 +57,9 @@
                                     </fieldSet>
                                     <fieldSet name="Dimensions" unreferencedProperties="false">
                                         <action id="changeDimensions"/>
-                                        <property id="charge"/>
-                                        <property id="fixedAsset"/>
-                                        <property id="project"/>
+                                        <property id="charge" promptStyle="INLINE"/>
+                                        <property id="fixedAsset" promptStyle="INLINE"/>
+                                        <property id="project" promptStyle="INLINE"/>
                                         <property id="period"/>
                                     </fieldSet>
                                 </bs3:col>
